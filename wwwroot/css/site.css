@@ -1,833 +1,308 @@
-/* =========================
-   HOME HERO
-========================= */
-
-.home-hero {
-    position: relative;
-    min-height: 420px;
-
-    background-image: url('/images/home.jpeg');
-    background-size: cover;
-    background-position: center;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: white;
-}
-
-.hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.60);
-}
-
-.hero-content {
-    position: relative;
-    z-index: 1;
-
-    max-width: 1000px;
-    padding: 60px 20px;
-}
-
-.hero-content h1 {
-    font-size: 42px;
-    font-weight: 700;
-    margin-bottom: 20px;
-}
-
-.hero-content p {
-    font-size: 18px;
-    line-height: 1.6;
-    margin-bottom: 25px;
-}
-
-.hero-content blockquote {
-    font-size: 20px;
-    font-style: italic;
-    margin: 0;
-}
-
-
-/* =========================
-   STATISTICS
-========================= */
-
-.statistics-section {
-    max-width: 1100px;
-
-    margin: 20px auto 70px;
-
-    padding: 0 20px;
-
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-
-    gap: 20px;
-}
-
-.stat-card {
-    background: white;
-
-    border: 1px solid #e5e7eb;
-
-    border-radius: 4px;
-
-    padding: 25px 15px;
-
-    text-align: center;
-
-    min-height: 125px;
-
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.stat-icon {
-    font-size: 30px;
-    color: #1769c2;
-
-    margin-bottom: 8px;
-}
-
-.stat-card h3 {
-    font-size: 18px;
-    margin: 0 0 8px;
-
-    color: #222;
-}
-
-.stat-card p {
-    margin: 0;
-
-    font-size: 16px;
-    color: #555;
-}
-
-
-/* =========================
-   LATEST UPDATES
-========================= */
-
-.updates-section {
-    max-width: 1100px;
-
-    margin: 0 auto;
-
-    padding: 0 20px 60px;
-}
-
-.section-header {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin-bottom: 25px;
-}
-
-.section-header h2 {
-    color: #1769c2;
-
-    font-size: 26px;
-
-    font-weight: 700;
-
-    margin: 0;
-}
-
-.view-all-btn {
-    border: 1px solid #777;
-
-    color: #444;
-
-    padding: 7px 14px;
-
-    border-radius: 4px;
-
-    text-decoration: none;
-
-    font-size: 13px;
-}
-
-.view-all-btn:hover {
-    background: #f3f4f6;
-}
-
-
-/* =========================
-   UPDATE CARDS
-========================= */
-
-.updates-grid {
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 20px;
-}
-
-.update-card {
-    background: white;
-
-    border-radius: 5px;
-
-    overflow: hidden;
-
-    border: 1px solid #e5e7eb;
-
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-}
-
-.update-card img {
-    width: 100%;
-
-    height: 180px;
-
-    object-fit: cover;
-
-    display: block;
-}
-
-.update-content {
-    padding: 18px;
-}
-
-.update-content h3 {
-    font-size: 18px;
-
-    margin-bottom: 8px;
-}
-
-.update-content p {
-    color: #666;
-
-    font-size: 14px;
-
-    margin: 0;
-
-    line-height: 1.5;
-}
-
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 768px) {
-
-    .statistics-section {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .updates-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .hero-content h1 {
-        font-size: 30px;
-    }
-
-    .hero-content p {
-        font-size: 16px;
-    }
-}
-
-
-@media (max-width: 500px) {
-
-    .statistics-section {
-        grid-template-columns: 1fr;
-    }
-}
 /* =========================================
-   ONUDHABON HOME PAGE
+   HOME PAGE
 ========================================= */
-
-.onudhabon-hero {
-    position: relative;
-
-    width: 100%;
-    min-height: 390px;
-
-    background-image: url('/images/home-hero.jpg');
-    background-size: cover;
-    background-position: center;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: white;
-}
-
-.hero-overlay {
-    position: absolute;
-    inset: 0;
-
-    background: rgba(0, 0, 0, 0.60);
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-
-    width: 100%;
-    max-width: 1000px;
-
-    padding: 60px 25px;
-
-    text-align: center;
-}
-
-.hero-content h1 {
-    margin: 0 0 18px;
-
-    font-size: 42px;
-    font-weight: 800;
-
-    color: white;
-}
-
-.hero-content p {
-    max-width: 950px;
-
-    margin: 0 auto 25px;
-
-    font-size: 17px;
-    line-height: 1.7;
-
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.hero-quote {
-    font-size: 19px;
-    font-style: italic;
-
-    color: rgba(255, 255, 255, 0.9);
-}
-
-
-/* =========================================
-   STATISTICS
-========================================= */
-
-.stats-wrapper {
-    width: 100%;
-
-    background: #f5f5f5;
-
-    padding: 20px 20px 55px;
-}
-
-.stats-container {
-    width: 100%;
-    max-width: 1010px;
-
-    margin: 0 auto;
-
-    display: grid;
-
-    grid-template-columns: repeat(4, 1fr);
-
-    gap: 18px;
-}
-
-.stat-card {
-    min-height: 128px;
-
-    background: #ffffff;
-
-    border: 1px solid #e1e1e1;
-
-    border-radius: 4px;
-
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-}
-
-.stat-icon {
-    margin-bottom: 7px;
-
-    font-size: 31px;
-
-    color: #1769c2;
-}
-
-.stat-number {
-    font-size: 17px;
-
-    font-weight: 600;
-
-    color: #222;
-
-    margin-bottom: 6px;
-}
-
-.stat-label {
-    font-size: 15px;
-
-    color: #555;
-}
-
-
-/* =========================================
-   LATEST UPDATES
-========================================= */
-
-.latest-updates {
-    max-width: 1010px;
-
-    margin: 0 auto;
-
-    padding: 0 20px 70px;
-}
-
-.updates-heading {
-    display: flex;
-
-    align-items: center;
-    justify-content: space-between;
-
-    margin-bottom: 22px;
-}
-
-.updates-heading h2 {
-    margin: 0;
-
-    font-size: 26px;
-
-    font-weight: 700;
-
-    color: #1769c2;
-}
-
-.view-all-btn {
-    padding: 7px 13px;
-
-    border: 1px solid #888;
-
-    border-radius: 4px;
-
-    background: white;
-
-    color: #444;
-
-    font-size: 13px;
-
-    text-decoration: none;
-}
-
-.view-all-btn:hover {
-    background: #f2f2f2;
-
-    color: #222;
-}
-
-
-/* =========================================
-   UPDATE CARDS
-========================================= */
-
-.updates-grid {
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 20px;
-}
-
-.update-card {
-    overflow: hidden;
-
-    background: white;
-
-    border: 1px solid #ddd;
-
-    border-radius: 5px;
-
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-}
-
-.update-card img {
-    display: block;
-
-    width: 100%;
-    height: 175px;
-
-    object-fit: cover;
-}
-
-.update-card-body {
-    padding: 17px;
-}
-
-.update-card-body h3 {
-    margin: 0 0 8px;
-
-    font-size: 18px;
-
-    font-weight: 700;
-
-    color: #222;
-}
-
-.update-card-body p {
-    margin: 0;
-
-    font-size: 14px;
-
-    line-height: 1.5;
-
-    color: #666;
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 800px) {
-
-    .stats-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .updates-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .hero-content h1 {
-        font-size: 32px;
-    }
-}
-
-
-@media (max-width: 500px) {
-
-    .stats-container {
-        grid-template-columns: 1fr;
-    }
-
-    .hero-content h1 {
-        font-size: 27px;
-    }
-
-    .hero-content p {
-        font-size: 15px;
-    }
-
-    .updates-heading {
-        align-items: flex-start;
-
-        gap: 10px;
-    }
-}
-/* =========================================
-   ONUDHABON HOME PAGE
-========================================= */
-
-.hero-section {
-    position: relative;
-    min-height: 400px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background-image: url('/images/home-hero.jpg');
-    background-size: cover;
-    background-position: center;
-
-    padding: 70px 20px;
-}
-
-.hero-section::before {
-    content: "";
-
-    position: absolute;
-    inset: 0;
-
-    background: rgba(0, 0, 0, 0.60);
-}
-
-.hero-content {
-    position: relative;
-    z-index: 1;
-
-    max-width: 950px;
-
-    margin: auto;
-}
-
-.hero-content h1 {
-    color: white;
-
-    margin-bottom: 20px;
-}
-
-.mission-statement {
-    max-width: 900px;
-
-    margin-left: auto;
-    margin-right: auto;
-
-    line-height: 1.7;
-}
-
-.stat-box {
-    background: white;
-
-    min-height: 140px;
-
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: center;
-}
-
-.stat-box i {
-    font-size: 32px;
-}
-
-.stat-box h5 {
-    font-weight: 700;
-
-    color: #222;
-}
-
-.stat-box p {
-    color: #555;
-}
-
-.home-page .card {
-    border: 1px solid #ddd;
-
-    border-radius: 5px;
-
-    transition: transform 0.2s ease,
-                box-shadow 0.2s ease;
-}
-
-.home-page .card:hover {
-    transform: translateY(-3px);
-
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
 
 .home-page {
     background: #dfe0e3;
     color: #1f2937;
     font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+    min-height: 100vh;
 }
+
+
+/* =========================================
+   HERO
+========================================= */
 
 .home-hero {
     position: relative;
-    height: 410px;
+    min-height: 340px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     background-image: url('/images/home.jpeg');
     background-size: cover;
     background-position: center;
-    margin-top: 8px;
+
     overflow: hidden;
 }
 
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(14, 15, 18, 0.58);
+    background: rgba(7, 10, 18, 0.62);
 }
 
 .hero-content {
     position: relative;
     z-index: 1;
-    width: min(100%, 980px);
+
+    width: min(1000px, 90%);
+    margin: 0 auto;
+
     text-align: center;
     color: #fff;
-    padding: 30px 24px;
+
+    padding: 40px 20px;
 }
 
 .hero-content h1 {
-    margin: 0 0 18px;
+    margin: 0 0 16px;
+
+    font-size: clamp(2.2rem, 3.2vw, 3.5rem);
     font-weight: 800;
-    font-size: clamp(2.2rem, 4vw, 4rem);
-    line-height: 1.1;
+    line-height: 1.12;
+
     color: #fff;
 }
 
 .hero-content p {
-    max-width: 820px;
-    margin: 0 auto 28px;
-    font-size: 1.08rem;
-    line-height: 1.8;
-    color: rgba(255, 255, 255, 0.9);
+    max-width: 800px;
+
+    margin: 0 auto 20px;
+
+    font-size: 0.95rem;
+    line-height: 1.6;
+
+    color: rgba(255, 255, 255, 0.92);
 }
 
 .hero-content blockquote {
-    margin: 0 auto;
     max-width: 700px;
-    font-size: clamp(1.2rem, 2vw, 2rem);
+
+    margin: 0 auto;
+
+    font-size: clamp(1.1rem, 1.8vw, 1.6rem);
     line-height: 1.5;
+
     font-style: italic;
+
     color: rgba(255, 255, 255, 0.95);
 }
 
+
+/* =========================================
+   STATISTICS
+========================================= */
+
 .home-stats {
-    max-width: 1200px;
+    max-width: 1080px;
+
     margin: 0 auto;
-    padding: 34px 24px 18px;
+
+    padding: 28px 20px 18px;
+
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
+
     gap: 16px;
-    background: transparent;
 }
 
 .stat-item {
+    min-height: 140px;
+
     background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(20, 28, 45, 0.07);
+
+    border: 1px solid rgba(15, 23, 42, 0.08);
     border-radius: 8px;
-    min-height: 170px;
+
     display: flex;
     flex-direction: column;
+
     align-items: center;
     justify-content: center;
+
     text-align: center;
-    box-shadow: 0 1px 8px rgba(15, 23, 42, 0.03);
+
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+
+    padding: 15px;
 }
 
 .stat-icon {
-    width: 62px;
-    height: 62px;
+    width: 52px;
+    height: 52px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     border: 2px solid #2d7df6;
     border-radius: 50%;
-    font-size: 2rem;
+
+    font-size: 1.5rem;
+
     color: #2d7df6;
-    margin-bottom: 12px;
+
+    margin-bottom: 10px;
+
     background: rgba(45, 125, 246, 0.05);
 }
 
 .stat-value {
-    font-size: clamp(1.25rem, 2vw, 2.1rem);
+    font-size: clamp(1.1rem, 1.8vw, 1.5rem);
     font-weight: 700;
+
     color: #1f2937;
+
     margin-bottom: 4px;
 }
 
 .stat-label {
-    font-size: 1.02rem;
-    line-height: 1.45;
+    font-size: 0.9rem;
+    line-height: 1.4;
+
     color: #4b5563;
 }
 
+
+/* =========================================
+   LATEST UPDATES
+========================================= */
+
 .home-updates {
-    max-width: 1240px;
+    max-width: 1080px;
+
     margin: 0 auto;
-    padding: 26px 24px 24px;
+
+    padding: 24px 20px 55px;
 }
 
 .section-header {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     margin-bottom: 20px;
 }
 
 .section-header h2 {
     margin: 0;
-    font-size: clamp(2rem, 2vw, 2.4rem);
+
+    font-size: clamp(1.6rem, 2.2vw, 2rem);
     font-weight: 700;
+
     color: #1f2937;
 }
 
 .view-all-btn {
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
+
+    padding: 8px 15px;
+
     background: rgba(255, 255, 255, 0.72);
+
     border: 1px solid rgba(15, 23, 42, 0.18);
     border-radius: 6px;
-    padding: 10px 18px;
-    font-size: 0.95rem;
+
+    font-size: 0.85rem;
+
     color: #1f2937;
     text-decoration: none;
 }
 
+.view-all-btn:hover {
+    background: #f2f2f2;
+}
+
+
+/* =========================================
+   UPDATE CARDS
+========================================= */
+
 .updates-grid {
     display: grid;
+
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 22px;
+
+    gap: 16px;
 }
 
 .update-card {
     background: rgba(255, 255, 255, 0.9);
+
     border: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 10px;
+    border-radius: 8px;
+
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
 }
 
 .update-card img {
     display: block;
+
     width: 100%;
-    height: 215px;
+    height: 180px;
+
     object-fit: cover;
 }
 
 .update-card-body {
-    padding: 18px 18px 22px;
+    padding: 15px;
 }
 
 .update-card-body h3 {
-    margin: 0 0 12px;
-    font-size: 1.05rem;
+    margin: 0 0 8px;
+
+    font-size: 1rem;
     line-height: 1.35;
     font-weight: 700;
+
     color: #1f2937;
 }
 
 .update-card-body p {
     margin: 0;
+
     color: #5b6472;
-    line-height: 1.65;
-    font-size: 0.98rem;
+
+    line-height: 1.55;
+
+    font-size: 0.85rem;
 }
+
+
+/* =========================================
+   UPDATE PANEL
+========================================= */
 
 .toggle-update,
 .close-panel {
     background: transparent;
     border: none;
-    color: #1d72d8;
-    font-weight: 600;
-    padding: 0;
-    margin-top: 14px;
-    cursor: pointer;
-    font-size: 1rem;
-}
 
-.toggle-update.active {
     color: #1d72d8;
+
+    font-weight: 600;
+
+    padding: 0;
+    margin-top: 12px;
+
+    cursor: pointer;
+
+    font-size: 0.9rem;
 }
 
 .update-panel {
     display: none;
-    margin-top: 22px;
+
+    margin-top: 18px;
+
     background: rgba(255, 255, 255, 0.75);
+
     border: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 10px;
-    padding: 22px 24px 18px;
-    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+    border-radius: 8px;
+
+    padding: 20px;
+
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
 }
 
 .update-panel.active {
@@ -836,29 +311,41 @@
 
 .update-panel-header {
     display: flex;
+
     flex-wrap: wrap;
+
     align-items: center;
-    gap: 10px 12px;
-    margin-bottom: 16px;
+
+    gap: 8px 10px;
+
+    margin-bottom: 14px;
 }
 
 .update-panel-header h3 {
     margin: 0;
-    font-size: clamp(1.6rem, 2vw, 2.2rem);
+
+    font-size: clamp(1.4rem, 2vw, 1.9rem);
     font-weight: 700;
+
     color: #1f2937;
+
     line-height: 1.25;
 }
 
 .panel-date,
 .panel-tag {
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
-    padding: 4px 10px;
+
+    padding: 4px 9px;
+
     border-radius: 6px;
-    font-size: 0.82rem;
+
+    font-size: 0.75rem;
     line-height: 1;
+
     font-weight: 600;
 }
 
@@ -874,105 +361,213 @@
 
 .update-panel p {
     margin: 0;
+
     color: #4b5563;
-    font-size: 1rem;
-    line-height: 1.7;
+
+    font-size: 0.9rem;
+    line-height: 1.6;
 }
 
 .close-panel {
-    margin-top: 18px;
+    margin-top: 15px;
+
     background: rgba(148, 163, 184, 0.18);
+
     color: #374151;
+
     border-radius: 6px;
-    padding: 8px 16px;
-    font-weight: 600;
+
+    padding: 7px 14px;
 }
 
+
+/* =========================================
+   FOOTER
+========================================= */
+
 .home-footer {
+    position: relative;
+
+    width: 100%;
+
     margin-top: 18px;
+
+    clear: both;
+
     background: rgba(255, 255, 255, 0.18);
+
     border-top: 1px solid rgba(15, 23, 42, 0.08);
-    padding: 28px 0 18px;
+
+    padding: 25px 0 16px;
 }
 
 .footer-inner {
-    max-width: 1240px;
+    max-width: 1080px;
+
     margin: 0 auto;
-    padding: 0 24px;
+
+    padding: 0 20px;
+
     display: grid;
+
     grid-template-columns: 1.6fr 1fr 1fr;
-    gap: 28px;
+
+    gap: 25px;
+
     align-items: start;
 }
 
 .footer-column h3 {
-    margin: 0 0 18px;
-    font-size: 1.1rem;
+    margin: 0 0 14px;
+
+    font-size: 1rem;
     font-weight: 700;
+
     color: #111827;
 }
 
 .about-column p {
     margin: 0;
+
     color: #4b5563;
-    line-height: 1.8;
-    font-size: 1rem;
+
+    line-height: 1.65;
+
+    font-size: 0.9rem;
 }
 
 .footer-column ul {
     list-style: none;
+
     padding: 0;
     margin: 0;
 }
 
 .footer-column li {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+
     color: #1f2937;
-    font-size: 1rem;
-    line-height: 1.6;
+
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 .footer-bottom {
-    max-width: 1240px;
-    margin: 18px auto 0;
-    padding: 18px 24px 0;
+    max-width: 1080px;
+
+    margin: 16px auto 0;
+
+    padding: 16px 20px 0;
+
     border-top: 1px solid rgba(15, 23, 42, 0.08);
+
     text-align: center;
+
     color: #4b5563;
-    font-size: 0.95rem;
+
+    font-size: 0.85rem;
 }
 
+
+/* =========================================
+   TABLET
+========================================= */
+
 @media (max-width: 980px) {
-    .updates-grid,
+
     .home-stats,
-    .footer-inner {
+    .updates-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .home-stats {
-        gap: 16px;
+    .footer-inner {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
+
+/* =========================================
+   MOBILE
+========================================= */
+
 @media (max-width: 720px) {
-    .updates-grid,
+
+    .home-hero {
+        min-height: 300px;
+    }
+
+    .hero-content {
+        width: min(100%, 90%);
+        padding: 30px 15px;
+    }
+
+    .hero-content h1 {
+        font-size: 2.1rem;
+    }
+
+    .hero-content p {
+        font-size: 0.88rem;
+    }
+
+    .hero-content blockquote {
+        font-size: 1.1rem;
+    }
+
     .home-stats,
+    .updates-grid,
     .footer-inner {
         grid-template-columns: 1fr;
     }
 
-    .home-hero {
-        height: 350px;
+    .home-updates {
+        padding-left: 16px;
+        padding-right: 16px;
     }
 
     .section-header {
         flex-direction: column;
+
         align-items: flex-start;
-        gap: 12px;
+
+        gap: 10px;
     }
 
     .update-card img {
-        height: 180px;
+        height: 200px;
+    }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 500px) {
+
+    .home-hero {
+        min-height: 280px;
+    }
+
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .hero-content p {
+        font-size: 0.82rem;
+    }
+
+    .hero-content blockquote {
+        font-size: 1rem;
+    }
+
+    .stat-item {
+        min-height: 125px;
+    }
+
+    .stat-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 1.3rem;
     }
 }
 
@@ -984,12 +579,17 @@
     background: #e7e7e7;
     min-height: 100vh;
     color: #1f2937;
+    overflow: visible;
     font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
 }
 
+/* =========================
+   HERO
+   ========================= */
+
 .lecture-hero {
     position: relative;
-    min-height: 380px;
+    min-height: 340px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1008,55 +608,60 @@
 .lecture-hero-content {
     position: relative;
     z-index: 1;
-    width: min(1100px, 90%);
+    width: min(1000px, 90%);
     text-align: center;
     color: #fff;
-    padding: 26px 20px 40px;
+    padding: 24px 20px 35px;
 }
 
 .hero-label {
     display: inline-block;
     color: rgba(255, 255, 255, 0.82);
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    margin-bottom: 20px;
-    padding: 6px 12px;
+    margin-bottom: 14px;
+    padding: 5px 11px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.08);
 }
 
 .lecture-hero-content h1 {
     margin: 0;
-    font-size: clamp(2.8rem, 4vw, 5rem);
+    font-size: clamp(2.2rem, 3.2vw, 3.5rem);
     font-weight: 800;
-    line-height: 1.08;
-    letter-spacing: -0.04em;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
     color: #fff;
 }
 
 .lecture-hero-content p {
-    max-width: 980px;
-    margin: 20px auto 0;
-    font-size: 1.1rem;
-    line-height: 1.7;
+    max-width: 800px;
+    margin: 16px auto 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
     color: rgba(255, 255, 255, 0.92);
 }
 
+
+/* =========================
+   MAIN CONTENT
+   ========================= */
+
 .lecture-inner {
-    max-width: 1240px;
+    max-width: 1080px;
     margin: 0 auto;
-    padding: 36px 24px 80px;
+    padding: 30px 20px 60px;
 }
 
 .lecture-title {
-    margin: 0 0 18px;
-    font-size: clamp(2.1rem, 2.7vw, 4rem);
+    margin: 0 0 16px;
+    font-size: 1.8rem;
     font-weight: 800;
     color: #1f2937;
 }
 
 .lecture-actions {
-    margin-bottom: 28px;
+    margin-bottom: 22px;
 }
 
 .upload-btn {
@@ -1065,9 +670,9 @@
     justify-content: center;
     background: linear-gradient(180deg, #1d2f87 0%, #0d1f73 100%);
     color: #fff;
-    border-radius: 10px;
-    padding: 14px 26px;
-    font-size: 1.05rem;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
     font-weight: 700;
     text-decoration: none;
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
@@ -1078,22 +683,27 @@
     text-decoration: none;
 }
 
+
+/* =========================
+   FILTERS
+   ========================= */
+
 .lecture-filters {
     display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
-    gap: 14px;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    gap: 12px;
     background: transparent;
-    margin-bottom: 26px;
+    margin-bottom: 22px;
 }
 
 .filter-field {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .filter-field label {
-    font-size: 0.95rem;
+    font-size: 0.82rem;
     font-weight: 700;
     color: #1f2937;
     margin: 0;
@@ -1102,14 +712,15 @@
 .filter-field input,
 .filter-field select {
     width: 100%;
-    height: 44px;
+    height: 40px;
     border: 1px solid rgba(15, 23, 42, 0.12);
     background: rgba(255, 255, 255, 0.64);
-    border-radius: 8px;
-    padding: 0 14px;
-    font-size: 0.96rem;
+    border-radius: 7px;
+    padding: 0 12px;
+    font-size: 0.85rem;
     color: #1f2937;
     outline: none;
+    box-sizing: border-box;
 }
 
 .filter-field input::placeholder {
@@ -1120,30 +731,49 @@
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-image: linear-gradient(45deg, transparent 50%, #4b5563 50%), linear-gradient(135deg, #4b5563 50%, transparent 50%);
-    background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+    background-image:
+        linear-gradient(45deg, transparent 50%, #4b5563 50%),
+        linear-gradient(135deg, #4b5563 50%, transparent 50%);
+    background-position:
+        calc(100% - 17px) calc(50% - 2px),
+        calc(100% - 11px) calc(50% - 2px);
     background-size: 6px 6px, 6px 6px;
     background-repeat: no-repeat;
-    padding-right: 36px;
+    padding-right: 32px;
 }
+
+
+/* =========================
+   LECTURE GRID
+   ========================= */
 
 .lecture-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 22px;
+    gap: 16px;
 }
+
+
+/* =========================
+   LECTURE CARD
+   ========================= */
 
 .lecture-card {
     background: rgba(255, 255, 255, 0.64);
     border: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 14px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
 }
+
+
+/* =========================
+   VIDEO
+   ========================= */
 
 .video-frame {
     position: relative;
-    height: 220px;
+    height: 175px;
     background: #09090b;
     overflow: hidden;
 }
@@ -1159,42 +789,52 @@
 .video-overlay {
     position: absolute;
     inset: auto 0 0 0;
-    padding: 10px 12px 8px;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.72) 40%, rgba(0, 0, 0, 0.9) 100%);
+    padding: 8px 10px 7px;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.72) 40%,
+        rgba(0, 0, 0, 0.9) 100%
+    );
     display: flex;
     align-items: center;
     justify-content: space-between;
     color: #fff;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
 }
 
 .play-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     background: rgba(255, 255, 255, 0.16);
     border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .time-label {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     font-weight: 600;
     opacity: 0.95;
 }
 
+
+/* =========================
+   CARD CONTENT
+   ========================= */
+
 .lecture-card-body {
-    padding: 18px 16px 16px;
+    padding: 14px;
 }
 
 .meta-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 14px;
+    gap: 6px;
+    margin-bottom: 10px;
 }
 
 .grade-pill,
@@ -1202,18 +842,18 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 4px 10px;
+    padding: 3px 8px;
     border-radius: 999px;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     background: rgba(148, 163, 184, 0.09);
     color: #374151;
 }
 
 .lecture-card h3 {
-    margin: 0 0 8px;
-    font-size: clamp(1.5rem, 2vw, 2.1rem);
-    line-height: 1.2;
+    margin: 0 0 7px;
+    font-size: 17px;
+    line-height: 1.3;
     font-weight: 700;
     color: #1f2937;
 }
@@ -1221,28 +861,43 @@
 .lecture-card p {
     margin: 0;
     color: #4b5563;
-    font-size: 0.95rem;
-    line-height: 1.7;
+    font-size: 0.82rem;
+    line-height: 1.55;
 }
 
 .author-row {
-    margin-top: 18px;
+    margin-top: 13px;
     color: #374151;
-    font-size: 0.9rem;
+    font-size: 0.78rem;
     font-weight: 600;
 }
+
+
+/* =========================
+   EMPTY STATE
+   ========================= */
 
 .no-lectures {
     background: rgba(255, 255, 255, 0.7);
     border: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 10px;
-    padding: 22px;
+    border-radius: 8px;
+    padding: 20px;
     text-align: center;
     color: #374151;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
+
+/* =========================
+   TABLET
+   ========================= */
+
 @media (max-width: 980px) {
+
+    .lecture-inner {
+        max-width: 900px;
+    }
+
     .lecture-filters {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -1252,13 +907,23 @@
     }
 }
 
+
+/* =========================
+   MOBILE
+   ========================= */
+
 @media (max-width: 720px) {
+
     .lecture-hero {
-        min-height: 320px;
+        min-height: 300px;
     }
 
     .lecture-hero-content h1 {
-        font-size: 2.3rem;
+        font-size: 2.1rem;
+    }
+
+    .lecture-hero-content p {
+        font-size: 0.88rem;
     }
 
     .lecture-inner {
@@ -1266,8 +931,30 @@
         padding-right: 16px;
     }
 
+    .lecture-title {
+        font-size: 1.6rem;
+    }
+
     .lecture-filters,
     .lecture-grid {
         grid-template-columns: 1fr;
     }
+
+    .video-frame {
+        height: 200px;
+    }
+}
+.home-footer {
+    position: relative;
+    width: 100%;
+    margin-top: 18px;
+    clear: both;
+    background: rgba(255, 255, 255, 0.18);
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    padding: 28px 0 18px;
+}
+.lecture-page {
+    min-height: auto;
+    height: auto;
+    overflow: visible;
 }
