@@ -1,4 +1,35 @@
 /* =========================================
+   BASE & GLOBAL LAYOUT
+========================================= */
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+}
+
+main[role="main"],
+main {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+.footer {
+    width: 100%;
+    margin-top: auto;
+    line-height: normal;
+    padding: 1.25rem 0;
+    background-color: #ffffff;
+}
+
+/* =========================================
    HOME PAGE
 ========================================= */
 
@@ -6,7 +37,9 @@
     background: #dfe0e3;
     color: #1f2937;
     font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
-    min-height: 100vh;
+    min-height: auto;
+    width: 100%;
+    overflow: visible;
 }
 
 
@@ -577,7 +610,9 @@
 
 .lecture-page {
     background: #e7e7e7;
-    min-height: 100vh;
+    min-height: auto;
+    height: auto;
+    width: 100%;
     color: #1f2937;
     overflow: visible;
     font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
@@ -943,18 +978,4 @@
     .video-frame {
         height: 200px;
     }
-}
-.home-footer {
-    position: relative;
-    width: 100%;
-    margin-top: 18px;
-    clear: both;
-    background: rgba(255, 255, 255, 0.18);
-    border-top: 1px solid rgba(15, 23, 42, 0.08);
-    padding: 28px 0 18px;
-}
-.lecture-page {
-    min-height: auto;
-    height: auto;
-    overflow: visible;
-}
+}
