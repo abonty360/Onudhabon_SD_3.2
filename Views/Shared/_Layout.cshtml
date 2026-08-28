@@ -5,7 +5,6 @@
 @{
     string? userPicture = null;
     string? userRole = null;
-
     if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         userPicture = User.FindFirst("Picture")?.Value;
@@ -14,13 +13,10 @@
         if (string.IsNullOrEmpty(userPicture))
         {
             var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (int.TryParse(userIdStr, out int uid))
             {
                 var dbUser = DbContext.Users.Find(uid);
-
                 userPicture = dbUser?.Picture;
-
                 if (string.IsNullOrEmpty(userRole))
                 {
                     userRole = dbUser?.Role;
@@ -28,485 +24,169 @@
             }
         }
     }
+
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 }
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>@ViewData["Title"] - Onudhabon</title>
-
     <script type="importmap"></script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
-
-    <link rel="stylesheet"
-          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <link rel="stylesheet"
-          href="~/css/site.css"
-          asp-append-version="true" />
-
-    <link rel="stylesheet"
-          href="~/Onudhabon_ISD.styles.css"
-          asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Onudhabon_ISD.styles.css" asp-append-version="true" />
 </head>
-
 <body class="d-flex flex-column min-vh-100">
-
-    <header>
-
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3 py-2.5">
-
-            <div class="container-fluid px-lg-4">
-
-                <!-- LOGO -->
-                <a class="navbar-brand d-flex align-items-center me-4"
-                   asp-area=""
-                   asp-controller="Home"
-                   asp-action="Index">
-
-                    <img src="~/images/navbar_logo.png"
-                         asp-append-version="true"
-                         alt="Onudhabon"
-                         style="height: 38px; width: auto;" />
-
+    <header class="site-header">
+        <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
+            <div class="container-fluid px-lg-4 px-3">
+                <!-- Logo -->
+                <a class="navbar-brand d-flex align-items-center me-lg-4 me-2" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/navbar_logo.png" asp-append-version="true" alt="Onudhabon" style="height: 38px; width: auto;" />
                 </a>
 
-
-                <!-- MOBILE TOGGLER -->
-                <button class="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation">
-
+                <!-- Mobile toggler -->
+                <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
-
                 </button>
 
-
                 <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
-
-                    <!-- MAIN NAVIGATION -->
-                    <ul class="navbar-nav flex-grow-1 align-items-center">
-
-                        <!-- HOME -->
+                    <!-- Center/Left Navigation -->
+                    <ul class="navbar-nav flex-grow-1 align-items-lg-center">
                         <li class="nav-item">
-
-                            <a class="nav-link text-dark fw-medium px-3"
-                               asp-area=""
-                               asp-controller="Home"
-                               asp-action="Index">
-
-                                Home
-
-                            </a>
-
+                            <a class="nav-link @(currentController == "Home" && (currentAction == "Index" || string.IsNullOrEmpty(currentAction)) ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-
-
-                        <!-- RECORDED LECTURES -->
                         <li class="nav-item">
-
-                            <a class="nav-link text-dark fw-medium px-3"
-                               asp-area=""
-                               asp-controller="Lecture"
-                               asp-action="Index">
-
-                                Recorded Lectures
-
-                            </a>
-
+                            <a class="nav-link @(currentController == "Lecture" ? "active" : "")" asp-area="" asp-controller="Lecture" asp-action="Index">Lectures</a>
                         </li>
-
-
-                        <!-- STUDY MATERIALS -->
                         <li class="nav-item">
-
-                            <a class="nav-link text-dark fw-medium px-3"
-                               asp-area=""
-                               asp-controller="Material"
-                               asp-action="Index">
-
-                                Study Materials
-
-                            </a>
-
+                            <a class="nav-link @(currentController == "Material" ? "active" : "")" asp-area="" asp-controller="Material" asp-action="Index">Materials</a>
                         </li>
-
-
-                        <!-- ABOUT -->
                         <li class="nav-item">
-
-                            <a class="nav-link text-dark fw-medium px-3"
-                               asp-area=""
-                               asp-controller="Home"
-                               asp-action="About">
-
-                                About
-
-                            </a>
-
+                            <a class="nav-link @(currentController == "Home" && currentAction == "About" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="About">About</a>
                         </li>
-
-
-                        <!-- FORUM -->
                         <li class="nav-item">
-
-                            <a class="nav-link text-dark fw-medium px-3"
-                               asp-area=""
-                               asp-controller="Forum"
-                               asp-action="Index">
-
-                                Forum
-
-                            </a>
-
+                            <a class="nav-link @(currentController == "Forum" ? "active" : "")" asp-area="" asp-controller="Forum" asp-action="Index">Forum</a>
                         </li>
-
-
-                        <!-- ADMIN DASHBOARD -->
                         @if (userRole == "Admin" || User.IsInRole("Admin"))
                         {
-
                             <li class="nav-item">
-
-                                <a class="nav-link text-danger fw-semibold px-3"
-                                   asp-controller="Admin"
-                                   asp-action="Dashboard">
-
+                                <a class="nav-link text-danger fw-semibold px-3 @(currentController == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Dashboard">
                                     🛡️ Admin Dashboard
-
                                 </a>
-
                             </li>
-
                         }
-
                     </ul>
 
-
-                    <!-- RIGHT SIDE NAVIGATION -->
-                    <ul class="navbar-nav align-items-center mt-2 mt-lg-0">
-
+                    <!-- Right Side: Profile / User Info + Logout -->
+                    <ul class="navbar-nav align-items-lg-center mt-3 mt-lg-0 gap-2">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-
-                            <!-- EDUCATOR UPLOAD -->
-                            @if (userRole == "Educator" || User.IsInRole("Educator"))
-                            {
-
-                                <li class="nav-item dropdown me-3">
-
-                                    <a class="btn btn-outline-primary btn-sm dropdown-toggle rounded-pill px-3 py-1.5"
-                                       href="#"
-                                       role="button"
-                                       data-bs-toggle="dropdown"
-                                       aria-expanded="false">
-
-                                        + Upload
-
-                                    </a>
-
-
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2">
-
-                                        <!-- UPLOAD LECTURE -->
-                                        <li>
-
-                                            <a class="dropdown-item rounded-3 py-2"
-                                               asp-controller="Lecture"
-                                               asp-action="Upload">
-
-                                                🎥 Upload Lecture Video
-
-                                            </a>
-
-                                        </li>
-
-
-                                        <!-- UPLOAD MATERIAL -->
-                                        <li>
-
-                                            <a class="dropdown-item rounded-3 py-2"
-                                               asp-controller="Material"
-                                               asp-action="Upload">
-
-                                                📄 Upload Study Material
-
-                                            </a>
-
-                                        </li>
-
-                                    </ul>
-
-                                </li>
-
-                            }
-
-
-                            <!-- PROFILE DROPDOWN -->
+                            <!-- Profile compact area -->
                             <li class="nav-item dropdown">
-
-                                <a class="nav-link d-flex align-items-center gap-2 text-dark dropdown-toggle py-1 px-2 rounded-pill hover-bg"
-                                   href="#"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
-
-
-                                    <!-- PROFILE IMAGE -->
+                                <a class="nav-link d-flex align-items-center gap-2 user-profile-link dropdown-toggle py-1 px-2.5 rounded-pill" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     @if (!string.IsNullOrWhiteSpace(userPicture))
                                     {
-
-                                        <img src="@CloudinaryService.GetAvatarUrl(userPicture, 70)"
-                                             alt="@User.Identity.Name"
-                                             class="rounded-circle border"
-                                             style="width: 34px; height: 34px; object-fit: cover;" />
-
+                                        <img src="@CloudinaryService.GetAvatarUrl(userPicture, 70)" 
+                                             alt="@User.Identity.Name" 
+                                             class="rounded-circle border border-2 border-white" 
+                                             style="width: 32px; height: 32px; object-fit: cover;" />
                                     }
                                     else
                                     {
-
-                                        <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center border"
-                                             style="width: 34px; height: 34px; font-size: 0.85rem;">
-
-                                            @(string.IsNullOrEmpty(User.Identity.Name)
-                                                ? "U"
-                                                : User.Identity.Name.Substring(0, 1).ToUpper())
-
+                                        <div class="rounded-circle bg-white text-primary fw-bold d-flex align-items-center justify-content-center shadow-sm" 
+                                             style="width: 32px; height: 32px; font-size: 0.85rem;">
+                                            @(string.IsNullOrEmpty(User.Identity.Name) ? "U" : User.Identity.Name.Substring(0, 1).ToUpper())
                                         </div>
-
                                     }
-
-
-                                    <!-- USERNAME -->
-                                    <span class="fw-semibold">
-
-                                        @(User.Identity.Name)
-
-                                    </span>
-
+                                    <span class="fw-semibold text-white">@(User.Identity.Name)</span>
                                 </a>
-
-
-                                <!-- PROFILE DROPDOWN MENU -->
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2"
-                                    style="min-width: 220px;">
-
-
-                                    <!-- USER INFORMATION -->
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2" style="min-width: 220px;">
                                     <li class="px-3 py-2 border-bottom mb-1">
-
-                                        <div class="fw-bold text-dark">
-
-                                            @(User.Identity.Name)
-
-                                        </div>
-
+                                        <div class="fw-bold text-dark">@(User.Identity.Name)</div>
                                         <div class="text-muted small">
-
-                                            Role:
-
-                                            <span class="badge @(userRole == "Admin" ? "bg-danger" : "bg-secondary") rounded-pill">
-
-                                                @(userRole ?? "User")
-
-                                            </span>
-
+                                            Role: <span class="badge @(userRole == "Admin" ? "bg-danger" : "bg-secondary") rounded-pill">@(userRole ?? "User")</span>
                                         </div>
-
                                     </li>
-
-
-                                    <!-- ADMIN DASHBOARD -->
                                     @if (userRole == "Admin" || User.IsInRole("Admin"))
                                     {
-
                                         <li>
-
-                                            <a class="dropdown-item rounded-3 py-2 text-danger fw-semibold"
-                                               asp-controller="Admin"
-                                               asp-action="Dashboard">
-
+                                            <a class="dropdown-item rounded-3 py-2 text-danger fw-semibold" asp-controller="Admin" asp-action="Dashboard">
                                                 🛡️ Admin Dashboard
-
                                             </a>
-
                                         </li>
-
                                     }
-
-
-                                    <!-- VIEW PROFILE -->
                                     <li>
-
-                                        <a class="dropdown-item rounded-3 py-2"
-                                           asp-controller="Account"
-                                           asp-action="Profile">
-
+                                        <a class="dropdown-item rounded-3 py-2" asp-controller="Account" asp-action="Profile">
                                             👤 View Profile
-
                                         </a>
-
                                     </li>
-
-
-                                    <!-- EDUCATOR OPTIONS -->
                                     @if (userRole == "Educator" || User.IsInRole("Educator"))
                                     {
-
-                                        <!-- UPLOAD LECTURE -->
                                         <li>
-
-                                            <a class="dropdown-item rounded-3 py-2"
-                                               asp-controller="Lecture"
-                                               asp-action="Upload">
-
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Lecture" asp-action="Upload">
                                                 🎥 Upload Lecture
-
                                             </a>
-
                                         </li>
-
-
-                                        <!-- UPLOAD MATERIAL -->
                                         <li>
-
-                                            <a class="dropdown-item rounded-3 py-2"
-                                               asp-controller="Material"
-                                               asp-action="Upload">
-
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Material" asp-action="Upload">
                                                 📄 Upload Material
-
                                             </a>
-
                                         </li>
-
                                     }
-
-
-                                    <!-- DIVIDER -->
-                                    <li>
-
-                                        <hr class="dropdown-divider my-1">
-
-                                    </li>
-
-
-                                    <!-- LOGOUT -->
-                                    <li>
-
-                                        <form asp-controller="Account"
-                                              asp-action="Logout"
-                                              method="post"
-                                              class="px-1 py-1">
-
-                                            @Html.AntiForgeryToken()
-
-                                            <button type="submit"
-                                                    class="dropdown-item rounded-3 text-danger py-2 w-100 text-start">
-
-                                                🚪 Sign Out
-
-                                            </button>
-
-                                        </form>
-
-                                    </li>
-
                                 </ul>
-
                             </li>
 
+                            <!-- Small light/white Logout button -->
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline m-0">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-logout d-inline-flex align-items-center gap-1.5 rounded-pill px-3 py-1 fw-semibold text-white">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                            <polyline points="16 17 21 12 16 7"></polyline>
+                                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                                        </svg>
+                                        <span>Logout</span>
+                                    </button>
+                                </form>
+                            </li>
                         }
                         else
                         {
-
-                            <!-- LOGIN -->
                             <li class="nav-item">
-
-                                <a class="nav-link btn btn-outline-primary px-3.5 py-1.5 text-primary ms-2 rounded-pill"
-                                   asp-area=""
-                                   asp-controller="Account"
-                                   asp-action="Login">
-
-                                    Login
-
-                                </a>
-
+                                <a class="nav-link btn btn-outline-light btn-sm px-3.5 py-1 text-white rounded-pill" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
-
-
-                            <!-- REGISTER -->
                             <li class="nav-item">
-
-                                <a class="nav-link btn btn-primary px-3.5 py-1.5 text-white ms-2 rounded-pill"
-                                   asp-area=""
-                                   asp-controller="Account"
-                                   asp-action="Register">
-
-                                    Register
-
-                                </a>
-
+                                <a class="nav-link btn btn-warning btn-sm px-3.5 py-1 text-dark fw-semibold rounded-pill" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
                             </li>
-
                         }
-
                     </ul>
-
                 </div>
-
             </div>
-
         </nav>
-
     </header>
-
-
-    <!-- MAIN CONTENT -->
-    <main role="main" class="flex-grow-1 pb-3">
-
+    
+    <main role="main" class="flex-grow-1">
         @RenderBody()
-
     </main>
 
-
-    <!-- FOOTER -->
     <footer class="border-top footer text-muted mt-auto">
-
-        <div class="container">
-
+        <div class="container text-center py-3">
             &copy; @DateTime.Now.Year - Onudhabon - Exploring Education
-
         </div>
-
     </footer>
-
-
-    <!-- SCRIPTS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="~/js/site.js"
-            asp-append-version="true"></script>
-
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
-
-</html> 
+</html>
