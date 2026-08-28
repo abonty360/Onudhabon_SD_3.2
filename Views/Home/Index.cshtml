@@ -14,127 +14,129 @@
         </div>
     </section>
 
-    <section class="home-stats">
-        <div class="stat-item">
-            <div class="stat-icon">👥</div>
-            <div class="stat-value">10,000+</div>
-            <div class="stat-label">Students Reached</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-icon">📘</div>
-            <div class="stat-value">2,500+</div>
-            <div class="stat-label">Learning Materials</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-icon">📊</div>
-            <div class="stat-value">850+</div>
-            <div class="stat-label">Active Volunteers</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-icon">🏆</div>
-            <div class="stat-value">1,200+</div>
-            <div class="stat-label">Success Stories</div>
-        </div>
-    </section>
+    <div class="home-content-body">
+        <section class="home-stats">
+            <div class="stat-item">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value">10,000+</div>
+                <div class="stat-label">Students Reached</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">📘</div>
+                <div class="stat-value">2,500+</div>
+                <div class="stat-label">Learning Materials</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value">850+</div>
+                <div class="stat-label">Active Volunteers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-value">1,200+</div>
+                <div class="stat-label">Success Stories</div>
+            </div>
+        </section>
 
-    <section class="home-updates">
-        <div class="section-header">
-            <h2>Latest Updates</h2>
-            <a href="#" class="view-all-btn">View All Posts</a>
-        </div>
+        <section class="home-updates">
+            <div class="section-header">
+                <h2>Latest Updates</h2>
+                <a asp-controller="Forum" asp-action="Index" class="view-all-btn">View All Posts</a>
+            </div>
 
-        <div class="updates-grid">
-            <article class="update-card" data-panel="panel-1">
-                <img src="~/images/latest updates pic1.jpeg" alt="Milestone image" />
-                <div class="update-card-body">
+            <div class="updates-grid">
+                <article class="update-card" data-panel="panel-1">
+                    <img src="~/images/latest updates pic1.jpeg" alt="Milestone image" />
+                    <div class="update-card-body">
+                        <h3>Onudhabon Reaches 10,000 Students Milestone</h3>
+                        <p>We’re proud to announce that our platform has now reached over 10,000 underprivileged children across rural South Asian communities. This milestone highlights the impact of collaborative education programs and grassroots volunteerism.</p>
+                        <button class="toggle-update" type="button" data-target="panel-1">Read More</button>
+                    </div>
+                </article>
+
+                <article class="update-card" data-panel="panel-2">
+                    <img src="~/images/latest updates pic2.jpeg" alt="Partnership image" />
+                    <div class="update-card-body">
+                        <h3>New Partnership with Bangladesh Education Foundation</h3>
+                        <p>Onudhabon partners with the Bangladesh Education Foundation to expand our reach and provide more comprehensive educational opportunities for children in need.</p>
+                        <button class="toggle-update" type="button" data-target="panel-2">Read More</button>
+                    </div>
+                </article>
+
+                <article class="update-card" data-panel="panel-3">
+                    <img src="~/images/latest updates pic3.jpeg" alt="Guardian image" />
+                    <div class="update-card-body">
+                        <h3>Volunteer Spotlight: Meet Our Amazing Local Guardians</h3>
+                        <p>Discover the inspiring stories of our local guardians who dedicate their time to ensure every child in their community gets access to quality education.</p>
+                        <button class="toggle-update" type="button" data-target="panel-3">Read More</button>
+                    </div>
+                </article>
+            </div>
+
+            <div class="update-panel" id="panel-1">
+                <div class="update-panel-header">
                     <h3>Onudhabon Reaches 10,000 Students Milestone</h3>
-                    <p>We’re proud to announce that our platform has now reached over 10,000 underprivileged children across rural South Asian communities. This milestone highlights the impact of collaborative education programs and grassroots volunteerism.</p>
-                    <button class="toggle-update" type="button" data-target="panel-1">Read More</button>
+                    <span class="panel-date">9/13/2025</span>
+                    <span class="panel-tag">Milestone</span>
                 </div>
-            </article>
+                <p>We’re proud to announce that our platform has now reached over 10,000 underprivileged children across rural South Asian communities. This milestone highlights the impact of collaborative education programs and grassroots volunteerism.</p>
+                <button class="close-panel" type="button">Close</button>
+            </div>
 
-            <article class="update-card" data-panel="panel-2">
-                <img src="~/images/latest updates pic2.jpeg" alt="Partnership image" />
-                <div class="update-card-body">
+            <div class="update-panel" id="panel-2">
+                <div class="update-panel-header">
                     <h3>New Partnership with Bangladesh Education Foundation</h3>
-                    <p>Onudhabon partners with the Bangladesh Education Foundation to expand our reach and provide more comprehensive educational opportunities for children in need.</p>
-                    <button class="toggle-update" type="button" data-target="panel-2">Read More</button>
+                    <span class="panel-date">1/10/2025</span>
+                    <span class="panel-tag">Partnership</span>
                 </div>
-            </article>
+                <p>Onudhabon partners with the Bangladesh Education Foundation to expand our reach and provide more comprehensive educational opportunities for children in need. Together, we are creating a stronger path to equitable learning for underserved communities.</p>
+                <button class="close-panel" type="button">Close</button>
+            </div>
 
-            <article class="update-card" data-panel="panel-3">
-                <img src="~/images/latest updates pic3.jpeg" alt="Guardian image" />
-                <div class="update-card-body">
+            <div class="update-panel" id="panel-3">
+                <div class="update-panel-header">
                     <h3>Volunteer Spotlight: Meet Our Amazing Local Guardians</h3>
-                    <p>Discover the inspiring stories of our local guardians who dedicate their time to ensure every child in their community gets access to quality education.</p>
-                    <button class="toggle-update" type="button" data-target="panel-3">Read More</button>
+                    <span class="panel-date">1/5/2025</span>
+                    <span class="panel-tag">Community</span>
                 </div>
-            </article>
-        </div>
-
-        <div class="update-panel" id="panel-1">
-            <div class="update-panel-header">
-                <h3>Onudhabon Reaches 10,000 Students Milestone</h3>
-                <span class="panel-date">9/13/2025</span>
-                <span class="panel-tag">Milestone</span>
+                <p>Discover the inspiring stories of our local guardians who dedicate their time to ensure every child in their community gets access to quality education. Their compassion and support are helping build brighter futures for families everywhere.</p>
+                <button class="close-panel" type="button">Close</button>
             </div>
-            <p>We’re proud to announce that our platform has now reached over 10,000 underprivileged children across rural South Asian communities. This milestone highlights the impact of collaborative education programs and grassroots volunteerism.</p>
-            <button class="close-panel" type="button">Close</button>
-        </div>
+        </section>
 
-        <div class="update-panel" id="panel-2">
-            <div class="update-panel-header">
-                <h3>New Partnership with Bangladesh Education Foundation</h3>
-                <span class="panel-date">1/10/2025</span>
-                <span class="panel-tag">Partnership</span>
-            </div>
-            <p>Onudhabon partners with the Bangladesh Education Foundation to expand our reach and provide more comprehensive educational opportunities for children in need. Together, we are creating a stronger path to equitable learning for underserved communities.</p>
-            <button class="close-panel" type="button">Close</button>
-        </div>
+        <footer class="home-footer">
+            <div class="footer-inner">
+                <div class="footer-column about-column">
+                    <h3>About Onudhabon</h3>
+                    <p>Onudhabon is a community-driven initiative focused on providing access to quality education for children in South Asia. We collaborate with local educators, volunteers, and organizations to create sustainable change.</p>
+                </div>
 
-        <div class="update-panel" id="panel-3">
-            <div class="update-panel-header">
-                <h3>Volunteer Spotlight: Meet Our Amazing Local Guardians</h3>
-                <span class="panel-date">1/5/2025</span>
-                <span class="panel-tag">Community</span>
-            </div>
-            <p>Discover the inspiring stories of our local guardians who dedicate their time to ensure every child in their community gets access to quality education. Their compassion and support are helping build brighter futures for families everywhere.</p>
-            <button class="close-panel" type="button">Close</button>
-        </div>
-    </section>
+                <div class="footer-column navigation-column">
+                    <h3>Navigation</h3>
+                    <ul>
+                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-controller="Lecture" asp-action="Index">Lectures</a></li>
+                        <li><a asp-controller="Material" asp-action="Index">Materials</a></li>
+                        <li><a asp-controller="Home" asp-action="About">About</a></li>
+                        <li><a asp-controller="Forum" asp-action="Index">Forum</a></li>
+                    </ul>
+                </div>
 
-    <footer class="home-footer">
-        <div class="footer-inner">
-            <div class="footer-column about-column">
-                <h3>About Onudhabon</h3>
-                <p>Onudhabon is a community-driven initiative focused on providing access to quality education for children in South Asia. We collaborate with local educators, volunteers, and organizations to create sustainable change.</p>
+                <div class="footer-column connect-column">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li>Facebook</li>
+                        <li>Instagram</li>
+                        <li>Contact Us</li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="footer-column navigation-column">
-                <h3>Navigation</h3>
-                <ul>
-                    <li>Home</li>
-                    <li>Lectures</li>
-                    <li>Materials</li>
-                    <li>About</li>
-                    <li>Forum</li>
-                </ul>
+            <div class="footer-bottom">
+                © 2025 Onudhabon. All rights reserved.
             </div>
-
-            <div class="footer-column connect-column">
-                <h3>Connect</h3>
-                <ul>
-                    <li>Facebook</li>
-                    <li>Instagram</li>
-                    <li>Contact Us</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="footer-bottom">
-            © 2025 Onudhabon. All rights reserved.
-        </div>
-    </footer>
+        </footer>
+    </div>
 </div>
 
 <script>
