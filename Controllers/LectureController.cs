@@ -205,36 +205,22 @@ namespace Onudhabon_ISD.Controllers
                 return View(model);
             }
 
-            string? videoUrl = null;
-            string? thumbnailUrl = null;
-
-            // 1. If a new video file is uploaded: upload to Cloudinary (ONLY ONCE)
-            if (model.VideoFile != null && model.VideoFile.Length > 0)
+            if (model.VideoFile == null || model.VideoFile.Length == 0)
             {
-                var uploadResult = await _cloudinaryService.UploadLectureVideoAsync(model.VideoFile);
-
-                if (!uploadResult.Success)
-                {
-                    ModelState.AddModelError(nameof(model.VideoFile), uploadResult.ErrorMessage ?? "Failed to upload video to Cloudinary.");
-                    return View(model);
-                }
-
-                videoUrl = uploadResult.SecureUrl;
-                thumbnailUrl = uploadResult.ThumbnailUrl ?? _cloudinaryService.GetVideoThumbnailUrl(videoUrl, 480, 270);
-            }
-            // 2. Otherwise if an existing Cloudinary URL is provided: reuse directly without re-uploading
-            else if (!string.IsNullOrWhiteSpace(model.ExistingVideoUrl))
-            {
-                videoUrl = model.ExistingVideoUrl.Trim();
-                thumbnailUrl = !string.IsNullOrWhiteSpace(model.ExistingThumbnailUrl)
-                    ? model.ExistingThumbnailUrl.Trim()
-                    : _cloudinaryService.GetVideoThumbnailUrl(videoUrl, 480, 270);
-            }
-            else
-            {
-                ModelState.AddModelError(nameof(model.VideoFile), "Please select a video file to upload or provide an existing Cloudinary URL.");
+                ModelState.AddModelError(nameof(model.VideoFile), "Please select a video file to upload.");
                 return View(model);
             }
+
+            var uploadResult = await _cloudinaryService.UploadLectureVideoAsync(model.VideoFile);
+
+            if (!uploadResult.Success)
+            {
+                ModelState.AddModelError(nameof(model.VideoFile), uploadResult.ErrorMessage ?? "Failed to upload video to Cloudinary.");
+                return View(model);
+            }
+
+            string? videoUrl = uploadResult.SecureUrl;
+            string? thumbnailUrl = uploadResult.ThumbnailUrl ?? (videoUrl != null ? _cloudinaryService.GetVideoThumbnailUrl(videoUrl, 480, 270) : null);
 
             var lecture = new Lecture
             {

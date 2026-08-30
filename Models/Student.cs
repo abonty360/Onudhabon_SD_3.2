@@ -57,7 +57,7 @@ namespace Onudhabon_ISD.Models
 
         [MaxLength(50)]
         [Display(Name = "Status")]
-        public string? Status { get; set; } = "Active";
+        public string? Status { get; set; } = "Pending";
 
         [Display(Name = "Completed Classes")]
         public int CompletedClasses { get; set; } = 0;

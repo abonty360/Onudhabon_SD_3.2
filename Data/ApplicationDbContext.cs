@@ -79,7 +79,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.ConsentLetterUrl).HasMaxLength(500);
                 entity.Property(e => e.GuardianId).HasMaxLength(50);
                 entity.Property(e => e.GuardianName).HasMaxLength(150);
-                entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Active");
+                entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Pending");
                 entity.Property(e => e.CompletedClasses).HasDefaultValue(0);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
                 entity.Property(e => e.__v).HasDefaultValue(0);
@@ -203,6 +203,8 @@ namespace Onudhabon_ISD.Data
                 entity.OwnsMany(e => e.Subjects, subject =>
                 {
                     subject.ToJson();
+                    subject.Property(s => s.Name).HasJsonPropertyName("name");
+                    subject.Property(s => s.TotalLectures).HasJsonPropertyName("totalLectures");
                 });
             });
         }

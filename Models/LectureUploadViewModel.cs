@@ -37,15 +37,8 @@ namespace Onudhabon_ISD.Models
         [Display(Name = "Topic")]
         public string Topic { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Please select a video file to upload.")]
         [Display(Name = "Video File (MP4, MKV, WebM)")]
         public IFormFile? VideoFile { get; set; }
-
-        [MaxLength(500)]
-        [Display(Name = "Existing Cloudinary Video URL (Optional)")]
-        public string? ExistingVideoUrl { get; set; }
-
-        [MaxLength(500)]
-        [Display(Name = "Existing Thumbnail URL (Optional)")]
-        public string? ExistingThumbnailUrl { get; set; }
     }
 }

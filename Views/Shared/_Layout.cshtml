@@ -114,6 +114,15 @@
                                 </li>
                             }
 
+                            @if (userRole == "Local Guardian" || User.IsInRole("Local Guardian"))
+                            {
+                                <li class="nav-item me-2">
+                                    <a class="btn btn-outline-light btn-sm rounded-pill px-3 py-1.5" asp-controller="Student" asp-action="Enroll">
+                                        + Enroll Student
+                                    </a>
+                                </li>
+                            }
+
                             <!-- Notifications Dropdown -->
                             <li class="nav-item dropdown me-2">
                                 <a class="nav-link position-relative py-1 px-2.5 rounded-circle hover-bg text-white" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -181,6 +190,19 @@
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2" asp-controller="Material" asp-action="Upload">
                                                 📄 Upload Material
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (userRole == "Local Guardian" || User.IsInRole("Local Guardian"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Student" asp-action="Index">
+                                                🎓 My Enrolled Students
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Student" asp-action="Enroll">
+                                                ➕ Enroll New Student
                                             </a>
                                         </li>
                                     }

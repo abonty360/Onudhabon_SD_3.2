@@ -192,36 +192,22 @@ namespace Onudhabon_ISD.Controllers
                 return View(model);
             }
 
-            string? fileUrl = null;
-            string? size = null;
-
-            // 1. If a new material file is uploaded: upload to Cloudinary (ONLY ONCE)
-            if (model.MaterialFile != null && model.MaterialFile.Length > 0)
+            if (model.MaterialFile == null || model.MaterialFile.Length == 0)
             {
-                var uploadResult = await _cloudinaryService.UploadMaterialPdfAsync(model.MaterialFile);
-
-                if (!uploadResult.Success)
-                {
-                    ModelState.AddModelError(nameof(model.MaterialFile), uploadResult.ErrorMessage ?? "Failed to upload document to Cloudinary.");
-                    return View(model);
-                }
-
-                fileUrl = uploadResult.SecureUrl;
-                size = uploadResult.FormattedSize; // Size formatted in MB (2 decimal places)
-            }
-            // 2. Otherwise if an existing Cloudinary URL is provided: reuse directly without re-uploading
-            else if (!string.IsNullOrWhiteSpace(model.ExistingFileUrl))
-            {
-                fileUrl = model.ExistingFileUrl.Trim();
-                size = !string.IsNullOrWhiteSpace(model.ExistingSize)
-                    ? model.ExistingSize.Trim()
-                    : "0.00 MB";
-            }
-            else
-            {
-                ModelState.AddModelError(nameof(model.MaterialFile), "Please select a material document (PDF/DOCX) or provide an existing Cloudinary URL.");
+                ModelState.AddModelError(nameof(model.MaterialFile), "Please select a material document file (PDF/DOCX) to upload.");
                 return View(model);
             }
+
+            var uploadResult = await _cloudinaryService.UploadMaterialPdfAsync(model.MaterialFile);
+
+            if (!uploadResult.Success)
+            {
+                ModelState.AddModelError(nameof(model.MaterialFile), uploadResult.ErrorMessage ?? "Failed to upload document to Cloudinary.");
+                return View(model);
+            }
+
+            string? fileUrl = uploadResult.SecureUrl;
+            string? size = uploadResult.FormattedSize;
 
             var material = new Material
             {

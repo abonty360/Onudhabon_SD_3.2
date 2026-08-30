@@ -1,0 +1,261 @@
+﻿@model IEnumerable<Onudhabon_ISD.Models.Student>
+@inject Onudhabon_ISD.Services.ICloudinaryService CloudinaryService
+
+@{
+    ViewData["Title"] = "My Enrolled Students - Onudhabon";
+}
+
+<div class="container py-5">
+    <!-- Header Row -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Enrolled Students</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-1">Students Under Guardianship</h2>
+            <p class="text-muted small mb-0">Manage enrolled children, track administrative verification, and oversee educational progress.</p>
+        </div>
+
+        <a asp-action="Enroll" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm d-inline-flex align-items-center gap-2">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Enroll New Student
+        </a>
+    </div>
+
+    <!-- Feedback Alerts -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Student Cards / Table -->
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 text-center py-5 px-4 bg-white">
+            <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex p-4 mx-auto mb-3">
+                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                </svg>
+            </div>
+            <h4 class="fw-bold text-dark">No Students Enrolled Yet</h4>
+            <p class="text-muted mx-auto mb-4" style="max-width: 480px;">
+                As a Local Guardian, you can enroll underprivileged students under your care by uploading their parent/guardian consent letter.
+            </p>
+            <div>
+                <a asp-action="Enroll" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+                    Enroll First Student
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var student in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white position-relative">
+                        <!-- Top Row: Avatar & Status -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" 
+                                     style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                    @(string.IsNullOrEmpty(student.FullName) ? "S" : student.FullName.Substring(0, 1).ToUpper())
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-0">@student.FullName</h5>
+                                    <span class="badge bg-light text-muted border rounded-pill small">Class @student.ClassLevel</span>
+                                </div>
+                            </div>
+
+                            @if (student.Status?.ToLower() == "active" || student.Status?.ToLower() == "approved")
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">
+                                    ✓ Active
+                                </span>
+                            }
+                            else if (student.Status?.ToLower() == "declined")
+                            {
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1">
+                                    ✕ Declined
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1">
+                                    ⏳ Pending Approval
+                                </span>
+                            }
+                        </div>
+
+                        <!-- Details List -->
+                        <div class="small text-muted mb-3">
+                            @if (!string.IsNullOrWhiteSpace(student.BirthCertificateId))
+                            {
+                                <div class="mb-1">
+                                    <span class="text-dark fw-medium">Birth Cert ID:</span> @student.BirthCertificateId
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(student.FatherName))
+                            {
+                                <div class="mb-1">
+                                    <span class="text-dark fw-medium">Father:</span> @student.FatherName
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(student.MotherName))
+                            {
+                                <div class="mb-1">
+                                    <span class="text-dark fw-medium">Mother:</span> @student.MotherName
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(student.Address))
+                            {
+                                <div class="mb-1 text-truncate">
+                                    <span class="text-dark fw-medium">Address:</span> @student.Address
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(student.Subjects))
+                            {
+                                <div class="mb-1">
+                                    <span class="text-dark fw-medium">Subjects:</span> @student.Subjects
+                                </div>
+                            }
+                            <div class="mt-2 pt-2 border-top">
+                                <span>Enrolled: @student.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                <span class="mx-1">•</span>
+                                <span>Year: @(student.EnrollmentYear ?? "2026")</span>
+                            </div>
+                        </div>
+
+                        <!-- Consent Letter Preview / Actions -->
+                        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                            @if (!string.IsNullOrWhiteSpace(student.ConsentLetterUrl))
+                            {
+                                <a href="@student.ConsentLetterUrl" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                    📄 Consent Letter
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">No consent file</span>
+                            }
+
+                            <button type="button" class="btn btn-link text-primary btn-sm p-0 fw-semibold text-decoration-none" data-bs-toggle="modal" data-bs-target="#studentDetailModal-@student.Id">
+                                View Profile →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal for Student Details -->
+                <div class="modal fade" id="studentDetailModal-@student.Id" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content rounded-4 border-0 shadow">
+                            <div class="modal-header border-bottom-0 pb-0">
+                                <div>
+                                    <h5 class="modal-title fw-bold text-dark mb-0">@student.FullName</h5>
+                                    <div class="text-muted small">
+                                        Class @student.ClassLevel | Status: 
+                                        <span class="badge @(student.Status == "Active" || student.Status == "Approved" ? "bg-success" : (student.Status == "Declined" ? "bg-danger" : "bg-warning text-dark")) rounded-pill">
+                                            @(student.Status ?? "Pending")
+                                        </span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body py-3">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-sm-6">
+                                        <div class="p-3 bg-light rounded-3 small">
+                                            <div class="text-muted mb-1">Student Name</div>
+                                            <div class="fw-bold text-dark">@student.FullName</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="p-3 bg-light rounded-3 small">
+                                            <div class="text-muted mb-1">Birth Certificate ID</div>
+                                            <div class="fw-bold text-dark">@(student.BirthCertificateId ?? "N/A")</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="p-3 bg-light rounded-3 small">
+                                            <div class="text-muted mb-1">Class Level</div>
+                                            <div class="fw-bold text-dark">Class @student.ClassLevel</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="p-3 bg-light rounded-3 small">
+                                            <div class="text-muted mb-1">Enrollment Year</div>
+                                            <div class="fw-bold text-dark">@(student.EnrollmentYear ?? "2026")</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="p-3 bg-light rounded-3 small">
+                                            <div class="text-muted mb-1">Enrolled Subjects</div>
+                                            <div class="fw-bold text-dark">@(student.Subjects ?? "General Curriculum")</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="p-3 bg-light rounded-3 small">
+                                            <div class="text-muted mb-1">Father's Name</div>
+                                            <div class="fw-bold text-dark">@(student.FatherName ?? "N/A")</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="p-3 bg-light rounded-3 small">
+                                            <div class="text-muted mb-1">Mother's Name</div>
+                                            <div class="fw-bold text-dark">@(student.MotherName ?? "N/A")</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="p-3 bg-light rounded-3 small">
+                                            <div class="text-muted mb-1">Residential Address</div>
+                                            <div class="fw-bold text-dark">@(student.Address ?? "N/A")</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Consent Letter Section -->
+                                <div class="p-3 rounded-3 border bg-white small">
+                                    <div class="fw-bold text-dark mb-2">Legal Guardian Consent Letter</div>
+                                    @if (!string.IsNullOrWhiteSpace(student.ConsentLetterUrl))
+                                    {
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="text-muted text-truncate" style="max-width: 400px;">@student.ConsentLetterUrl</span>
+                                            <a href="@student.ConsentLetterUrl" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                                Open Document ↗
+                                            </a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted">No consent letter file uploaded.</div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="modal-footer border-top-0 pt-0">
+                                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

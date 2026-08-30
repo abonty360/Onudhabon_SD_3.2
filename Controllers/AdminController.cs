@@ -47,7 +47,9 @@ namespace Onudhabon_ISD.Controllers
                 .OrderByDescending(f => f.CreatedAt)
                 .ToListAsync();
 
-            var studentCount = await _context.Students.CountAsync();
+            var students = await _context.Students
+                .OrderByDescending(s => s.CreatedAt)
+                .ToListAsync();
 
             var viewModel = new AdminDashboardViewModel
             {
@@ -55,7 +57,7 @@ namespace Onudhabon_ISD.Controllers
                 Lectures = lectures,
                 Materials = materials,
                 ForumPosts = forumPosts,
-                TotalStudentsCount = studentCount
+                Students = students
             };
 
             ViewBag.ActiveTab = tab ?? "volunteers";
@@ -198,6 +200,36 @@ namespace Onudhabon_ISD.Controllers
 
             TempData["SuccessMessage"] = $"Forum post '{post.Title}' has been declined.";
             return RedirectToAction(nameof(Dashboard), new { tab = "forum" });
+        }
+
+        // POST: /Admin/ApproveStudent/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) return NotFound();
+
+            student.Status = "Active";
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Student '{student.FullName}' enrollment has been approved.";
+            return RedirectToAction(nameof(Dashboard), new { tab = "students" });
+        }
+
+        // POST: /Admin/DeclineStudent/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeclineStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) return NotFound();
+
+            student.Status = "Declined";
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Student '{student.FullName}' enrollment has been declined.";
+            return RedirectToAction(nameof(Dashboard), new { tab = "students" });
         }
 
         // POST: /Admin/RestrictEducator or RestrictUser
