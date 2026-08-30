@@ -76,6 +76,9 @@
                         <li class="nav-item">
                             <a class="nav-link @(currentController == "Forum" ? "active" : "")" asp-area="" asp-controller="Forum" asp-action="Index">Forum</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Forum" asp-action="Index">Community Forum</a>
+                        </li>
                         @if (userRole == "Admin" || User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
@@ -90,7 +93,63 @@
                     <ul class="navbar-nav align-items-lg-center mt-3 mt-lg-0 gap-2">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <!-- Profile compact area -->
+                            @if (userRole == "Educator" || User.IsInRole("Educator"))
+                            {
+                                <li class="nav-item dropdown me-3">
+                                    <a class="btn btn-outline-primary btn-sm dropdown-toggle rounded-pill px-3 py-1.5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        + Upload
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2">
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Lecture" asp-action="Upload">
+                                                🎥 Upload Lecture Video
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Material" asp-action="Upload">
+                                                📄 Upload Study Material
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+    <a class="nav-link text-dark fw-medium px-3"
+       asp-area=""
+       asp-controller="Home"
+       asp-action="About">
+        About
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link text-dark fw-medium px-3"
+       asp-area=""
+       asp-controller="Forum"
+       asp-action="Index">
+        Forum
+    </a>
+</li>
+                                    </ul>
+                                </li>
+                            }
+
+                            <!-- Notifications Dropdown -->
+                            <li class="nav-item dropdown me-3">
+                                <a class="nav-link position-relative py-1 px-2.5 rounded-circle hover-bg text-dark" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    🔔
+                                    <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                                        0
+                                    </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2" aria-labelledby="notificationDropdown" style="width: 320px; max-height: 380px; overflow-y: auto;">
+                                    <li class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold text-dark">Notifications</span>
+                                        <button id="markReadBtn" class="btn btn-link btn-sm text-primary p-0 text-decoration-none small">Mark all read</button>
+                                    </li>
+                                    <div id="notificationsContainer">
+                                        <li class="px-3 py-3 text-center text-muted small">Loading notifications...</li>
+                                    </div>
+                                </ul>
+                            </li>
+
                             <li class="nav-item dropdown">
                                 <a class="nav-link d-flex align-items-center gap-2 user-profile-link dropdown-toggle py-1 px-2.5 rounded-pill" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     @if (!string.IsNullOrWhiteSpace(userPicture))
@@ -187,6 +246,71 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <script>
+            $(document).ready(function () {
+                function fetchNotifications() {
+                    $.get('/Forum/GetNotifications', function (data) {
+                        var container = $('#notificationsContainer');
+                        container.empty();
+                        var unreadCount = 0;
+
+                        if (!data || data.length === 0) {
+                            container.append('<li class="px-3 py-3 text-center text-muted small">No notifications yet.</li>');
+                            $('#notificationBadge').addClass('d-none').text(0);
+                            return;
+                        }
+
+                        $.each(data, function (i, n) {
+                            if (!n.isRead) unreadCount++;
+                            var icon = n.type === 'Like' ? '❤️' : '💬';
+                            var actionText = n.type === 'Like' ? 'liked your post' : 'commented on your post';
+                            
+                            // Unread notifications get a light blue highlight, read ones stay white
+                            var unreadBg = n.isRead ? 'bg-white' : 'bg-primary-subtle border-start border-primary border-3';
+                            var targetUrl = '/Forum#post-' + n.postId;
+
+                            var item = '<li class="px-3 py-2 border-bottom small notification-item ' + unreadBg + '" style="cursor: pointer;" data-notif-id="' + n.id + '" data-url="' + targetUrl + '">' +
+                                '<div>' + icon + ' <strong>' + n.sender + '</strong> ' + actionText + ' <em>"' + n.post + '"</em></div>' +
+                                '<div class="text-muted text-end mt-1" style="font-size: 0.75rem;">' + n.createdAt + '</div>' +
+                                '</li>';
+                            container.append(item);
+                        });
+
+                        if (unreadCount > 0) {
+                            $('#notificationBadge').removeClass('d-none').text(unreadCount);
+                        } else {
+                            $('#notificationBadge').addClass('d-none').text(0);
+                        }
+                    });
+                }
+
+                // Handle notification item click
+                $(document).on('click', '.notification-item', function () {
+                    var notifId = $(this).data('notif-id');
+                    var targetUrl = $(this).data('url');
+
+                    // Mark this notification as read in database
+                    $.post('/Forum/MarkSingleNotificationAsRead', { id: notifId }, function () {
+                        window.location.href = targetUrl;
+                    });
+                });
+
+                fetchNotifications();
+                setInterval(fetchNotifications, 10000); // Check every 10 seconds
+
+                $('#markReadBtn').click(function (e) {
+                    e.preventDefault();
+                    $.post('/Forum/MarkNotificationsAsRead', function (res) {
+                        if (res.success) {
+                            fetchNotifications();
+                        }
+                    });
+                });
+            });
+        </script>
+    }
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

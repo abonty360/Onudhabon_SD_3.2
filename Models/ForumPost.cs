@@ -23,9 +23,23 @@ namespace Onudhabon_ISD.Models
         [Display(Name = "Author")]
         public string? Author { get; set; }
 
+        [MaxLength(50)]
+        [Display(Name = "Author Role")]
+        public string? AuthorRole { get; set; }
+
         [MaxLength(255)]
         [Display(Name = "Tags")]
         public string? Tags { get; set; }
+
+        [MaxLength(100)]
+        [Display(Name = "Category")]
+        public string? Category { get; set; }
+
+        [Display(Name = "Likes")]
+        public int Likes { get; set; } = 0;
+
+        [Display(Name = "Dislikes")]
+        public int Dislikes { get; set; } = 0;
 
         [Display(Name = "Replies")]
         public int Replies { get; set; } = 0;
