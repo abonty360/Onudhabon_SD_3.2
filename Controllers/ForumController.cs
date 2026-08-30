@@ -146,6 +146,25 @@ namespace Onudhabon_ISD.Controllers
                     CreatedAt = DateTime.UtcNow
                 });
                 post.Likes += 1;
+
+                var sender = User.Identity?.Name ?? "Someone";
+                if (!string.IsNullOrEmpty(post.Author) && !post.Author.Equals(sender, StringComparison.OrdinalIgnoreCase))
+                {
+                    var notification = new Notification
+                    {
+                        User = post.Author,
+                        Sender = sender,
+                        Post = post.Title,
+                        Type = "Like",
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow,
+                        __v = 0
+                    };
+                    _context.Notifications.Add(notification);
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, likes = post.Likes });
                 userReaction = "like";
             }
 
@@ -274,6 +293,22 @@ namespace Onudhabon_ISD.Controllers
 
             _context.ForumComments.Add(comment);
             post.Replies += 1;
+
+            if (!string.IsNullOrEmpty(post.Author) && !post.Author.Equals(userName, StringComparison.OrdinalIgnoreCase))
+            {
+                var notification = new Notification
+                {
+                    User = post.Author,
+                    Sender = userName,
+                    Post = post.Title,
+                    Type = "Comment",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    __v = 0
+                };
+                _context.Notifications.Add(notification);
+            }
+
             await _context.SaveChangesAsync();
 
             return Json(new { 
@@ -287,6 +322,73 @@ namespace Onudhabon_ISD.Controllers
                     createdAt = comment.CreatedAt.ToString("M/d/yyyy, h:mm:ss tt")
                 }
             });
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetNotifications()
+        {
+            var userName = User.Identity?.Name;
+            if (string.IsNullOrEmpty(userName)) return Json(new List<object>());
+
+            var userPosts = await _context.ForumPosts.ToListAsync();
+            var notifications = await _context.Notifications
+                .Where(n => n.User == userName)
+                .OrderByDescending(n => n.CreatedAt)
+                .Take(20)
+                .ToListAsync();
+
+            var result = notifications.Select(n => {
+                var targetPost = userPosts.FirstOrDefault(p => p.Title == n.Post);
+                return new {
+                    n.Id,
+                    n.Sender,
+                    n.Post,
+                    n.Type,
+                    n.IsRead,
+                    postId = targetPost?.Id ?? 0,
+                    createdAt = n.CreatedAt.ToString("M/d/yyyy, h:mm tt")
+                };
+            });
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> MarkSingleNotificationAsRead(int id)
+        {
+            var userName = User.Identity?.Name;
+            if (string.IsNullOrEmpty(userName)) return Json(new { success = false });
+
+            var notif = await _context.Notifications.FirstOrDefaultAsync(n => n.Id == id && n.User == userName);
+            if (notif != null)
+            {
+                notif.IsRead = true;
+                await _context.SaveChangesAsync();
+            }
+
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> MarkNotificationsAsRead()
+        {
+            var userName = User.Identity?.Name;
+            if (string.IsNullOrEmpty(userName)) return Json(new { success = false });
+
+            var unread = await _context.Notifications
+                .Where(n => n.User == userName && !n.IsRead)
+                .ToListAsync();
+
+            foreach (var n in unread)
+            {
+                n.IsRead = true;
+            }
+
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
         }
     }
 }
