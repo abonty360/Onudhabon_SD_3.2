@@ -51,13 +51,18 @@ namespace Onudhabon_ISD.Controllers
                 .OrderByDescending(s => s.CreatedAt)
                 .ToListAsync();
 
+            var donations = await _context.Donations
+                .OrderByDescending(d => d.CreatedAt)
+                .ToListAsync();
+
             var viewModel = new AdminDashboardViewModel
             {
                 Users = users,
                 Lectures = lectures,
                 Materials = materials,
                 ForumPosts = forumPosts,
-                Students = students
+                Students = students,
+                Donations = donations
             };
 
             ViewBag.ActiveTab = tab ?? "volunteers";

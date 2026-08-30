@@ -7,6 +7,7 @@ namespace Onudhabon_ISD.Models
         public List<Material> Materials { get; set; } = new();
         public List<ForumPost> ForumPosts { get; set; } = new();
         public List<Student> Students { get; set; } = new();
+        public List<Donation> Donations { get; set; } = new();
 
         public int TotalUsers => Users.Count;
         public int PendingVolunteersCount => Users.Count(u => u.Role != "Admin" && (u.VerificationStatus == "Pending" || string.IsNullOrEmpty(u.VerificationStatus)));
@@ -26,5 +27,9 @@ namespace Onudhabon_ISD.Models
         public int PendingStudentsCount => Students.Count(s => s.Status == "pending" || s.Status == "Pending" || string.IsNullOrEmpty(s.Status));
         public int ApprovedStudentsCount => Students.Count(s => s.Status == "Active" || s.Status == "Approved");
         public int TotalStudentsCount => Students.Count;
+
+        public decimal TotalDonationsAmount => Donations.Where(d => d.Status == "Completed").Sum(d => d.Amount);
+        public int CompletedDonationsCount => Donations.Count(d => d.Status == "Completed");
+        public int TotalDonorsCount => Donations.Where(d => d.Status == "Completed").Select(d => d.DonorPhone ?? d.DonorEmail ?? d.DonorName).Distinct().Count();
     }
 }

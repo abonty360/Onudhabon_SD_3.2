@@ -28,16 +28,36 @@ namespace Onudhabon_ISD.Controllers
         }
 
         [HttpGet]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Login(string? returnUrl = null)
         {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl) && !returnUrl.Contains("/Account/Login", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Redirect(returnUrl);
+                }
+                return RedirectAuthenticatedUser();
+            }
+
             ViewData["ReturnUrl"] = returnUrl;
             return View(new LoginViewModel { ReturnUrl = returnUrl });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
             ViewData["ReturnUrl"] = returnUrl;
 
             if (!ModelState.IsValid)
@@ -131,16 +151,32 @@ namespace Onudhabon_ISD.Controllers
         }
 
         [HttpGet]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Register(string? returnUrl = null)
         {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
             ViewData["ReturnUrl"] = returnUrl;
             return View(new RegisterViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl = null)
         {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
             ViewData["ReturnUrl"] = returnUrl;
 
             // Restrict roles strictly to Educator or Local Guardian
@@ -273,6 +309,31 @@ namespace Onudhabon_ISD.Controllers
         public IActionResult AccessDenied()
         {
             return View();
+        }
+
+        private IActionResult RedirectAuthenticatedUser()
+        {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) || User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+            if (string.Equals(role, "Local Guardian", StringComparison.OrdinalIgnoreCase) || User.IsInRole("Local Guardian"))
+            {
+                return RedirectToAction("Index", "Student");
+            }
+            if (string.Equals(role, "Educator", StringComparison.OrdinalIgnoreCase) || User.IsInRole("Educator"))
+            {
+                return RedirectToAction("Index", "Lecture");
+            }
+            return RedirectToAction("Index", "Home");
+        }
+
+        private void SetNoCacheHeaders()
+        {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
         }
     }
 }

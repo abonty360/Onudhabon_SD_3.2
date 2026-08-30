@@ -64,6 +64,22 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 
+// Prevent browser from caching auth pages or authenticated pages (prevents back-button access after login)
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value?.ToLowerInvariant() ?? "";
+    if (path.StartsWith("/account/login") || 
+        path.StartsWith("/account/register") || 
+        path.StartsWith("/admin") || 
+        context.User.Identity?.IsAuthenticated == true)
+    {
+        context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0";
+        context.Response.Headers["Pragma"] = "no-cache";
+        context.Response.Headers["Expires"] = "-1";
+    }
+    await next();
+});
+
 app.MapStaticAssets();
 
 app.MapControllerRoute(
@@ -82,6 +98,7 @@ using (var scope = app.Services.CreateScope())
         DbInitializer.SeedAdminUser(context, hasher);
         DbInitializer.SeedClassPlans(context);
         DbInitializer.SeedForumPosts(context);
+        DbInitializer.SeedDonations(context);
     }
     catch (Exception ex)
     {

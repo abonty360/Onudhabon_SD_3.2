@@ -182,5 +182,72 @@ namespace Onudhabon_ISD.Data
                 }
             }
         }
+
+        public static void SeedDonations(ApplicationDbContext context)
+        {
+            if (!context.Donations.Any())
+            {
+                var sampleDonations = new List<Donation>
+                {
+                    new Donation
+                    {
+                        DonorName = "Rahim Chowdhury",
+                        DonorEmail = "rahim.chowdhury@example.com",
+                        DonorPhone = "01711223344",
+                        Amount = 2500.00m,
+                        Currency = "BDT",
+                        Purpose = "Student Learning Materials & Textbooks",
+                        Message = "Keep up the noble mission for underprivileged kids education!",
+                        PaymentMethod = "bKash",
+                        BkashWalletNumber = "01711223344",
+                        BkashTransactionId = "TRX9A8B7C6D",
+                        BkashPaymentId = "BK-20260828104522-4912",
+                        Status = "Completed",
+                        IsAnonymous = false,
+                        CreatedAt = DateTime.UtcNow.AddDays(-3),
+                        __v = 0
+                    },
+                    new Donation
+                    {
+                        DonorName = "Dr. Nusrat Jahan",
+                        DonorEmail = "nusrat.jahan@example.com",
+                        DonorPhone = "01819345678",
+                        Amount = 5000.00m,
+                        Currency = "BDT",
+                        Purpose = "Community Digital Classrooms",
+                        Message = "Supporting digital literacy and recorded video lecture equipment.",
+                        PaymentMethod = "bKash",
+                        BkashWalletNumber = "01819345678",
+                        BkashTransactionId = "TRX8K7L6M5N",
+                        BkashPaymentId = "BK-20260829142010-8201",
+                        Status = "Completed",
+                        IsAnonymous = false,
+                        CreatedAt = DateTime.UtcNow.AddDays(-2),
+                        __v = 0
+                    },
+                    new Donation
+                    {
+                        DonorName = "Anonymous Well-Wisher",
+                        DonorEmail = "donor@gmail.com",
+                        DonorPhone = "01912987654",
+                        Amount = 1000.00m,
+                        Currency = "BDT",
+                        Purpose = "General Education & Child Support Fund",
+                        Message = "In memory of my parents.",
+                        PaymentMethod = "bKash",
+                        BkashWalletNumber = "01912987654",
+                        BkashTransactionId = "TRX7P6Q5R4S",
+                        BkashPaymentId = "BK-20260830091530-1094",
+                        Status = "Completed",
+                        IsAnonymous = true,
+                        CreatedAt = DateTime.UtcNow.AddHours(-18),
+                        __v = 0
+                    }
+                };
+
+                context.Donations.AddRange(sampleDonations);
+                context.SaveChanges();
+            }
+        }
     }
 }
