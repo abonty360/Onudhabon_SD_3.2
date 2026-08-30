@@ -5,28 +5,73 @@
     ViewData["Title"] = "Study Materials & Notes - Onudhabon";
 }
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <div>
-            <h2 class="fw-bold mb-1" style="color: #1e293b;">Study Materials & Documents</h2>
-            <p class="text-muted mb-0">Browse lecture sheets, guides, and PDF resources securely hosted on Cloudinary.</p>
+<div class="material-page">
+    <section class="material-hero">
+        <div class="material-hero-overlay"></div>
+        <div class="material-hero-content">
+            <div class="material-breadcrumb">Home/Materials</div>
+            <h1>Learning Resources for Every Journey</h1>
+            <p>Access a growing library of study materials, guides, and tools created by our dedicated community. From foundational concepts to advanced topics, these resources are here to support every learner's path toward success.</p>
         </div>
-        @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator"))
-        {
-            <div class="d-flex gap-2">
-                <a asp-action="Upload" class="btn btn-primary px-3 py-2 rounded-pill">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="me-1 align-text-bottom">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Upload Material Document
-                </a>
+    </section>
+
+    <main class="material-content">
+        <div class="material-heading-row">
+            <h2>Study Materials</h2>
+            @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator"))
+            {
+                <a asp-action="Upload" class="material-upload-btn">Upload Material</a>
+            }
+        </div>
+
+        <form method="get" asp-action="Index" class="material-filters">
+            <div class="material-filter-field material-search-field">
+                <label for="material-search">Search</label>
+                <input id="material-search" name="search" type="text" placeholder="Search lectures, instructors, or topics" />
             </div>
-        }
-    </div>
+            <div class="material-filter-field">
+                <label for="classLevel">Class</label>
+                <select id="classLevel" name="classLevel">
+                    <option value="">All Classes</option>
+                    @foreach (var item in Model.Select(m => m.ClassLevel).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().OrderBy(x => x))
+                    {
+                        <option value="@item" selected="@(ViewBag.ClassLevel == item)">@item</option>
+                    }
+                </select>
+            </div>
+            <div class="material-filter-field">
+                <label for="subject">Subject</label>
+                <select id="subject" name="subject">
+                    <option value="">All Subjects</option>
+                    @foreach (var item in Model.Select(m => m.Subject).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().OrderBy(x => x))
+                    {
+                        <option value="@item" selected="@(ViewBag.Subject == item)">@item</option>
+                    }
+                </select>
+            </div>
+            <div class="material-filter-field">
+                <label for="topic">Topic</label>
+                <select id="topic" name="topic">
+                    <option value="">Select subject</option>
+                    @foreach (var item in Model.Select(m => m.Topic).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().OrderBy(x => x))
+                    {
+                        <option value="@item" selected="@(ViewBag.Topic == item)">@item</option>
+                    }
+                </select>
+            </div>
+            <div class="material-filter-field">
+                <label for="version">Version</label>
+                <select id="version" name="version">
+                    <option value="">Both Versions</option>
+                    <option value="Bangla">Bangla</option>
+                    <option value="English">English</option>
+                </select>
+            </div>
+        </form>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -34,8 +79,8 @@
 
     @if (!Model.Any())
     {
-        <div class="card border-0 shadow-sm rounded-4 text-center p-5" style="background-color: #f8fafc;">
-            <div class="card-body">
+        <div class="material-empty-state">
+            <div>
                 <div class="mb-3 text-muted">
                     <svg width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -45,63 +90,62 @@
                 <p class="text-muted">Educational documents and study guides will appear here for learners.</p>
                 @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator"))
                 {
-                    <a asp-action="Upload" class="btn btn-outline-primary px-4 rounded-pill">Upload First Document</a>
+                    <a asp-action="Upload" class="material-upload-btn">Upload First Document</a>
                 }
             </div>
         </div>
     }
     else
     {
-        <div class="row g-4">
+        <div class="material-grid">
             @foreach (var material in Model)
             {
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                        <div class="card-body p-4 d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="rounded-3 bg-primary-subtle text-primary p-2.5">
+                <article class="material-card">
+                    <div class="material-card-body">
+                            <div class="material-card-top">
+                                <div class="material-file-icon">
                                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                     </svg>
                                 </div>
-                                <span class="badge @(material.Status?.ToLower() == "pending" ? "bg-warning-subtle text-warning border-warning-subtle" : "bg-success-subtle text-success border-success-subtle") border rounded-pill">
-                                    @material.Status
+                                <span class="material-status @(material.Status?.ToLower() == "pending" ? "pending" : (material.Status?.ToLower() == "declined" ? "declined" : "active"))">
+                                    @(material.Status?.ToLower() == "pending" ? "⏳ Pending Approval" : (material.Status?.ToLower() == "declined" ? "✕ Declined" : "Active"))
                                 </span>
                             </div>
 
-                            <div class="d-flex align-items-center gap-1.5 mb-2">
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill small">Class @material.ClassLevel</span>
-                                <span class="badge bg-light text-secondary border rounded-pill small">@material.Subject</span>
+                            <div class="material-meta">
+                                <span>Class @material.ClassLevel</span>
+                                <span>@material.Subject</span>
                             </div>
 
-                            <h6 class="fw-bold text-dark mb-1 text-truncate-2">
-                                <a asp-action="Details" asp-route-id="@material.Id" class="text-decoration-none text-dark">
+                            <h3>
+                                <a asp-action="Details" asp-route-id="@material.Id">
                                     @material.Title
                                 </a>
-                            </h6>
+                            </h3>
 
-                            <p class="text-muted small text-truncate-2 mb-3">
+                            <p>
                                 @(string.IsNullOrWhiteSpace(material.Description) ? "No description provided." : material.Description)
                             </p>
 
-                            <div class="mt-auto border-top pt-3">
-                                <div class="d-flex justify-content-between text-muted small mb-2">
+                            <div class="material-card-footer">
+                                <div class="material-stats">
                                     <span>Size: <strong>@(material.Size ?? "N/A")</strong></span>
                                     <span>Downloads: <strong>@material.Downloads</strong></span>
                                 </div>
-                                <div class="d-flex gap-2">
-                                    <a asp-action="Details" asp-route-id="@material.Id" class="btn btn-outline-primary btn-sm rounded-pill flex-grow-1">
+                                <div class="material-actions">
+                                    <a asp-action="Details" asp-route-id="@material.Id" class="material-view-btn">
                                         View
                                     </a>
-                                    <a asp-action="Download" asp-route-id="@material.Id" class="btn btn-primary btn-sm rounded-pill flex-grow-1">
+                                    <a asp-action="Download" asp-route-id="@material.Id" class="material-download-btn">
                                         Download
                                     </a>
                                 </div>
                             </div>
-                        </div>
                     </div>
-                </div>
+                </article>
             }
         </div>
     }
+    </main>
 </div>

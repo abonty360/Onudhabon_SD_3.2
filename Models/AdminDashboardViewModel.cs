@@ -5,6 +5,8 @@ namespace Onudhabon_ISD.Models
         public List<User> Users { get; set; } = new();
         public List<Lecture> Lectures { get; set; } = new();
         public List<Material> Materials { get; set; } = new();
+        public List<ForumPost> ForumPosts { get; set; } = new();
+        public List<Student> Students { get; set; } = new();
 
         public int TotalUsers => Users.Count;
         public int PendingVolunteersCount => Users.Count(u => u.Role != "Admin" && (u.VerificationStatus == "Pending" || string.IsNullOrEmpty(u.VerificationStatus)));
@@ -18,6 +20,11 @@ namespace Onudhabon_ISD.Models
         public int PendingMaterialsCount => Materials.Count(m => m.Status == "pending" || m.Status == "Pending");
         public int ApprovedMaterialsCount => Materials.Count(m => m.Status == "Active" || m.Status == "Approved");
 
-        public int TotalStudentsCount { get; set; } = 0;
+        public int PendingForumPostsCount => ForumPosts.Count(f => f.Status == "pending" || f.Status == "Pending" || string.IsNullOrEmpty(f.Status));
+        public int ApprovedForumPostsCount => ForumPosts.Count(f => f.Status == "Active" || f.Status == "Approved");
+
+        public int PendingStudentsCount => Students.Count(s => s.Status == "pending" || s.Status == "Pending" || string.IsNullOrEmpty(s.Status));
+        public int ApprovedStudentsCount => Students.Count(s => s.Status == "Active" || s.Status == "Approved");
+        public int TotalStudentsCount => Students.Count;
     }
 }

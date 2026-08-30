@@ -1,13 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Onudhabon_ISD.Models
 {
     public class SubjectDetail
     {
+        [JsonPropertyName("name")]
         [Display(Name = "Subject Name")]
         public string Name { get; set; } = string.Empty;
 
+        [JsonPropertyName("totalLectures")]
         [Display(Name = "Total Lectures")]
         public int TotalLectures { get; set; }
     }

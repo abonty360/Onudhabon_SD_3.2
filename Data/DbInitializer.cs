@@ -144,6 +144,7 @@ namespace Onudhabon_ISD.Data
                         AuthorRole = "Educator",
                         Tags = "#discussion #lectures",
                         Category = "General",
+                        Status = "Active",
                         Likes = 5,
                         Dislikes = 0,
                         Replies = 1,
@@ -157,6 +158,7 @@ namespace Onudhabon_ISD.Data
                         AuthorRole = "Admin",
                         Tags = "#localguardian #studentprogress",
                         Category = "General",
+                        Status = "Active",
                         Likes = 1,
                         Dislikes = 0,
                         Replies = 0,
@@ -166,6 +168,18 @@ namespace Onudhabon_ISD.Data
 
                 context.ForumPosts.AddRange(samplePosts);
                 context.SaveChanges();
+            }
+            else
+            {
+                var postsNeedingStatus = context.ForumPosts.Where(p => p.Status == null || p.Status == "").ToList();
+                if (postsNeedingStatus.Any())
+                {
+                    foreach (var p in postsNeedingStatus)
+                    {
+                        p.Status = "Active";
+                    }
+                    context.SaveChanges();
+                }
             }
         }
     }

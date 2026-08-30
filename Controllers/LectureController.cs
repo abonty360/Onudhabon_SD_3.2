@@ -23,6 +23,29 @@ namespace Onudhabon_ISD.Controllers
             _logger = logger;
         }
 
+        private async Task<List<string>> GetCurrentUserIdentifiersAsync()
+        {
+            var identifiers = new List<string>();
+            var userName = User.Identity?.Name;
+            var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrWhiteSpace(userName)) identifiers.Add(userName.Trim().ToLower());
+            if (!string.IsNullOrWhiteSpace(userEmail)) identifiers.Add(userEmail.Trim().ToLower());
+
+            if (int.TryParse(userIdClaim, out int uid))
+            {
+                var dbUser = await _context.Users.FindAsync(uid);
+                if (dbUser != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(dbUser.FullName)) identifiers.Add(dbUser.FullName.Trim().ToLower());
+                    if (!string.IsNullOrWhiteSpace(dbUser.Email)) identifiers.Add(dbUser.Email.Trim().ToLower());
+                }
+            }
+
+            return identifiers.Distinct().ToList();
+        }
+
         // GET: /Lecture
         [HttpGet]
         [AllowAnonymous]
@@ -51,7 +74,7 @@ namespace Onudhabon_ISD.Controllers
                                 Subject = "General",
                                 Topic = cVid.DisplayTitle,
                                 VideoUrl = cVid.SecureUrl,
-                                Thumbnail = cVid.ThumbnailUrl ?? _cloudinaryService.GetVideoThumbnailUrl(cVid.SecureUrl, 300, 200),
+                                Thumbnail = _cloudinaryService.GetVideoThumbnailUrl(cVid.SecureUrl, 480, 270),
                                 Status = "Active",
                                 CreatedAt = cVid.CreatedAt,
                                 __v = 0
@@ -65,13 +88,45 @@ namespace Onudhabon_ISD.Controllers
                         await _context.SaveChangesAsync();
                     }
                 }
+
+                // Automatically ensure all existing lectures have Cloudinary thumbnails generated
+                var lecturesNeedingThumbnails = await _context.Lectures
+                    .Where(l => !string.IsNullOrEmpty(l.VideoUrl) && string.IsNullOrEmpty(l.Thumbnail))
+                    .ToListAsync();
+
+                if (lecturesNeedingThumbnails.Any())
+                {
+                    foreach (var lec in lecturesNeedingThumbnails)
+                    {
+                        lec.Thumbnail = _cloudinaryService.GetVideoThumbnailUrl(lec.VideoUrl, 480, 270);
+                    }
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogInformation("Cloudinary video discovery skipped: {Message}", ex.Message);
             }
 
+            var isAdmin = User.IsInRole("Admin");
             var query = _context.Lectures.AsQueryable();
+
+            if (isAdmin)
+            {
+                // Admins see all lectures
+            }
+            else if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                // Logged-in educators/users see all approved lectures PLUS their own uploaded pending/declined lectures
+                var userIdentifiers = await GetCurrentUserIdentifiersAsync();
+                query = query.Where(l => l.Status == "Active" || l.Status == "Approved" || l.Status == "approved" 
+                    || (l.Instructor != null && userIdentifiers.Contains(l.Instructor.ToLower())));
+            }
+            else
+            {
+                // Anonymous visitors only see approved lectures
+                query = query.Where(l => l.Status == "Active" || l.Status == "Approved" || l.Status == "approved");
+            }
 
             if (!string.IsNullOrWhiteSpace(classLevel))
             {
@@ -110,6 +165,21 @@ namespace Onudhabon_ISD.Controllers
                 return NotFound();
             }
 
+            var isAdmin = User.IsInRole("Admin");
+            bool isApproved = lecture.Status == "Active" || lecture.Status == "Approved" || lecture.Status == "approved";
+            bool isOwner = false;
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userIdentifiers = await GetCurrentUserIdentifiersAsync();
+                isOwner = !string.IsNullOrEmpty(lecture.Instructor) && userIdentifiers.Contains(lecture.Instructor.Trim().ToLower());
+            }
+
+            if (!isApproved && !isAdmin && !isOwner)
+            {
+                return NotFound();
+            }
+
             return View(lecture);
         }
 
@@ -135,36 +205,22 @@ namespace Onudhabon_ISD.Controllers
                 return View(model);
             }
 
-            string? videoUrl = null;
-            string? thumbnailUrl = null;
-
-            // 1. If a new video file is uploaded: upload to Cloudinary (ONLY ONCE)
-            if (model.VideoFile != null && model.VideoFile.Length > 0)
+            if (model.VideoFile == null || model.VideoFile.Length == 0)
             {
-                var uploadResult = await _cloudinaryService.UploadLectureVideoAsync(model.VideoFile);
-
-                if (!uploadResult.Success)
-                {
-                    ModelState.AddModelError(nameof(model.VideoFile), uploadResult.ErrorMessage ?? "Failed to upload video to Cloudinary.");
-                    return View(model);
-                }
-
-                videoUrl = uploadResult.SecureUrl;
-                thumbnailUrl = uploadResult.ThumbnailUrl;
-            }
-            // 2. Otherwise if an existing Cloudinary URL is provided: reuse directly without re-uploading
-            else if (!string.IsNullOrWhiteSpace(model.ExistingVideoUrl))
-            {
-                videoUrl = model.ExistingVideoUrl.Trim();
-                thumbnailUrl = !string.IsNullOrWhiteSpace(model.ExistingThumbnailUrl)
-                    ? model.ExistingThumbnailUrl.Trim()
-                    : _cloudinaryService.GetVideoThumbnailUrl(videoUrl, 300, 200);
-            }
-            else
-            {
-                ModelState.AddModelError(nameof(model.VideoFile), "Please select a video file to upload or provide an existing Cloudinary URL.");
+                ModelState.AddModelError(nameof(model.VideoFile), "Please select a video file to upload.");
                 return View(model);
             }
+
+            var uploadResult = await _cloudinaryService.UploadLectureVideoAsync(model.VideoFile);
+
+            if (!uploadResult.Success)
+            {
+                ModelState.AddModelError(nameof(model.VideoFile), uploadResult.ErrorMessage ?? "Failed to upload video to Cloudinary.");
+                return View(model);
+            }
+
+            string? videoUrl = uploadResult.SecureUrl;
+            string? thumbnailUrl = uploadResult.ThumbnailUrl ?? (videoUrl != null ? _cloudinaryService.GetVideoThumbnailUrl(videoUrl, 480, 270) : null);
 
             var lecture = new Lecture
             {
@@ -178,7 +234,7 @@ namespace Onudhabon_ISD.Controllers
                 Subject = model.Subject.Trim(),
                 Topic = model.Topic.Trim(),
                 VideoUrl = videoUrl,
-                Thumbnail = thumbnailUrl,
+                Thumbnail = thumbnailUrl ?? _cloudinaryService.GetVideoThumbnailUrl(videoUrl, 480, 270),
                 Status = "pending",
                 CreatedAt = DateTime.UtcNow,
                 __v = 0
@@ -239,7 +295,22 @@ namespace Onudhabon_ISD.Controllers
                 return Json(Array.Empty<string>());
             }
 
+            var isAdmin = User.IsInRole("Admin");
             var query = _context.Lectures.Where(l => l.Subject == subject);
+
+            if (!isAdmin)
+            {
+                if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    var userIdentifiers = await GetCurrentUserIdentifiersAsync();
+                    query = query.Where(l => l.Status == "Active" || l.Status == "Approved" || l.Status == "approved" 
+                        || (l.Instructor != null && userIdentifiers.Contains(l.Instructor.ToLower())));
+                }
+                else
+                {
+                    query = query.Where(l => l.Status == "Active" || l.Status == "Approved" || l.Status == "approved");
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(classLevel))
             {

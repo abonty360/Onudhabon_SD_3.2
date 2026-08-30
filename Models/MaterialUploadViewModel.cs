@@ -37,15 +37,8 @@ namespace Onudhabon_ISD.Models
         [Display(Name = "Topic")]
         public string Topic { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Please select a material document file (PDF/DOCX) to upload.")]
         [Display(Name = "Material Document File (PDF, DOCX, etc.)")]
         public IFormFile? MaterialFile { get; set; }
-
-        [MaxLength(500)]
-        [Display(Name = "Existing Cloudinary File URL (Optional)")]
-        public string? ExistingFileUrl { get; set; }
-
-        [MaxLength(50)]
-        [Display(Name = "Existing Size (e.g. 2.45 MB)")]
-        public string? ExistingSize { get; set; }
     }
 }

@@ -43,14 +43,21 @@ namespace Onudhabon_ISD.Controllers
                 .OrderByDescending(m => m.Date)
                 .ToListAsync();
 
-            var studentCount = await _context.Students.CountAsync();
+            var forumPosts = await _context.ForumPosts
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
+
+            var students = await _context.Students
+                .OrderByDescending(s => s.CreatedAt)
+                .ToListAsync();
 
             var viewModel = new AdminDashboardViewModel
             {
                 Users = users,
                 Lectures = lectures,
                 Materials = materials,
-                TotalStudentsCount = studentCount
+                ForumPosts = forumPosts,
+                Students = students
             };
 
             ViewBag.ActiveTab = tab ?? "volunteers";
@@ -165,31 +172,91 @@ namespace Onudhabon_ISD.Controllers
             return RedirectToAction(nameof(Dashboard), new { tab = "materials" });
         }
 
-        // POST: /Admin/RestrictEducator
+        // POST: /Admin/ApproveForumPost/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveForumPost(int id)
+        {
+            var post = await _context.ForumPosts.FindAsync(id);
+            if (post == null) return NotFound();
+
+            post.Status = "Active";
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Forum post '{post.Title}' has been approved and is now live in the community forum.";
+            return RedirectToAction(nameof(Dashboard), new { tab = "forum" });
+        }
+
+        // POST: /Admin/DeclineForumPost/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeclineForumPost(int id)
+        {
+            var post = await _context.ForumPosts.FindAsync(id);
+            if (post == null) return NotFound();
+
+            post.Status = "Declined";
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Forum post '{post.Title}' has been declined.";
+            return RedirectToAction(nameof(Dashboard), new { tab = "forum" });
+        }
+
+        // POST: /Admin/ApproveStudent/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) return NotFound();
+
+            student.Status = "Active";
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Student '{student.FullName}' enrollment has been approved.";
+            return RedirectToAction(nameof(Dashboard), new { tab = "students" });
+        }
+
+        // POST: /Admin/DeclineStudent/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeclineStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) return NotFound();
+
+            student.Status = "Declined";
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Student '{student.FullName}' enrollment has been declined.";
+            return RedirectToAction(nameof(Dashboard), new { tab = "students" });
+        }
+
+        // POST: /Admin/RestrictEducator or RestrictUser
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RestrictEducator(string educatorName, string? returnTab = "lectures")
         {
             if (string.IsNullOrWhiteSpace(educatorName))
             {
-                TempData["ErrorMessage"] = "Educator identifier is missing.";
+                TempData["ErrorMessage"] = "User identifier is missing.";
                 return RedirectToAction(nameof(Dashboard), new { tab = returnTab });
             }
 
             var cleanName = educatorName.Trim().ToLower();
-            var educator = await _context.Users
+            var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.FullName.ToLower() == cleanName || u.Email.ToLower() == cleanName);
 
-            if (educator == null)
+            if (user == null)
             {
-                TempData["ErrorMessage"] = $"No registered user matching educator '{educatorName}' was found in the database.";
+                TempData["ErrorMessage"] = $"No registered user matching '{educatorName}' was found in the database.";
                 return RedirectToAction(nameof(Dashboard), new { tab = returnTab });
             }
 
-            educator.IsRestricted = true;
+            user.IsRestricted = true;
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = $"Educator '{educator.FullName}' ({educator.Email}) has been restricted and blocked from logging in.";
+            TempData["SuccessMessage"] = $"User '{user.FullName}' ({user.Email}) has been restricted and blocked from logging in.";
             return RedirectToAction(nameof(Dashboard), new { tab = returnTab });
         }
     }

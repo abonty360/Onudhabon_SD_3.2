@@ -4,7 +4,7 @@
     ViewData["Title"] = "Upload Study Material - Onudhabon";
 }
 
-<div class="container py-4">
+<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -88,22 +88,10 @@
 
                     <!-- Document File Upload (Cloudinary) -->
                     <div class="mb-4">
-                        <label asp-for="MaterialFile" class="form-label fw-semibold">Select Document File (PDF, DOCX, PPTX)</label>
+                        <label asp-for="MaterialFile" class="form-label fw-semibold">Select Document File (PDF, DOCX, PPTX) *</label>
                         <input asp-for="MaterialFile" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx" class="form-control form-control-lg rounded-3" />
                         <span class="text-muted small d-block mt-1">Uploaded directly to <code>onudhabon/materials</code>. File size in MB will be saved automatically.</span>
                         <span asp-validation-for="MaterialFile" class="text-danger small"></span>
-                    </div>
-
-                    <div class="text-center my-3 text-muted position-relative">
-                        <hr />
-                        <span class="bg-white px-3 position-absolute top-50 start-50 translate-middle small fw-semibold text-secondary">OR USE EXISTING CLOUDINARY URL</span>
-                    </div>
-
-                    <!-- Optional Existing Cloudinary File URL (No Re-upload) -->
-                    <div class="mb-4">
-                        <label asp-for="ExistingFileUrl" class="form-label fw-semibold text-secondary">Existing File URL (If already on Cloudinary)</label>
-                        <input asp-for="ExistingFileUrl" class="form-control rounded-3" placeholder="https://res.cloudinary.com/.../onudhabon/materials/sample.pdf" />
-                        <span class="text-muted small">If provided, the existing Cloudinary document URL will be linked directly without re-uploading.</span>
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">
