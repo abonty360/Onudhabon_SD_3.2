@@ -16,6 +16,22 @@ namespace Onudhabon_ISD.Controllers
             _context = context;
         }
 
+        private int? GetCurrentUserId()
+        {
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                return null;
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                return userId;
+            }
+
+            return null;
+        }
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Index()
@@ -23,6 +39,20 @@ namespace Onudhabon_ISD.Controllers
             var posts = await _context.ForumPosts
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
+
+            var userReactions = new Dictionary<int, bool>(); // PostId -> IsLike (true = like, false = dislike)
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId.HasValue)
+            {
+                var postIds = posts.Select(p => p.Id).ToList();
+                var reactions = await _context.ForumPostReactions
+                    .Where(r => r.UserId == currentUserId.Value && postIds.Contains(r.PostId))
+                    .ToListAsync();
+
+                userReactions = reactions.ToDictionary(r => r.PostId, r => r.IsLike);
+            }
+
+            ViewBag.UserReactions = userReactions;
             return View(posts);
         }
 
@@ -62,12 +92,59 @@ namespace Onudhabon_ISD.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public async Task<IActionResult> Like(int id)
         {
-            var post = await _context.ForumPosts.FindAsync(id);
-            if (post != null)
+            var currentUserId = GetCurrentUserId();
+            if (!currentUserId.HasValue)
             {
+                return Json(new { 
+                    success = false, 
+                    requireLogin = true, 
+                    redirectUrl = Url.Action("Login", "Account", new { returnUrl = "/Forum" }) 
+                });
+            }
+
+            var post = await _context.ForumPosts.FindAsync(id);
+            if (post == null)
+            {
+                return Json(new { success = false, message = "Post not found." });
+            }
+
+            var userId = currentUserId.Value;
+            var existingReaction = await _context.ForumPostReactions
+                .FirstOrDefaultAsync(r => r.PostId == id && r.UserId == userId);
+
+            string userReaction;
+
+            if (existingReaction != null)
+            {
+                if (existingReaction.IsLike)
+                {
+                    // 2nd click on Like -> Undo Like
+                    _context.ForumPostReactions.Remove(existingReaction);
+                    post.Likes = Math.Max(0, post.Likes - 1);
+                    userReaction = "none";
+                }
+                else
+                {
+                    // Switched from Dislike to Like
+                    existingReaction.IsLike = true;
+                    existingReaction.CreatedAt = DateTime.UtcNow;
+                    post.Dislikes = Math.Max(0, post.Dislikes - 1);
+                    post.Likes += 1;
+                    userReaction = "like";
+                }
+            }
+            else
+            {
+                // First reaction: Add Like
+                _context.ForumPostReactions.Add(new ForumPostReaction
+                {
+                    PostId = id,
+                    UserId = userId,
+                    IsLike = true,
+                    CreatedAt = DateTime.UtcNow
+                });
                 post.Likes += 1;
 
                 var sender = User.Identity?.Name ?? "Someone";
@@ -88,22 +165,85 @@ namespace Onudhabon_ISD.Controllers
 
                 await _context.SaveChangesAsync();
                 return Json(new { success = true, likes = post.Likes });
+                userReaction = "like";
             }
-            return Json(new { success = false });
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { 
+                success = true, 
+                likes = post.Likes, 
+                dislikes = post.Dislikes,
+                userReaction = userReaction 
+            });
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public async Task<IActionResult> Dislike(int id)
         {
-            var post = await _context.ForumPosts.FindAsync(id);
-            if (post != null)
+            var currentUserId = GetCurrentUserId();
+            if (!currentUserId.HasValue)
             {
-                post.Dislikes += 1;
-                await _context.SaveChangesAsync();
-                return Json(new { success = true, dislikes = post.Dislikes });
+                return Json(new { 
+                    success = false, 
+                    requireLogin = true, 
+                    redirectUrl = Url.Action("Login", "Account", new { returnUrl = "/Forum" }) 
+                });
             }
-            return Json(new { success = false });
+
+            var post = await _context.ForumPosts.FindAsync(id);
+            if (post == null)
+            {
+                return Json(new { success = false, message = "Post not found." });
+            }
+
+            var userId = currentUserId.Value;
+            var existingReaction = await _context.ForumPostReactions
+                .FirstOrDefaultAsync(r => r.PostId == id && r.UserId == userId);
+
+            string userReaction;
+
+            if (existingReaction != null)
+            {
+                if (!existingReaction.IsLike)
+                {
+                    // 2nd click on Dislike -> Undo Dislike
+                    _context.ForumPostReactions.Remove(existingReaction);
+                    post.Dislikes = Math.Max(0, post.Dislikes - 1);
+                    userReaction = "none";
+                }
+                else
+                {
+                    // Switched from Like to Dislike
+                    existingReaction.IsLike = false;
+                    existingReaction.CreatedAt = DateTime.UtcNow;
+                    post.Likes = Math.Max(0, post.Likes - 1);
+                    post.Dislikes += 1;
+                    userReaction = "dislike";
+                }
+            }
+            else
+            {
+                // First reaction: Add Dislike
+                _context.ForumPostReactions.Add(new ForumPostReaction
+                {
+                    PostId = id,
+                    UserId = userId,
+                    IsLike = false,
+                    CreatedAt = DateTime.UtcNow
+                });
+                post.Dislikes += 1;
+                userReaction = "dislike";
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { 
+                success = true, 
+                likes = post.Likes, 
+                dislikes = post.Dislikes,
+                userReaction = userReaction 
+            });
         }
 
         [HttpGet]

@@ -18,6 +18,7 @@ namespace Onudhabon_ISD.Data
         public DbSet<Forum> Forums { get; set; }
         public DbSet<ForumPost> ForumPosts { get; set; }
         public DbSet<ForumComment> ForumComments { get; set; }
+        public DbSet<ForumPostReaction> ForumPostReactions { get; set; }
         public DbSet<ClassPlan> ClassPlans { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -177,6 +178,15 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Content).IsRequired().HasMaxLength(2000);
                 entity.Property(e => e.Author).HasMaxLength(150);
                 entity.Property(e => e.AuthorRole).HasMaxLength(50);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            // ForumPostReaction Entity Configuration
+            modelBuilder.Entity<ForumPostReaction>(entity =>
+            {
+                entity.ToTable("ForumPostReactions");
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => new { e.PostId, e.UserId }).IsUnique();
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
             });
 

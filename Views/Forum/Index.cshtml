@@ -1,8 +1,10 @@
-@model IEnumerable<Onudhabon_ISD.Models.ForumPost>
+﻿@model IEnumerable<Onudhabon_ISD.Models.ForumPost>
 @using System.Security.Claims
 
 @{
     ViewData["Title"] = "Community Forum";
+    var userReactions = ViewBag.UserReactions as Dictionary<int, bool> ?? new Dictionary<int, bool>();
+    bool isAuthenticated = User.Identity != null && User.Identity.IsAuthenticated;
 }
 
 <div class="container py-4" style="max-width: 900px;">
@@ -11,7 +13,7 @@
             <h2 class="fw-bold text-dark mb-1">Community Forum</h2>
             <p class="text-muted mb-0">Connect, ask questions, and share knowledge between Educators & Local Guardians.</p>
         </div>
-        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        @if (isAuthenticated)
         {
             <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createPostModal">
                 + New Discussion
@@ -19,7 +21,7 @@
         }
         else
         {
-            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary rounded-pill px-4">
+            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="btn btn-outline-primary rounded-pill px-4">
                 Login to Post
             </a>
         }
@@ -55,6 +57,11 @@
             @foreach (var post in Model)
             {
                 <div id="post-@post.Id" class="card border border-light-subtle rounded-3 shadow-sm p-4 bg-white hover-shadow transition">
+                bool hasReaction = userReactions.TryGetValue(post.Id, out bool isLike);
+                bool isLiked = hasReaction && isLike;
+                bool isDisliked = hasReaction && !isLike;
+
+                <div class="card border border-light-subtle rounded-3 shadow-sm p-4 bg-white hover-shadow transition">
                     <h4 class="fw-bold text-dark mb-2">@post.Title</h4>
                     
                     <div class="text-muted small mb-3">
@@ -63,7 +70,7 @@
                         {
                             <span class="text-muted">(@post.AuthorRole)</span>
                         }
-                        � @post.CreatedAt.ToString("M/d/yyyy, h:mm:ss tt")
+                        • @post.CreatedAt.ToString("M/d/yyyy, h:mm:ss tt")
                     </div>
 
                     @if (!string.IsNullOrEmpty(post.Tags))
@@ -84,10 +91,18 @@
                         </button>
 
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-outline-success btn-sm rounded-3 px-3 py-1 fw-medium like-btn" data-post-id="@post.Id">
+                            <button type="button" 
+                                    class="btn @(isLiked ? "btn-success text-white" : "btn-outline-success") btn-sm rounded-3 px-3 py-1 fw-medium like-btn" 
+                                    id="like-btn-@post.Id"
+                                    data-post-id="@post.Id"
+                                    data-is-active="@(isLiked ? "true" : "false")">
                                 Like (<span id="like-count-@post.Id">@post.Likes</span>)
                             </button>
-                            <button type="button" class="btn btn-outline-danger btn-sm rounded-3 px-3 py-1 fw-medium dislike-btn" data-post-id="@post.Id">
+                            <button type="button" 
+                                    class="btn @(isDisliked ? "btn-danger text-white" : "btn-outline-danger") btn-sm rounded-3 px-3 py-1 fw-medium dislike-btn" 
+                                    id="dislike-btn-@post.Id"
+                                    data-post-id="@post.Id"
+                                    data-is-active="@(isDisliked ? "true" : "false")">
                                 Dislike (<span id="dislike-count-@post.Id">@post.Dislikes</span>)
                             </button>
                         </div>
@@ -101,7 +116,7 @@
                             <div class="text-muted small">Loading comments...</div>
                         </div>
 
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        @if (isAuthenticated)
                         {
                             <div class="input-group">
                                 <input type="text" id="comment-input-@post.Id" class="form-control rounded-start-3" placeholder="Write a reply..." />
@@ -111,7 +126,7 @@
                         else
                         {
                             <div class="alert alert-light border small text-muted mb-0">
-                                Please <a asp-controller="Account" asp-action="Login" class="fw-semibold">log in</a> to leave a reply.
+                                Please <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="fw-semibold">log in</a> to leave a reply.
                             </div>
                         }
                     </div>
@@ -122,7 +137,7 @@
 </div>
 
 <!-- Modal for New Post -->
-@if (User.Identity != null && User.Identity.IsAuthenticated)
+@if (isAuthenticated)
 {
     <div class="modal fade" id="createPostModal" tabindex="-1" aria-labelledby="createPostModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -175,6 +190,26 @@
                         detailsDiv.removeClass('d-none');
                         loadComments(postId);
                     }
+            var isAuthenticated = @(isAuthenticated ? "true" : "false");
+            var loginUrl = '@Url.Action("Login", "Account", new { returnUrl = "/Forum" })';
+
+            function updateReactionUI(postId, likes, dislikes, userReaction) {
+                $('#like-count-' + postId).text(likes);
+                $('#dislike-count-' + postId).text(dislikes);
+
+                var likeBtn = $('#like-btn-' + postId);
+                var dislikeBtn = $('#dislike-btn-' + postId);
+
+                if (userReaction === 'like') {
+                    likeBtn.removeClass('btn-outline-success').addClass('btn-success text-white').attr('data-is-active', 'true');
+                    dislikeBtn.removeClass('btn-danger text-white').addClass('btn-outline-danger').attr('data-is-active', 'false');
+                } else if (userReaction === 'dislike') {
+                    dislikeBtn.removeClass('btn-outline-danger').addClass('btn-danger text-white').attr('data-is-active', 'true');
+                    likeBtn.removeClass('btn-success text-white').addClass('btn-outline-success').attr('data-is-active', 'false');
+                } else {
+                    // 'none' or undone
+                    likeBtn.removeClass('btn-success text-white').addClass('btn-outline-success').attr('data-is-active', 'false');
+                    dislikeBtn.removeClass('btn-danger text-white').addClass('btn-outline-danger').attr('data-is-active', 'false');
                 }
             }
 
@@ -230,22 +265,52 @@
             });
 
             // Like Action
-            $('.like-btn').click(function () {
+            $(document).on('click', '.like-btn', function () {
+                if (!isAuthenticated) {
+                    window.location.href = loginUrl;
+                    return;
+                }
+
                 var postId = $(this).data('post-id');
+                var btn = $(this);
+                btn.prop('disabled', true);
+
                 $.post('/Forum/Like', { id: postId }, function (res) {
-                    if (res.success) {
-                        $('#like-count-' + postId).text(res.likes);
+                    btn.prop('disabled', false);
+                    if (res.requireLogin) {
+                        window.location.href = res.redirectUrl || loginUrl;
+                        return;
                     }
+                    if (res.success) {
+                        updateReactionUI(postId, res.likes, res.dislikes, res.userReaction);
+                    }
+                }).fail(function () {
+                    btn.prop('disabled', false);
                 });
             });
 
             // Dislike Action
-            $('.dislike-btn').click(function () {
+            $(document).on('click', '.dislike-btn', function () {
+                if (!isAuthenticated) {
+                    window.location.href = loginUrl;
+                    return;
+                }
+
                 var postId = $(this).data('post-id');
+                var btn = $(this);
+                btn.prop('disabled', true);
+
                 $.post('/Forum/Dislike', { id: postId }, function (res) {
-                    if (res.success) {
-                        $('#dislike-count-' + postId).text(res.dislikes);
+                    btn.prop('disabled', false);
+                    if (res.requireLogin) {
+                        window.location.href = res.redirectUrl || loginUrl;
+                        return;
                     }
+                    if (res.success) {
+                        updateReactionUI(postId, res.likes, res.dislikes, res.userReaction);
+                    }
+                }).fail(function () {
+                    btn.prop('disabled', false);
                 });
             });
         });
