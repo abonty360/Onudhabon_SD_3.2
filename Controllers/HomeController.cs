@@ -20,7 +20,8 @@ namespace Onudhabon_ISD.Controllers
 {
     var userCount = await _context.Users.CountAsync();
 
-    var materialCount = await _context.Materials.CountAsync();
+    var materialCount = await _context.Materials
+        .CountAsync(m => m.Status == "Active" || m.Status == "Approved" || m.Status == "approved");
 
     var volunteerCount = await _context.Users
         .CountAsync(u => u.Role == "Volunteer");

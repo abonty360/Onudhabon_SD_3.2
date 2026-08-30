@@ -49,6 +49,21 @@
             </div>
         }
 
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 mt-2" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4 mt-2" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
         <form method="get" asp-action="Index" class="lecture-filters" id="lectureFilters">
             <div class="filter-field search-field">
                 <label for="search">Search</label>
@@ -147,9 +162,21 @@
                             </div>
 
                             <div class="lecture-card-body">
-                                <div class="meta-row">
+                                <div class="meta-row d-flex align-items-center flex-wrap gap-1">
                                     <span class="grade-pill">Class @lecture.ClassLevel</span>
                                     <span class="subject-pill">@lecture.Subject</span>
+                                    @if (lecture.Status?.ToLower() == "pending")
+                                    {
+                                        <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill px-2 py-0.5 ms-auto" style="font-size: 0.75rem;">
+                                            ⏳ Pending Approval
+                                        </span>
+                                    }
+                                    else if (lecture.Status?.ToLower() == "declined")
+                                    {
+                                        <span class="badge bg-danger text-white border rounded-pill px-2 py-0.5 ms-auto" style="font-size: 0.75rem;">
+                                            ✕ Declined
+                                        </span>
+                                    }
                                 </div>
 
                                 <h3>@lecture.Title</h3>

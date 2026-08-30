@@ -23,6 +23,29 @@ namespace Onudhabon_ISD.Controllers
             _logger = logger;
         }
 
+        private async Task<List<string>> GetCurrentUserIdentifiersAsync()
+        {
+            var identifiers = new List<string>();
+            var userName = User.Identity?.Name;
+            var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrWhiteSpace(userName)) identifiers.Add(userName.Trim().ToLower());
+            if (!string.IsNullOrWhiteSpace(userEmail)) identifiers.Add(userEmail.Trim().ToLower());
+
+            if (int.TryParse(userIdClaim, out int uid))
+            {
+                var dbUser = await _context.Users.FindAsync(uid);
+                if (dbUser != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(dbUser.FullName)) identifiers.Add(dbUser.FullName.Trim().ToLower());
+                    if (!string.IsNullOrWhiteSpace(dbUser.Email)) identifiers.Add(dbUser.Email.Trim().ToLower());
+                }
+            }
+
+            return identifiers.Distinct().ToList();
+        }
+
         // GET: /Lecture
         [HttpGet]
         [AllowAnonymous]
@@ -85,7 +108,25 @@ namespace Onudhabon_ISD.Controllers
                 _logger.LogInformation("Cloudinary video discovery skipped: {Message}", ex.Message);
             }
 
+            var isAdmin = User.IsInRole("Admin");
             var query = _context.Lectures.AsQueryable();
+
+            if (isAdmin)
+            {
+                // Admins see all lectures
+            }
+            else if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                // Logged-in educators/users see all approved lectures PLUS their own uploaded pending/declined lectures
+                var userIdentifiers = await GetCurrentUserIdentifiersAsync();
+                query = query.Where(l => l.Status == "Active" || l.Status == "Approved" || l.Status == "approved" 
+                    || (l.Instructor != null && userIdentifiers.Contains(l.Instructor.ToLower())));
+            }
+            else
+            {
+                // Anonymous visitors only see approved lectures
+                query = query.Where(l => l.Status == "Active" || l.Status == "Approved" || l.Status == "approved");
+            }
 
             if (!string.IsNullOrWhiteSpace(classLevel))
             {
@@ -120,6 +161,21 @@ namespace Onudhabon_ISD.Controllers
         {
             var lecture = await _context.Lectures.FirstOrDefaultAsync(l => l.Id == id);
             if (lecture == null)
+            {
+                return NotFound();
+            }
+
+            var isAdmin = User.IsInRole("Admin");
+            bool isApproved = lecture.Status == "Active" || lecture.Status == "Approved" || lecture.Status == "approved";
+            bool isOwner = false;
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userIdentifiers = await GetCurrentUserIdentifiersAsync();
+                isOwner = !string.IsNullOrEmpty(lecture.Instructor) && userIdentifiers.Contains(lecture.Instructor.Trim().ToLower());
+            }
+
+            if (!isApproved && !isAdmin && !isOwner)
             {
                 return NotFound();
             }
@@ -253,7 +309,22 @@ namespace Onudhabon_ISD.Controllers
                 return Json(Array.Empty<string>());
             }
 
+            var isAdmin = User.IsInRole("Admin");
             var query = _context.Lectures.Where(l => l.Subject == subject);
+
+            if (!isAdmin)
+            {
+                if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    var userIdentifiers = await GetCurrentUserIdentifiersAsync();
+                    query = query.Where(l => l.Status == "Active" || l.Status == "Approved" || l.Status == "approved" 
+                        || (l.Instructor != null && userIdentifiers.Contains(l.Instructor.ToLower())));
+                }
+                else
+                {
+                    query = query.Where(l => l.Status == "Active" || l.Status == "Approved" || l.Status == "approved");
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(classLevel))
             {
