@@ -447,18 +447,43 @@ namespace Onudhabon_ISD.Services
             return originalUrl.Replace("/video/upload/", $"/video/upload/{transformString}/");
         }
 
-        public string GetVideoThumbnailUrl(string? videoUrl, int width = 300, int height = 200)
+        public string GetVideoThumbnailUrl(string? videoUrl, int width = 480, int height = 270)
         {
             if (string.IsNullOrWhiteSpace(videoUrl)) return string.Empty;
 
-            if (!videoUrl.Contains("res.cloudinary.com") || !videoUrl.Contains("/video/upload/"))
+            if (!videoUrl.Contains("res.cloudinary.com"))
             {
                 return videoUrl;
             }
 
-            var transform = $"so_0,w_{width},h_{height},c_fill,f_jpg";
-            var transformed = videoUrl.Replace("/video/upload/", $"/video/upload/{transform}/");
-            return Path.ChangeExtension(transformed, ".jpg");
+            if (videoUrl.Contains("/video/upload/"))
+            {
+                var uploadIndex = videoUrl.IndexOf("/video/upload/", StringComparison.OrdinalIgnoreCase);
+                var prefix = videoUrl.Substring(0, uploadIndex + "/video/upload/".Length);
+                var rest = videoUrl.Substring(uploadIndex + "/video/upload/".Length);
+
+                // Strip existing transformation parameters if present
+                if (System.Text.RegularExpressions.Regex.IsMatch(rest, @"^(?:(?:[a-zA-Z0-9_-]+(?:_[a-zA-Z0-9_-]+)*,?)+/)?v\d+/"))
+                {
+                    rest = System.Text.RegularExpressions.Regex.Replace(rest, @"^(?:[a-zA-Z0-9_-]+(?:_[a-zA-Z0-9_-]+)*,?)+/(v\d+/)", "$1");
+                }
+                else if (System.Text.RegularExpressions.Regex.IsMatch(rest, @"^[a-zA-Z0-9_,]+/(?!v\d+)"))
+                {
+                    rest = System.Text.RegularExpressions.Regex.Replace(rest, @"^[a-zA-Z0-9_,]+/", "");
+                }
+
+                // Change extension to .jpg for video thumbnail delivery
+                rest = System.Text.RegularExpressions.Regex.Replace(rest, @"\.(mp4|mkv|webm|mov|avi|flv|wmv|m4v|jpg|jpeg|png)(\?.*)?$", ".jpg$2", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (!rest.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) && !rest.Contains(".jpg?"))
+                {
+                    rest += ".jpg";
+                }
+
+                var transform = $"so_0,w_{width},h_{height},c_fill,f_jpg";
+                return $"{prefix}{transform}/{rest}";
+            }
+
+            return videoUrl;
         }
 
         public string GetPdfThumbnailUrl(string? originalUrl, int width = 300, int page = 1)

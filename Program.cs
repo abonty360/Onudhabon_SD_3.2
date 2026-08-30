@@ -56,9 +56,8 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthentication();
@@ -82,6 +81,7 @@ using (var scope = app.Services.CreateScope())
         var hasher = services.GetRequiredService<IPasswordHasher<User>>();
         DbInitializer.SeedAdminUser(context, hasher);
         DbInitializer.SeedClassPlans(context);
+        DbInitializer.SeedForumPosts(context);
     }
     catch (Exception ex)
     {

@@ -129,5 +129,44 @@ namespace Onudhabon_ISD.Data
                 context.SaveChanges();
             }
         }
+
+        public static void SeedForumPosts(ApplicationDbContext context)
+        {
+            if (!context.ForumPosts.Any())
+            {
+                var samplePosts = new List<ForumPost>
+                {
+                    new ForumPost
+                    {
+                        Title = "Physics Lecture",
+                        Content = "Are there any Educators planning to create lectures on 11th grade physics -> Electricity topic? If not, then I'd like to...",
+                        Author = "Abonty Rahman Flora",
+                        AuthorRole = "Educator",
+                        Tags = "#discussion #lectures",
+                        Category = "General",
+                        Likes = 5,
+                        Dislikes = 0,
+                        Replies = 1,
+                        CreatedAt = new DateTime(2025, 9, 19, 19, 23, 13, DateTimeKind.Utc)
+                    },
+                    new ForumPost
+                    {
+                        Title = "Student Progress Tracker Live",
+                        Content = "Local Guardians can now track live progress of their enrolled students....",
+                        Author = "System Admin",
+                        AuthorRole = "Admin",
+                        Tags = "#localguardian #studentprogress",
+                        Category = "General",
+                        Likes = 1,
+                        Dislikes = 0,
+                        Replies = 0,
+                        CreatedAt = new DateTime(2025, 9, 14, 9, 15, 20, DateTimeKind.Utc)
+                    }
+                };
+
+                context.ForumPosts.AddRange(samplePosts);
+                context.SaveChanges();
+            }
+        }
     }
 }
