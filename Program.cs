@@ -82,6 +82,7 @@ using (var scope = app.Services.CreateScope())
         var hasher = services.GetRequiredService<IPasswordHasher<User>>();
         DbInitializer.SeedAdminUser(context, hasher);
         DbInitializer.SeedClassPlans(context);
+        DbInitializer.SeedForumPosts(context);
     }
     catch (Exception ex)
     {

@@ -62,6 +62,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Material" asp-action="Index">Study Materials</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Forum" asp-action="Index">Community Forum</a>
+                        </li>
                         @if (userRole == "Admin" || User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
