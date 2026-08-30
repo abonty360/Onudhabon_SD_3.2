@@ -56,6 +56,7 @@
         {
             @foreach (var post in Model)
             {
+                <div id="post-@post.Id" class="card border border-light-subtle rounded-3 shadow-sm p-4 bg-white hover-shadow transition">
                 bool hasReaction = userReactions.TryGetValue(post.Id, out bool isLike);
                 bool isLiked = hasReaction && isLike;
                 bool isDisliked = hasReaction && !isLike;
@@ -174,6 +175,21 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            // Auto open & scroll to post if hash URL is provided (e.g. #post-5)
+            if (window.location.hash) {
+                var targetPost = $(window.location.hash);
+                if (targetPost.length) {
+                    $('html, body').animate({
+                        scrollTop: targetPost.offset().top - 80
+                    }, 500);
+
+                    targetPost.addClass('border-primary shadow');
+                    var postId = window.location.hash.replace('#post-', '');
+                    var detailsDiv = $('#details-section-' + postId);
+                    if (detailsDiv.length) {
+                        detailsDiv.removeClass('d-none');
+                        loadComments(postId);
+                    }
             var isAuthenticated = @(isAuthenticated ? "true" : "false");
             var loginUrl = '@Url.Action("Login", "Account", new { returnUrl = "/Forum" })';
 
