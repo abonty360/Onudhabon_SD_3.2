@@ -163,8 +163,6 @@ namespace Onudhabon_ISD.Controllers
                     _context.Notifications.Add(notification);
                 }
 
-                await _context.SaveChangesAsync();
-                return Json(new { success = true, likes = post.Likes });
                 userReaction = "like";
             }
 

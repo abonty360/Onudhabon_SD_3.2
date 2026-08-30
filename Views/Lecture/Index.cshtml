@@ -122,26 +122,41 @@
                              data-subject="@lecture.Subject"
                              data-topic="@lecture.Topic"
                              data-version="@lecture.Version">
-                        <div class="video-frame">
-                            <img src="@(string.IsNullOrWhiteSpace(lecture.Thumbnail) ? CloudinaryService.GetVideoThumbnailUrl(lecture.VideoUrl, 480, 270) : lecture.Thumbnail)"
-                                 alt="@lecture.Title"
-                                 onerror="this.src='https://via.placeholder.com/480x270?text=Lecture+Video';" />
-                            <div class="video-overlay">
-                                <span class="play-icon">▶</span>
-                                <span class="time-label">0:00 / 0:25</span>
+                        <a asp-action="Details" asp-route-id="@lecture.Id" class="text-decoration-none text-dark d-block">
+                            <div class="video-frame">
+                                @if (!string.IsNullOrWhiteSpace(lecture.VideoUrl))
+                                {
+                                    <video class="lecture-video-preview"
+                                           preload="metadata"
+                                           muted
+                                           playsinline
+                                           disablepictureinpicture
+                                           src="@(lecture.VideoUrl)#t=0.5">
+                                    </video>
+                                }
+                                else
+                                {
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted bg-dark">
+                                        <span>No Video</span>
+                                    </div>
+                                }
+                                <div class="video-overlay">
+                                    <span class="play-icon">▶</span>
+                                    <span class="time-label" style="display: none;">0:00</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="lecture-card-body">
-                            <div class="meta-row">
-                                <span class="grade-pill">Grade @lecture.ClassLevel</span>
-                                <span class="subject-pill">@lecture.Subject</span>
+                            <div class="lecture-card-body">
+                                <div class="meta-row">
+                                    <span class="grade-pill">Class @lecture.ClassLevel</span>
+                                    <span class="subject-pill">@lecture.Subject</span>
+                                </div>
+
+                                <h3>@lecture.Title</h3>
+                                <p>@(string.IsNullOrWhiteSpace(lecture.Description) ? "Recorded video lecture for students." : lecture.Description)</p>
+                                <div class="author-row">👨‍🏫 @(lecture.Instructor ?? "Educator")</div>
                             </div>
-
-                            <h3>@lecture.Title</h3>
-                            <p>@(string.IsNullOrWhiteSpace(lecture.Description) ? "This is a test" : lecture.Description)</p>
-                            <div class="author-row">@lecture.Instructor</div>
-                        </div>
+                        </a>
                     </article>
                 }
             </div>
@@ -151,12 +166,60 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // 1. Calculate & display static total duration for each video card (fixed, never increases)
+        function formatDuration(seconds) {
+            if (!seconds || isNaN(seconds) || !isFinite(seconds)) return '0:00';
+            const totalSecs = Math.round(seconds);
+            const hrs = Math.floor(totalSecs / 3600);
+            const mins = Math.floor((totalSecs % 3600) / 60);
+            const secs = totalSecs % 60;
+            
+            if (hrs > 0) {
+                return `${hrs}:${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        const cards = Array.from(document.querySelectorAll('.lecture-card'));
+
+        cards.forEach(function (card) {
+            const video = card.querySelector('video.lecture-video-preview');
+            const timeLabel = card.querySelector('.time-label');
+
+            if (video && timeLabel) {
+                function updateDuration() {
+                    if (video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
+                        timeLabel.textContent = formatDuration(video.duration);
+                        timeLabel.style.display = 'inline-block';
+                    }
+                }
+
+                if (video.readyState >= 1) {
+                    updateDuration();
+                } else {
+                    video.addEventListener('loadedmetadata', updateDuration, { once: true });
+                }
+
+                // Optional smooth hover preview without affecting static total duration
+                card.addEventListener('mouseenter', function () {
+                    if (video.readyState >= 2) {
+                        video.play().catch(function() {});
+                    }
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    video.pause();
+                    video.currentTime = 0.5;
+                });
+            }
+        });
+
+        // 2. Search & filter logic
         const searchInput = document.getElementById('search');
         const classSelect = document.getElementById('classLevel');
         const subjectSelect = document.getElementById('subject');
         const topicSelect = document.getElementById('topic');
         const versionSelect = document.getElementById('version');
-        const cards = Array.from(document.querySelectorAll('.lecture-card'));
 
         function getValue(element) {
             return element ? element.value.trim().toLowerCase() : '';

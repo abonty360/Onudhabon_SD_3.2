@@ -415,89 +415,76 @@ main {
 
 
 /* =========================================
-   FOOTER
+   GLOBAL FOOTER
 ========================================= */
 
+.site-footer,
 .home-footer {
     position: relative;
-
     width: 100%;
-
-    margin-top: 18px;
-
+    margin-top: auto;
     clear: both;
-
-    background: rgba(255, 255, 255, 0.18);
-
+    background: #ffffff;
     border-top: 1px solid rgba(15, 23, 42, 0.08);
-
-    padding: 25px 0 16px;
+    padding: 36px 0 20px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.02);
 }
 
 .footer-inner {
     max-width: 1080px;
-
     margin: 0 auto;
-
     padding: 0 20px;
-
     display: grid;
-
     grid-template-columns: 1.6fr 1fr 1fr;
-
-    gap: 25px;
-
+    gap: 30px;
     align-items: start;
 }
 
 .footer-column h3 {
     margin: 0 0 14px;
-
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 700;
-
     color: #111827;
 }
 
 .about-column p {
     margin: 0;
-
     color: #4b5563;
-
     line-height: 1.65;
-
     font-size: 0.9rem;
 }
 
 .footer-column ul {
     list-style: none;
-
     padding: 0;
     margin: 0;
 }
 
 .footer-column li {
     margin-bottom: 8px;
-
     color: #1f2937;
-
     font-size: 0.9rem;
     line-height: 1.5;
 }
 
+.footer-column a {
+    color: #4b5563;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-column a:hover {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
 .footer-bottom {
     max-width: 1080px;
-
-    margin: 16px auto 0;
-
+    margin: 24px auto 0;
     padding: 16px 20px 0;
-
     border-top: 1px solid rgba(15, 23, 42, 0.08);
-
     text-align: center;
-
-    color: #4b5563;
-
+    color: #64748b;
     font-size: 0.85rem;
 }
 
@@ -794,11 +781,22 @@ main {
    ========================= */
 
 .lecture-card {
-    background: rgba(255, 255, 255, 0.64);
+    background: #ffffff;
     border: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lecture-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+}
+
+.lecture-card a {
+    text-decoration: none;
+    color: inherit;
 }
 
 
@@ -808,52 +806,82 @@ main {
 
 .video-frame {
     position: relative;
-    height: 175px;
+    height: 190px;
     background: #09090b;
     overflow: hidden;
 }
 
-.video-frame img {
+.video-frame img,
+.video-frame video,
+.video-frame .lecture-video-preview {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: saturate(1.08) contrast(1.02);
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+.lecture-card:hover .video-frame img,
+.lecture-card:hover .video-frame video,
+.lecture-card:hover .video-frame .lecture-video-preview {
+    transform: scale(1.04);
 }
 
 .video-overlay {
     position: absolute;
-    inset: auto 0 0 0;
-    padding: 8px 10px 7px;
+    inset: 0;
+    padding: 10px 12px;
     background: linear-gradient(
         180deg,
-        rgba(0, 0, 0, 0) 0%,
-        rgba(0, 0, 0, 0.72) 40%,
-        rgba(0, 0, 0, 0.9) 100%
+        rgba(0, 0, 0, 0.1) 0%,
+        rgba(0, 0, 0, 0) 50%,
+        rgba(0, 0, 0, 0.75) 100%
     );
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     color: #fff;
-    font-size: 0.8rem;
+    transition: background 0.2s ease;
+    pointer-events: none;
+}
+
+.lecture-card:hover .video-overlay {
+    background: rgba(0, 0, 0, 0.25);
 }
 
 .play-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    font-size: 0.65rem;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    font-size: 1.1rem;
+    background: rgba(255, 255, 255, 0.92);
+    color: #0f172a;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.lecture-card:hover .play-icon {
+    transform: scale(1.12);
+    background: #fbbf24;
+    color: #0f172a;
 }
 
 .time-label {
-    font-size: 0.75rem;
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    font-size: 0.78rem;
     font-weight: 600;
-    opacity: 0.95;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(4px);
 }
 
 
@@ -980,31 +1008,65 @@ main {
     }
 }
 
-/* Shared transparent header and hero adjustments */
+/* Shared transparent / solid header and hero adjustments */
 .site-header {
+    width: 100%;
+    z-index: 1050;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.site-header.header-transparent {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1050;
     background: transparent;
+}
+
+.site-header.header-solid {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #0b1329 0%, #111e38 50%, #172554 100%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .main-navbar {
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
-    padding: 18px 0;
+    padding: 12px 0;
 }
 
 .main-navbar .nav-link {
-    color: rgba(255, 255, 255, 0.9) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.45rem 0.85rem !important;
+    border-radius: 6px;
+    transition: color 0.2s ease, background-color 0.2s ease;
 }
 
 .main-navbar .nav-link:hover,
-.main-navbar .nav-link:focus,
+.main-navbar .nav-link:focus {
+    color: #fbbf24 !important;
+}
+
 .main-navbar .nav-link.active {
     color: #fbbf24 !important;
+    font-weight: 700;
+}
+
+.user-profile-link {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: background-color 0.2s ease;
+}
+
+.user-profile-link:hover {
+    background: rgba(255, 255, 255, 0.16);
 }
 
 .home-hero,

@@ -51,7 +51,7 @@ namespace Onudhabon_ISD.Controllers
                                 Subject = "General",
                                 Topic = cVid.DisplayTitle,
                                 VideoUrl = cVid.SecureUrl,
-                                Thumbnail = cVid.ThumbnailUrl ?? _cloudinaryService.GetVideoThumbnailUrl(cVid.SecureUrl, 300, 200),
+                                Thumbnail = _cloudinaryService.GetVideoThumbnailUrl(cVid.SecureUrl, 480, 270),
                                 Status = "Active",
                                 CreatedAt = cVid.CreatedAt,
                                 __v = 0
@@ -64,6 +64,20 @@ namespace Onudhabon_ISD.Controllers
                         _context.Lectures.AddRange(newLectures);
                         await _context.SaveChangesAsync();
                     }
+                }
+
+                // Automatically ensure all existing lectures have Cloudinary thumbnails generated
+                var lecturesNeedingThumbnails = await _context.Lectures
+                    .Where(l => !string.IsNullOrEmpty(l.VideoUrl) && string.IsNullOrEmpty(l.Thumbnail))
+                    .ToListAsync();
+
+                if (lecturesNeedingThumbnails.Any())
+                {
+                    foreach (var lec in lecturesNeedingThumbnails)
+                    {
+                        lec.Thumbnail = _cloudinaryService.GetVideoThumbnailUrl(lec.VideoUrl, 480, 270);
+                    }
+                    await _context.SaveChangesAsync();
                 }
             }
             catch (Exception ex)
@@ -150,7 +164,7 @@ namespace Onudhabon_ISD.Controllers
                 }
 
                 videoUrl = uploadResult.SecureUrl;
-                thumbnailUrl = uploadResult.ThumbnailUrl;
+                thumbnailUrl = uploadResult.ThumbnailUrl ?? _cloudinaryService.GetVideoThumbnailUrl(videoUrl, 480, 270);
             }
             // 2. Otherwise if an existing Cloudinary URL is provided: reuse directly without re-uploading
             else if (!string.IsNullOrWhiteSpace(model.ExistingVideoUrl))
@@ -158,7 +172,7 @@ namespace Onudhabon_ISD.Controllers
                 videoUrl = model.ExistingVideoUrl.Trim();
                 thumbnailUrl = !string.IsNullOrWhiteSpace(model.ExistingThumbnailUrl)
                     ? model.ExistingThumbnailUrl.Trim()
-                    : _cloudinaryService.GetVideoThumbnailUrl(videoUrl, 300, 200);
+                    : _cloudinaryService.GetVideoThumbnailUrl(videoUrl, 480, 270);
             }
             else
             {
@@ -178,7 +192,7 @@ namespace Onudhabon_ISD.Controllers
                 Subject = model.Subject.Trim(),
                 Topic = model.Topic.Trim(),
                 VideoUrl = videoUrl,
-                Thumbnail = thumbnailUrl,
+                Thumbnail = thumbnailUrl ?? _cloudinaryService.GetVideoThumbnailUrl(videoUrl, 480, 270),
                 Status = "pending",
                 CreatedAt = DateTime.UtcNow,
                 __v = 0

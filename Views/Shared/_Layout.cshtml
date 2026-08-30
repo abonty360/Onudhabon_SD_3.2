@@ -27,6 +27,9 @@
 
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    bool isHeroPage = (currentController == "Home" && (currentAction == "Index" || string.IsNullOrEmpty(currentAction)))
+                   || (currentController == "Lecture" && currentAction == "Index")
+                   || (currentController == "Material" && currentAction == "Index");
 }
 
 <!DOCTYPE html>
@@ -44,7 +47,7 @@
     <link rel="stylesheet" href="~/Onudhabon_ISD.styles.css" asp-append-version="true" />
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <header class="site-header">
+    <header class="site-header @(isHeroPage ? "header-transparent" : "header-solid")">
         <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
             <div class="container-fluid px-lg-4 px-3">
                 <!-- Logo -->
@@ -65,19 +68,16 @@
                             <a class="nav-link @(currentController == "Home" && (currentAction == "Index" || string.IsNullOrEmpty(currentAction)) ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(currentController == "Lecture" ? "active" : "")" asp-area="" asp-controller="Lecture" asp-action="Index">Lectures</a>
+                            <a class="nav-link @(currentController == "Lecture" && currentAction == "Index" ? "active" : "")" asp-area="" asp-controller="Lecture" asp-action="Index">Lectures</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(currentController == "Material" ? "active" : "")" asp-area="" asp-controller="Material" asp-action="Index">Materials</a>
+                            <a class="nav-link @(currentController == "Material" && currentAction == "Index" ? "active" : "")" asp-area="" asp-controller="Material" asp-action="Index">Materials</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(currentController == "Home" && currentAction == "About" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="About">About</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(currentController == "Forum" ? "active" : "")" asp-area="" asp-controller="Forum" asp-action="Index">Forum</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Forum" asp-action="Index">Community Forum</a>
                         </li>
                         @if (userRole == "Admin" || User.IsInRole("Admin"))
                         {
@@ -95,8 +95,8 @@
                         {
                             @if (userRole == "Educator" || User.IsInRole("Educator"))
                             {
-                                <li class="nav-item dropdown me-3">
-                                    <a class="btn btn-outline-primary btn-sm dropdown-toggle rounded-pill px-3 py-1.5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <li class="nav-item dropdown me-2">
+                                    <a class="btn btn-outline-light btn-sm dropdown-toggle rounded-pill px-3 py-1.5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         + Upload
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2">
@@ -110,30 +110,13 @@
                                                 📄 Upload Study Material
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-    <a class="nav-link text-dark fw-medium px-3"
-       asp-area=""
-       asp-controller="Home"
-       asp-action="About">
-        About
-    </a>
-</li>
-
-<li class="nav-item">
-    <a class="nav-link text-dark fw-medium px-3"
-       asp-area=""
-       asp-controller="Forum"
-       asp-action="Index">
-        Forum
-    </a>
-</li>
                                     </ul>
                                 </li>
                             }
 
                             <!-- Notifications Dropdown -->
-                            <li class="nav-item dropdown me-3">
-                                <a class="nav-link position-relative py-1 px-2.5 rounded-circle hover-bg text-dark" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <li class="nav-item dropdown me-2">
+                                <a class="nav-link position-relative py-1 px-2.5 rounded-circle hover-bg text-white" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     🔔
                                     <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
                                         0
@@ -238,9 +221,36 @@
         @RenderBody()
     </main>
 
-    <footer class="border-top footer text-muted mt-auto">
-        <div class="container text-center py-3">
-            &copy; @DateTime.Now.Year - Onudhabon - Exploring Education
+    <footer class="site-footer mt-auto">
+        <div class="footer-inner">
+            <div class="footer-column about-column">
+                <h3>About Onudhabon</h3>
+                <p>Onudhabon is a community-driven initiative focused on providing access to quality education for children in Bangladesh. We collaborate with local educators, volunteers, and organizations to create sustainable change.</p>
+            </div>
+
+            <div class="footer-column navigation-column">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="Lecture" asp-action="Index">Lectures</a></li>
+                    <li><a asp-controller="Material" asp-action="Index">Materials</a></li>
+                    <li><a asp-controller="Home" asp-action="About">About Us</a></li>
+                    <li><a asp-controller="Forum" asp-action="Index">Forum</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column connect-column">
+                <h3>Connect</h3>
+                <ul>
+                    <li><a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+                    <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                    <li><a href="mailto:support@onudhabon.com">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            &copy; @DateTime.Now.Year Onudhabon. All rights reserved.
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -44,6 +44,11 @@ namespace Onudhabon_ISD.Controllers
             return RedirectToAction("Dashboard", "Admin", new { tab = "volunteers" });
         }
 
+        public IActionResult About()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
