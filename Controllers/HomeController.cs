@@ -26,6 +26,7 @@ namespace Onudhabon_ISD.Controllers
         .CountAsync(u => u.Role == "Volunteer");
 
     var latestPosts = await _context.ForumPosts
+        .Where(p => p.Status == "Active" || p.Status == "Approved" || p.Status == "approved")
         .OrderByDescending(p => p.CreatedAt)
         .Take(3)
         .ToListAsync();

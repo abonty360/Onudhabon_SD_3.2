@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Onudhabon_ISD.Models.ForumPost>
+@model IEnumerable<Onudhabon_ISD.Models.ForumPost>
 @using System.Security.Claims
 
 @{
@@ -61,7 +61,21 @@
                 bool isDisliked = hasReaction && !isLike;
 
                 <div id="post-@post.Id" class="card border border-light-subtle rounded-3 shadow-sm p-4 bg-white hover-shadow transition">
-                    <h4 class="fw-bold text-dark mb-2">@post.Title</h4>
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                        <h4 class="fw-bold text-dark mb-0">@post.Title</h4>
+                        @if (post.Status == "Pending" || post.Status == "pending" || string.IsNullOrEmpty(post.Status))
+                        {
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 text-nowrap">
+                                ⏳ Pending Admin Approval
+                            </span>
+                        }
+                        else if (post.Status == "Declined" || post.Status == "declined")
+                        {
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 text-nowrap">
+                                ✕ Declined
+                            </span>
+                        }
+                    </div>
                     
                     <div class="text-muted small mb-3">
                         By <span class="fw-semibold text-dark">@post.Author</span>
@@ -148,6 +162,13 @@
                 <form asp-action="CreatePost" method="post">
                     @Html.AntiForgeryToken()
                     <div class="modal-body p-4">
+                        <div class="alert alert-info py-2 px-3 small rounded-3 mb-3 d-flex align-items-center gap-2">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="flex-shrink-0">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                            </svg>
+                            <span>Discussions are submitted for administrator moderation before being visible to everyone.</span>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Title</label>
                             <input type="text" name="title" class="form-control rounded-3" placeholder="e.g. Physics Lecture Guidance" required />
@@ -163,7 +184,7 @@
                     </div>
                     <div class="modal-footer border-top px-4 py-3">
                         <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4">Post Discussion</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Submit for Approval</button>
                     </div>
                 </form>
             </div>

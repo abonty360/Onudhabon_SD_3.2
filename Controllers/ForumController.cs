@@ -36,7 +36,27 @@ namespace Onudhabon_ISD.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var posts = await _context.ForumPosts
+            var userName = User.Identity?.Name;
+            var isAdmin = User.IsInRole("Admin");
+
+            var query = _context.ForumPosts.AsQueryable();
+
+            if (isAdmin)
+            {
+                // Admins see all posts
+            }
+            else if (!string.IsNullOrEmpty(userName))
+            {
+                // Logged in users see all active posts plus their own posts (including Pending/Declined)
+                query = query.Where(p => p.Status == "Active" || p.Status == "Approved" || p.Status == "approved" || p.Author == userName);
+            }
+            else
+            {
+                // Anonymous visitors only see approved posts
+                query = query.Where(p => p.Status == "Active" || p.Status == "Approved" || p.Status == "approved");
+            }
+
+            var posts = await query
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
 
@@ -69,6 +89,7 @@ namespace Onudhabon_ISD.Controllers
 
             var userName = User.Identity?.Name ?? "Anonymous";
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
+            var isAdmin = User.IsInRole("Admin") || userRole == "Admin";
 
             var post = new ForumPost
             {
@@ -78,6 +99,7 @@ namespace Onudhabon_ISD.Controllers
                 AuthorRole = userRole,
                 Category = string.IsNullOrWhiteSpace(category) ? "General" : category.Trim(),
                 Tags = string.IsNullOrWhiteSpace(tags) ? "#discussion" : (tags.StartsWith("#") ? tags.Trim() : "#" + tags.Trim()),
+                Status = isAdmin ? "Active" : "Pending",
                 CreatedAt = DateTime.UtcNow,
                 Likes = 0,
                 Dislikes = 0,
@@ -87,7 +109,15 @@ namespace Onudhabon_ISD.Controllers
             _context.ForumPosts.Add(post);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Forum post created successfully!";
+            if (post.Status == "Active")
+            {
+                TempData["SuccessMessage"] = "Forum post created and published successfully!";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Your discussion post has been submitted for admin approval (Status: Pending).";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

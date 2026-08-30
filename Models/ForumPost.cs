@@ -35,6 +35,10 @@ namespace Onudhabon_ISD.Models
         [Display(Name = "Category")]
         public string? Category { get; set; }
 
+        [MaxLength(50)]
+        [Display(Name = "Status")]
+        public string? Status { get; set; } = "Pending";
+
         [Display(Name = "Likes")]
         public int Likes { get; set; } = 0;
 

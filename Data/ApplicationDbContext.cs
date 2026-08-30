@@ -166,6 +166,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Likes).HasDefaultValue(0);
                 entity.Property(e => e.Dislikes).HasDefaultValue(0);
                 entity.Property(e => e.Replies).HasDefaultValue(0);
+                entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Pending");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
