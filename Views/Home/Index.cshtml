@@ -1,83 +1,183 @@
+@model IEnumerable<Onudhabon_ISD.Models.ForumPost>
+
 @{
-    ViewData["Title"] = "Home Page - Onudhabon";
+    ViewData["Title"] = "Home - Onudhabon";
 }
 
-<div class="text-center py-5">
-    <div class="mb-3">
-        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill fs-6">
-            Exploring Education
-        </span>
-    </div>
-    <h1 class="display-5 fw-bold text-dark mb-3">Welcome to Onudhabon</h1>
-    <p class="lead text-muted mb-4 mx-auto" style="max-width: 600px;">
-        An open digital education initiative offering recorded video lectures, comprehensive study materials, and community volunteer empowerment.
-    </p>
-    
-    @if (User.Identity != null && User.Identity.IsAuthenticated)
-    {
-        <div class="card mx-auto shadow-sm p-4 border-0 rounded-4 text-start" style="max-width: 540px; background-color: #f8fafc;">
-            <div class="card-body p-0">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill">
-                        ✓ Authenticated
-                    </span>
-                    @if (User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role) != null)
-                    {
-                        var role = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
-                        <span class="badge @(role == "Admin" ? "bg-danger" : "bg-primary") text-white px-3 py-1.5 rounded-pill">
-                            @role
-                        </span>
-                    }
-                </div>
-                <h4 class="card-title fw-bold text-dark mb-1">Hello, @(User.Identity.Name)!</h4>
-                <p class="card-text text-muted mb-3 small">
-                    Email: @(User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value)
-                </p>
+<div class="home-page">
+    <section class="home-hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>Exploring Education Through Community</h1>
+            <p>Connecting volunteers, educators, and communities all across Bangladesh to provide quality education for underprivileged children.</p>
+            <blockquote>“One book, one pen, one child, and one volunteer can change the world.”</blockquote>
+        </div>
+    </section>
 
-                <div class="p-3 bg-white rounded-3 border mb-3">
-                    <div class="row g-2 small">
-                        <div class="col-6">
-                            <span class="text-muted d-block">City:</span>
-                            <span class="fw-semibold text-dark">@(User.Claims.FirstOrDefault(c => c.Type == "City")?.Value ?? "N/A")</span>
-                        </div>
-                        <div class="col-6">
-                            <span class="text-muted d-block">Region / Area:</span>
-                            <span class="fw-semibold text-dark">@(User.Claims.FirstOrDefault(c => c.Type == "Area")?.Value ?? "N/A")</span>
-                        </div>
-                    </div>
-                </div>
+    <section class="home-stats">
+        <div class="stat-item">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value">10,000+</div>
+            <div class="stat-label">Students Reached</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">📘</div>
+            <div class="stat-value">2,500+</div>
+            <div class="stat-label">Learning Materials</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">📊</div>
+            <div class="stat-value">850+</div>
+            <div class="stat-label">Active Volunteers</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-value">1,200+</div>
+            <div class="stat-label">Success Stories</div>
+        </div>
+    </section>
 
-                <div class="d-flex flex-wrap gap-2">
-                    <a asp-controller="Account" asp-action="Profile" class="btn btn-outline-primary rounded-pill flex-fill">
-                        👤 My Profile
-                    </a>
-                    @if (User.IsInRole("Admin") || User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value == "Admin")
-                    {
-                        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-danger rounded-pill flex-fill">
-                            🛡️ Admin Dashboard
-                        </a>
-                    }
-                    else
-                    {
-                        <a asp-controller="Lecture" asp-action="Index" class="btn btn-primary rounded-pill flex-fill">
-                            🎥 Browse Lectures
-                        </a>
-                    }
-                    <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-outline-danger rounded-pill px-3">Sign Out</button>
-                    </form>
+    <section class="home-updates">
+        <div class="section-header">
+            <h2>Latest Updates</h2>
+            <a href="#" class="view-all-btn">View All Posts</a>
+        </div>
+
+        <div class="updates-grid">
+            <article class="update-card" data-panel="panel-1">
+                <img src="~/images/latest updates pic1.jpeg" alt="Milestone image" />
+                <div class="update-card-body">
+                    <h3>Onudhabon Reaches 10,000 Students Milestone</h3>
+                    <p>We’re proud to announce that our platform has now reached over 10,000 underprivileged children across rural South Asian communities. This milestone highlights the impact of collaborative education programs and grassroots volunteerism.</p>
+                    <button class="toggle-update" type="button" data-target="panel-1">Read More</button>
                 </div>
+            </article>
+
+            <article class="update-card" data-panel="panel-2">
+                <img src="~/images/latest updates pic2.jpeg" alt="Partnership image" />
+                <div class="update-card-body">
+                    <h3>New Partnership with Bangladesh Education Foundation</h3>
+                    <p>Onudhabon partners with the Bangladesh Education Foundation to expand our reach and provide more comprehensive educational opportunities for children in need.</p>
+                    <button class="toggle-update" type="button" data-target="panel-2">Read More</button>
+                </div>
+            </article>
+
+            <article class="update-card" data-panel="panel-3">
+                <img src="~/images/latest updates pic3.jpeg" alt="Guardian image" />
+                <div class="update-card-body">
+                    <h3>Volunteer Spotlight: Meet Our Amazing Local Guardians</h3>
+                    <p>Discover the inspiring stories of our local guardians who dedicate their time to ensure every child in their community gets access to quality education.</p>
+                    <button class="toggle-update" type="button" data-target="panel-3">Read More</button>
+                </div>
+            </article>
+        </div>
+
+        <div class="update-panel" id="panel-1">
+            <div class="update-panel-header">
+                <h3>Onudhabon Reaches 10,000 Students Milestone</h3>
+                <span class="panel-date">9/13/2025</span>
+                <span class="panel-tag">Milestone</span>
+            </div>
+            <p>We’re proud to announce that our platform has now reached over 10,000 underprivileged children across rural South Asian communities. This milestone highlights the impact of collaborative education programs and grassroots volunteerism.</p>
+            <button class="close-panel" type="button">Close</button>
+        </div>
+
+        <div class="update-panel" id="panel-2">
+            <div class="update-panel-header">
+                <h3>New Partnership with Bangladesh Education Foundation</h3>
+                <span class="panel-date">1/10/2025</span>
+                <span class="panel-tag">Partnership</span>
+            </div>
+            <p>Onudhabon partners with the Bangladesh Education Foundation to expand our reach and provide more comprehensive educational opportunities for children in need. Together, we are creating a stronger path to equitable learning for underserved communities.</p>
+            <button class="close-panel" type="button">Close</button>
+        </div>
+
+        <div class="update-panel" id="panel-3">
+            <div class="update-panel-header">
+                <h3>Volunteer Spotlight: Meet Our Amazing Local Guardians</h3>
+                <span class="panel-date">1/5/2025</span>
+                <span class="panel-tag">Community</span>
+            </div>
+            <p>Discover the inspiring stories of our local guardians who dedicate their time to ensure every child in their community gets access to quality education. Their compassion and support are helping build brighter futures for families everywhere.</p>
+            <button class="close-panel" type="button">Close</button>
+        </div>
+    </section>
+
+    <footer class="home-footer">
+        <div class="footer-inner">
+            <div class="footer-column about-column">
+                <h3>About Onudhabon</h3>
+                <p>Onudhabon is a community-driven initiative focused on providing access to quality education for children in South Asia. We collaborate with local educators, volunteers, and organizations to create sustainable change.</p>
+            </div>
+
+            <div class="footer-column navigation-column">
+                <h3>Navigation</h3>
+                <ul>
+                    <li>Home</li>
+                    <li>Lectures</li>
+                    <li>Materials</li>
+                    <li>About</li>
+                    <li>Forum</li>
+                </ul>
+            </div>
+
+            <div class="footer-column connect-column">
+                <h3>Connect</h3>
+                <ul>
+                    <li>Facebook</li>
+                    <li>Instagram</li>
+                    <li>Contact Us</li>
+                </ul>
             </div>
         </div>
-    }
-    else
-    {
-        <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
-            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg px-4 rounded-pill">Sign In</a>
-            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-lg px-4 rounded-pill">Register as Volunteer</a>
-            <a asp-controller="Lecture" asp-action="Index" class="btn btn-light border btn-lg px-4 rounded-pill">🎥 Recorded Lectures</a>
-            <a asp-controller="Material" asp-action="Index" class="btn btn-light border btn-lg px-4 rounded-pill">📄 Study Materials</a>
+
+        <div class="footer-bottom">
+            © 2025 Onudhabon. All rights reserved.
         </div>
-    }
+    </footer>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const updateButtons = document.querySelectorAll('.toggle-update');
+        const panels = document.querySelectorAll('.update-panel');
+
+        updateButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const targetId = this.dataset.target;
+                const targetPanel = document.getElementById(targetId);
+                const isOpen = targetPanel.classList.contains('active');
+
+                panels.forEach(function (panel) {
+                    panel.classList.remove('active');
+                });
+
+                updateButtons.forEach(function (btn) {
+                    btn.textContent = 'Read More';
+                    btn.classList.remove('active');
+                });
+
+                if (!isOpen) {
+                    targetPanel.classList.add('active');
+                    this.textContent = 'Close';
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        document.querySelectorAll('.close-panel').forEach(function (closeButton) {
+            closeButton.addEventListener('click', function () {
+                const panel = this.closest('.update-panel');
+                panel.classList.remove('active');
+
+                const targetId = panel.id;
+                const relatedButton = document.querySelector('.toggle-update[data-target="' + targetId + '"]');
+
+                if (relatedButton) {
+                    relatedButton.textContent = 'Read More';
+                    relatedButton.classList.remove('active');
+                }
+            });
+        });
+    });
+</script>
