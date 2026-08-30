@@ -20,6 +20,7 @@ namespace Onudhabon_ISD.Data
         public DbSet<ForumComment> ForumComments { get; set; }
         public DbSet<ForumPostReaction> ForumPostReactions { get; set; }
         public DbSet<ClassPlan> ClassPlans { get; set; }
+        public DbSet<Donation> Donations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -206,6 +207,29 @@ namespace Onudhabon_ISD.Data
                     subject.Property(s => s.Name).HasJsonPropertyName("name");
                     subject.Property(s => s.TotalLectures).HasJsonPropertyName("totalLectures");
                 });
+            });
+
+            // Donation Entity Configuration
+            modelBuilder.Entity<Donation>(entity =>
+            {
+                entity.ToTable("Donations");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.DonorName).IsRequired().HasMaxLength(150);
+                entity.Property(e => e.DonorEmail).HasMaxLength(200);
+                entity.Property(e => e.DonorPhone).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Amount).HasColumnType("decimal(18,2)").IsRequired();
+                entity.Property(e => e.Currency).HasMaxLength(10).HasDefaultValue("BDT");
+                entity.Property(e => e.Purpose).IsRequired().HasMaxLength(150);
+                entity.Property(e => e.Message).HasMaxLength(1000);
+                entity.Property(e => e.PaymentMethod).HasMaxLength(50).HasDefaultValue("bKash");
+                entity.Property(e => e.BkashWalletNumber).HasMaxLength(30);
+                entity.Property(e => e.BkashTransactionId).HasMaxLength(100);
+                entity.Property(e => e.BkashPaymentId).HasMaxLength(100);
+                entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Completed");
+                entity.Property(e => e.IsAnonymous).HasDefaultValue(false);
+                entity.Property(e => e.UserId).HasMaxLength(100);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.__v).HasDefaultValue(0);
             });
         }
     }

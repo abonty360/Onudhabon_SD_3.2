@@ -1,0 +1,632 @@
+@model Onudhabon_ISD.Models.DonationInitiateViewModel
+
+@{
+    ViewData["Title"] = "Donate to Onudhabon - Support Underprivileged Education in Bangladesh";
+    var recentDonations = (List<Onudhabon_ISD.Models.Donation>?)ViewBag.RecentDonations ?? new List<Onudhabon_ISD.Models.Donation>();
+    decimal totalDonated = (decimal)(ViewBag.TotalDonated ?? 0m);
+    int totalDonorsCount = (int)(ViewBag.TotalDonorsCount ?? 0);
+}
+
+<!-- Hero Section -->
+<section class="py-5 text-white position-relative" style="background: linear-gradient(135deg, #0d3b66 0%, #1d4ed8 50%, #0369a1 100%);">
+    <div class="container py-4">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <span class="badge bg-warning text-dark px-3 py-1.5 rounded-pill fw-semibold mb-3">
+                    💖 Direct Impact • 100% Transparent
+                </span>
+                <h1 class="display-5 fw-bold mb-3">Empower Underprivileged Children Through Education</h1>
+                <p class="lead text-light mb-4" style="opacity: 0.95;">
+                    Your contribution directly sponsors learning materials, local community classrooms, and educational resources for students across Bangladesh. Every Taka counts.
+                </p>
+                <div class="d-flex flex-wrap gap-3 text-white-50 small">
+                    <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-2 rounded-pill">
+                        <span class="text-warning fs-5">৳</span>
+                        <span class="text-white fw-semibold">৳@totalDonated.ToString("N0") Raised</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-2 rounded-pill">
+                        <span class="text-warning fs-5">👥</span>
+                        <span class="text-white fw-semibold">@totalDonorsCount Donors Joined</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-2 rounded-pill">
+                        <span class="text-warning fs-5">⚡</span>
+                        <span class="text-white fw-semibold">Instant bKash Checkout</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="bg-white text-dark p-4 rounded-4 shadow-lg border-0 text-center">
+                    <div class="d-inline-flex p-3 rounded-circle mb-3" style="background-color: #fdf2f8;">
+                        <span class="fs-1">🌸</span>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-1">Make a Donation Today</h4>
+                    <p class="text-muted small mb-3">Pay securely with your bKash wallet. Get an instant official donation receipt.</p>
+                    <a href="#donation-form-card" class="btn btn-lg w-100 rounded-pill text-white fw-semibold shadow-sm" style="background-color: #e2136e;">
+                        Donate with bKash ৳
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Donation Form & Impact Details Container -->
+<div class="container py-5" id="donation-form-card">
+    <div class="row g-4 justify-content-center">
+        <!-- Left: Donation Form -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                    <div class="rounded-circle p-2.5 d-flex align-items-center justify-content-center text-white" style="background-color: #e2136e; width: 48px; height: 48px;">
+                        <span class="fs-4">৳</span>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold text-dark mb-0">Donate to Onudhabon</h3>
+                        <p class="text-muted small mb-0">Select your amount and cause, then complete payment securely via bKash.</p>
+                    </div>
+                </div>
+
+                <form id="donationForm">
+                    @Html.AntiForgeryToken()
+
+                    <div id="formErrorMessage" class="alert alert-danger rounded-3 mb-3 d-none"></div>
+
+                    <!-- Step 1: Select Amount -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark mb-2">1. Choose Donation Amount (BDT) *</label>
+                        
+                        <div class="row g-2 mb-3" id="presetAmountsContainer">
+                            <div class="col-4 col-sm-4 col-md-2">
+                                <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn" data-amount="100">
+                                    ৳100
+                                </button>
+                            </div>
+                            <div class="col-4 col-sm-4 col-md-2">
+                                <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn active btn-primary text-white border-primary" data-amount="500">
+                                    ৳500
+                                </button>
+                            </div>
+                            <div class="col-4 col-sm-4 col-md-2">
+                                <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn" data-amount="1000">
+                                    ৳1,000
+                                </button>
+                            </div>
+                            <div class="col-4 col-sm-4 col-md-2">
+                                <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn" data-amount="2500">
+                                    ৳2,500
+                                </button>
+                            </div>
+                            <div class="col-4 col-sm-4 col-md-2">
+                                <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn" data-amount="5000">
+                                    ৳5,000
+                                </button>
+                            </div>
+                            <div class="col-4 col-sm-4 col-md-2">
+                                <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn" data-amount="10000">
+                                    ৳10,000
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-dark fw-bold border-end-0 rounded-start-3">৳ BDT</span>
+                            <input asp-for="Amount" type="number" id="customAmountInput" class="form-control form-control-lg border-start-0 rounded-end-3 fw-bold text-primary" min="10" max="500000" placeholder="Enter custom amount (min ৳10)" value="500" required />
+                        </div>
+                        <span asp-validation-for="Amount" class="text-danger small"></span>
+                        <div class="form-text small text-muted">A donation of ৳500 covers study supplies and workbooks for one student for a full month.</div>
+                    </div>
+
+                    <!-- Step 2: Choose Purpose / Cause -->
+                    <div class="mb-4">
+                        <label asp-for="Purpose" class="form-label fw-bold text-dark mb-2">2. Select Cause / Program *</label>
+                        <select asp-for="Purpose" id="purposeSelect" class="form-select form-select-lg rounded-3">
+                            <option value="General Education & Child Support Fund">🎓 General Education & Child Support Fund (Most Needed)</option>
+                            <option value="Student Learning Materials & Textbooks">📚 Student Textbooks, Exercise Books & Stationery</option>
+                            <option value="Community Classrooms & Educator Support">🏫 Community Classroom Spaces & Local Educators</option>
+                            <option value="Digital Learning & Video Lecture Hardware">💻 Digital Learning Devices & Offline Media Hubs</option>
+                            <option value="Nutritional & Healthcare Welfare">🍎 Student Nutrition & Healthcare Welfare</option>
+                        </select>
+                        <span asp-validation-for="Purpose" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Step 3: Donor Information -->
+                    <div class="mb-4 p-3.5 bg-light rounded-4 border">
+                        <h5 class="fw-bold text-dark mb-3">3. Donor Contact Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="DonorName" class="form-label fw-semibold">Your Full Name *</label>
+                                <input asp-for="DonorName" id="donorNameInput" class="form-control rounded-3" placeholder="e.g. Tanvir Ahmed" required />
+                                <span asp-validation-for="DonorName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="DonorPhone" class="form-label fw-semibold">Mobile Number *</label>
+                                <input asp-for="DonorPhone" id="donorPhoneInput" class="form-control rounded-3" placeholder="e.g. 017XXXXXXXX" required />
+                                <span class="text-muted" style="font-size: 0.75rem;">Used for payment confirmation receipt</span>
+                                <span asp-validation-for="DonorPhone" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="DonorEmail" class="form-label fw-semibold">Email Address (Optional)</label>
+                                <input asp-for="DonorEmail" id="donorEmailInput" class="form-control rounded-3" placeholder="e.g. yourname@example.com" />
+                                <span class="text-muted" style="font-size: 0.75rem;">We'll email you the official tax/donation receipt</span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Message" class="form-label fw-semibold">Leave a Message or Dedication (Optional)</label>
+                                <textarea asp-for="Message" id="donorMessageInput" rows="2" class="form-control rounded-3" placeholder="e.g. In honor of our village teachers..."></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check form-switch mt-1">
+                                    <input asp-for="IsAnonymous" class="form-check-input" type="checkbox" id="isAnonymousSwitch" />
+                                    <label class="form-check-label fw-semibold text-secondary" for="isAnonymousSwitch">
+                                        Make this donation anonymous on public leaderboards
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Gateway Button -->
+                    <div class="p-3 rounded-4 mb-4" style="background-color: #fdf2f8; border: 1px solid #fbcfe8;">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-white p-2 rounded-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 54px; height: 40px;">
+                                    <span class="fw-bold" style="color: #e2136e; font-size: 1.1rem;">bKash</span>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">Official bKash Payment Gateway</div>
+                                    <div class="text-muted small">Merchant: <strong>Onudhabon Foundation</strong> (Zero Platform Fee)</div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-semibold">
+                                    🔒 256-Bit SSL Encrypted
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="openBkashModalBtn" class="btn btn-lg w-100 rounded-pill text-white fw-bold shadow py-3 d-flex align-items-center justify-content-center gap-2" style="background-color: #e2136e; font-size: 1.15rem; transition: transform 0.15s ease;">
+                        <span class="fs-4">📱</span>
+                        <span>Pay ৳<span id="btnAmountDisplay">500</span> with bKash</span>
+                    </button>
+                    <p class="text-center text-muted small mt-2 mb-0">
+                        By donating, you agree to Onudhabon's terms of service and contribution transparency policy.
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Impact & Live Donors -->
+        <div class="col-lg-4">
+            <!-- Impact Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                    <span>🌟</span> How Your Donation Helps
+                </h5>
+                <div class="d-flex flex-column gap-3 small text-muted">
+                    <div class="d-flex gap-3">
+                        <div class="rounded-circle bg-primary-subtle text-primary p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+                            📚
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">৳100 - Learning Supplies</div>
+                            <div>Provides notebooks, pens, and geometry sets for one student.</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div class="rounded-circle bg-success-subtle text-success p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+                            🎓
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">৳500 - Full Monthly Sponsorship</div>
+                            <div>Covers books, mentorship, and exam access for a child.</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div class="rounded-circle bg-info-subtle text-info p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+                            💻
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">৳2,500 - Digital Learning Hub</div>
+                            <div>Supports digital playback devices and lecture video offline libraries.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Donors Live Feed -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                        <span>💖</span> Recent Supporters
+                    </h5>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-2.5">Live</span>
+                </div>
+
+                <div id="recentDonorsList" class="d-flex flex-column gap-2.5">
+                    @if (recentDonations.Any())
+                    {
+                        @foreach (var d in recentDonations)
+                        {
+                            <div class="p-2.5 bg-light rounded-3 d-flex justify-content-between align-items-center small">
+                                <div>
+                                    <div class="fw-bold text-dark">@(d.IsAnonymous ? "Kind Supporter" : d.DonorName)</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">@d.Purpose</div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge rounded-pill px-2.5 py-1 text-white" style="background-color: #e2136e;">
+                                        ৳@d.Amount.ToString("N0")
+                                    </span>
+                                    <div class="text-muted mt-0.5" style="font-size: 0.7rem;">@d.CreatedAt.ToString("MMM dd")</div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-3 small">Be the first to donate today!</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= BKASH PAYMENT GATEWAY MODAL ================= -->
+<div class="modal fade" id="bkashPaymentModal" tabindex="-1" aria-labelledby="bkashModalTitle" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden" style="background-color: #fdf2f8;">
+            
+            <!-- bKash Brand Header -->
+            <div class="p-3 text-white d-flex justify-content-between align-items-center" style="background-color: #e2136e;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-white px-2 py-1 rounded-2 shadow-sm">
+                        <span class="fw-black" style="color: #e2136e; font-size: 1.1rem; font-weight: 900;">bKash</span>
+                    </div>
+                    <div>
+                        <div class="fw-bold small mb-0">Merchant: Onudhabon</div>
+                        <div style="font-size: 0.75rem; opacity: 0.9;">Secure Checkout Gateway</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="closeBkashModalBtn"></button>
+            </div>
+
+            <!-- Amount Card inside modal -->
+            <div class="bg-white px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small">Total Payable Amount</div>
+                    <div class="h4 fw-bold text-dark mb-0">৳ <span id="modalAmountDisplay">500.00</span> BDT</div>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-light text-secondary border rounded-pill small" id="modalInvoiceDisplay">INV-@DateTime.UtcNow.ToString("yyyyMMdd")</span>
+                </div>
+            </div>
+
+            <!-- Step 1: Wallet Number -->
+            <div id="bkashStep1" class="p-4 bg-white">
+                <div class="text-center mb-3">
+                    <div class="text-muted small fw-semibold">Your bKash Account Number</div>
+                    <div class="text-muted" style="font-size: 0.8rem;">Enter your 11-digit personal or agent wallet number</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-light text-muted border-end-0 fw-bold">🇧🇩 +88</span>
+                        <input type="tel" id="bkashWalletInput" class="form-control form-control-lg border-start-0 text-center fw-bold text-dark" placeholder="01XXXXXXXXX" maxlength="11" />
+                    </div>
+                    <div id="bkashWalletError" class="text-danger small mt-1 text-center d-none"></div>
+                </div>
+
+                <div class="form-check small text-muted mb-4">
+                    <input class="form-check-input" type="checkbox" id="bkashAgreeTerms" checked />
+                    <label class="form-check-label" for="bkashAgreeTerms" style="font-size: 0.75rem;">
+                        I agree to the <a href="https://www.bkash.com/terms-and-conditions" target="_blank" class="text-decoration-none" style="color: #e2136e;">terms and conditions</a> of bKash payment.
+                    </label>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary w-50 py-2.5 rounded-pill" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="btnProceedToOtp" class="btn w-50 py-2.5 rounded-pill text-white fw-semibold" style="background-color: #e2136e;">
+                        Confirm & Next →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: OTP Verification -->
+            <div id="bkashStep2" class="p-4 bg-white d-none">
+                <div class="text-center mb-3">
+                    <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 mb-2">Step 2 of 3</span>
+                    <div class="fw-bold text-dark">Verification Code (OTP)</div>
+                    <div class="text-muted small" style="font-size: 0.8rem;">
+                        A 6-digit verification code was sent to <strong id="displayWalletForOtp" class="text-dark">017XXXXXXXX</strong>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <input type="text" id="bkashOtpInput" class="form-control form-control-lg text-center fw-bold fs-4 letter-spacing-2" placeholder="1 2 3 4 5 6" maxlength="6" value="123456" />
+                    <div id="bkashOtpError" class="text-danger small mt-1 text-center d-none"></div>
+                    <div class="text-center text-muted small mt-2" style="font-size: 0.78rem;">
+                        (Demo Code: <code>123456</code> is pre-filled for testing)
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="button" id="btnBackToStep1" class="btn btn-outline-secondary w-50 py-2.5 rounded-pill">← Back</button>
+                    <button type="button" id="btnProceedToPin" class="btn w-50 py-2.5 rounded-pill text-white fw-semibold" style="background-color: #e2136e;">
+                        Verify Code →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: bKash PIN -->
+            <div id="bkashStep3" class="p-4 bg-white d-none">
+                <div class="text-center mb-3">
+                    <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 mb-2">Step 3 of 3</span>
+                    <div class="fw-bold text-dark">Enter bKash PIN</div>
+                    <div class="text-muted small" style="font-size: 0.8rem;">
+                        Enter your 5-digit bKash PIN to authorize payment of <strong class="text-dark">৳ <span id="pinStepAmount">500</span></strong>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <input type="password" id="bkashPinInput" class="form-control form-control-lg text-center fw-bold fs-3 letter-spacing-4" placeholder="• • • • •" maxlength="5" value="12345" />
+                    <div id="bkashPinError" class="text-danger small mt-1 text-center d-none"></div>
+                    <div class="text-center text-muted small mt-2" style="font-size: 0.78rem;">
+                        (Demo PIN: <code>12345</code> pre-filled)
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="button" id="btnBackToStep2" class="btn btn-outline-secondary w-50 py-2.5 rounded-pill">← Back</button>
+                    <button type="button" id="btnConfirmFinalPayment" class="btn w-50 py-2.5 rounded-pill text-white fw-bold d-flex align-items-center justify-content-center gap-2" style="background-color: #e2136e;">
+                        <span>Confirm Payment</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Processing Loader Screen -->
+            <div id="bkashProcessing" class="p-5 bg-white text-center d-none">
+                <div class="spinner-border text-danger mb-3" style="width: 3.5rem; height: 3.5rem; color: #e2136e !important;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">Processing bKash Payment...</h5>
+                <p class="text-muted small mb-0">Communicating with bKash payment gateway. Please do not refresh or close this window.</p>
+            </div>
+
+            <!-- Footer Note -->
+            <div class="p-2.5 text-center bg-light border-top text-muted" style="font-size: 0.72rem;">
+                bKash Helpline: <strong>16247</strong> • Onudhabon ISD Foundation
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const customAmountInput = document.getElementById('customAmountInput');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+            const btnAmountDisplay = document.getElementById('btnAmountDisplay');
+            const openBkashModalBtn = document.getElementById('openBkashModalBtn');
+            const modalAmountDisplay = document.getElementById('modalAmountDisplay');
+            const pinStepAmount = document.getElementById('pinStepAmount');
+            const modalInvoiceDisplay = document.getElementById('modalInvoiceDisplay');
+            
+            // Modal Steps
+            const bkashModal = new bootstrap.Modal(document.getElementById('bkashPaymentModal'));
+            const bkashStep1 = document.getElementById('bkashStep1');
+            const bkashStep2 = document.getElementById('bkashStep2');
+            const bkashStep3 = document.getElementById('bkashStep3');
+            const bkashProcessing = document.getElementById('bkashProcessing');
+            
+            const bkashWalletInput = document.getElementById('bkashWalletInput');
+            const bkashWalletError = document.getElementById('bkashWalletError');
+            const bkashOtpInput = document.getElementById('bkashOtpInput');
+            const bkashOtpError = document.getElementById('bkashOtpError');
+            const bkashPinInput = document.getElementById('bkashPinInput');
+            const bkashPinError = document.getElementById('bkashPinError');
+            const displayWalletForOtp = document.getElementById('displayWalletForOtp');
+            const formErrorMessage = document.getElementById('formErrorMessage');
+
+            // Handle Preset Amount Clicks
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    presetButtons.forEach(b => {
+                        b.classList.remove('active', 'btn-primary', 'text-white', 'border-primary');
+                        b.classList.add('btn-outline-secondary');
+                    });
+                    this.classList.remove('btn-outline-secondary');
+                    this.classList.add('active', 'btn-primary', 'text-white', 'border-primary');
+                    
+                    const amt = this.getAttribute('data-amount');
+                    customAmountInput.value = amt;
+                    btnAmountDisplay.textContent = Number(amt).toLocaleString();
+                });
+            });
+
+            // Handle Custom Amount Input
+            customAmountInput.addEventListener('input', function () {
+                const val = parseFloat(this.value) || 0;
+                btnAmountDisplay.textContent = val.toLocaleString();
+                presetButtons.forEach(b => {
+                    if (b.getAttribute('data-amount') === this.value) {
+                        b.classList.remove('btn-outline-secondary');
+                        b.classList.add('active', 'btn-primary', 'text-white', 'border-primary');
+                    } else {
+                        b.classList.remove('active', 'btn-primary', 'text-white', 'border-primary');
+                        b.classList.add('btn-outline-secondary');
+                    }
+                });
+            });
+
+            function resetModalSteps() {
+                bkashStep1.classList.remove('d-none');
+                bkashStep2.classList.add('d-none');
+                bkashStep3.classList.add('d-none');
+                bkashProcessing.classList.add('d-none');
+                bkashWalletError.classList.add('d-none');
+                bkashOtpError.classList.add('d-none');
+                bkashPinError.classList.add('d-none');
+            }
+
+            // Open bKash Checkout Modal with Validation
+            openBkashModalBtn.addEventListener('click', function () {
+                formErrorMessage.classList.add('d-none');
+                
+                const donorName = document.getElementById('donorNameInput').value.trim();
+                const donorPhone = document.getElementById('donorPhoneInput').value.trim();
+                const amount = parseFloat(customAmountInput.value);
+
+                if (!donorName) {
+                    formErrorMessage.textContent = 'Please enter your Full Name before proceeding.';
+                    formErrorMessage.classList.remove('d-none');
+                    document.getElementById('donorNameInput').focus();
+                    return;
+                }
+
+                if (!donorPhone) {
+                    formErrorMessage.textContent = 'Please enter your mobile phone number.';
+                    formErrorMessage.classList.remove('d-none');
+                    document.getElementById('donorPhoneInput').focus();
+                    return;
+                }
+
+                if (!amount || amount < 10) {
+                    formErrorMessage.textContent = 'Minimum donation amount is ৳10.';
+                    formErrorMessage.classList.remove('d-none');
+                    customAmountInput.focus();
+                    return;
+                }
+
+                // Populate modal amounts
+                modalAmountDisplay.textContent = amount.toFixed(2);
+                pinStepAmount.textContent = amount.toLocaleString();
+                modalInvoiceDisplay.textContent = 'INV-' + Math.floor(100000 + Math.random() * 900000);
+                
+                // Pre-fill wallet number from donor phone if valid
+                if (donorPhone.length === 11 && donorPhone.startsWith('01')) {
+                    bkashWalletInput.value = donorPhone;
+                }
+
+                resetModalSteps();
+                bkashModal.show();
+            });
+
+            // Step 1 -> Step 2
+            document.getElementById('btnProceedToOtp').addEventListener('click', function () {
+                const wallet = bkashWalletInput.value.trim();
+                const agree = document.getElementById('bkashAgreeTerms').checked;
+
+                if (!agree) {
+                    bkashWalletError.textContent = 'Please agree to the bKash payment terms.';
+                    bkashWalletError.classList.remove('d-none');
+                    return;
+                }
+
+                if (!wallet || wallet.length !== 11 || !wallet.startsWith('01')) {
+                    bkashWalletError.textContent = 'Please enter a valid 11-digit bKash account number (e.g. 017XXXXXXXX).';
+                    bkashWalletError.classList.remove('d-none');
+                    return;
+                }
+
+                bkashWalletError.classList.add('d-none');
+                displayWalletForOtp.textContent = wallet;
+
+                bkashStep1.classList.add('d-none');
+                bkashStep2.classList.remove('d-none');
+                bkashOtpInput.focus();
+            });
+
+            // Step 2 -> Step 1
+            document.getElementById('btnBackToStep1').addEventListener('click', function () {
+                bkashStep2.classList.add('d-none');
+                bkashStep1.classList.remove('d-none');
+            });
+
+            // Step 2 -> Step 3
+            document.getElementById('btnProceedToPin').addEventListener('click', function () {
+                const otp = bkashOtpInput.value.trim();
+                if (!otp || otp.length < 4) {
+                    bkashOtpError.textContent = 'Please enter the 6-digit OTP verification code.';
+                    bkashOtpError.classList.remove('d-none');
+                    return;
+                }
+
+                bkashOtpError.classList.add('d-none');
+                bkashStep2.classList.add('d-none');
+                bkashStep3.classList.remove('d-none');
+                bkashPinInput.focus();
+            });
+
+            // Step 3 -> Step 2
+            document.getElementById('btnBackToStep2').addEventListener('click', function () {
+                bkashStep3.classList.add('d-none');
+                bkashStep2.classList.remove('d-none');
+            });
+
+            // Step 3 -> Final Payment Execution
+            document.getElementById('btnConfirmFinalPayment').addEventListener('click', function () {
+                const pin = bkashPinInput.value.trim();
+                if (!pin || pin.length !== 5 || isNaN(pin)) {
+                    bkashPinError.textContent = 'Please enter your 5-digit bKash PIN.';
+                    bkashPinError.classList.remove('d-none');
+                    return;
+                }
+
+                bkashPinError.classList.add('d-none');
+                bkashStep3.classList.add('d-none');
+                bkashProcessing.classList.remove('d-none');
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+                const payload = {
+                    donorName: document.getElementById('donorNameInput').value.trim(),
+                    donorEmail: document.getElementById('donorEmailInput').value.trim() || null,
+                    donorPhone: document.getElementById('donorPhoneInput').value.trim(),
+                    amount: parseFloat(customAmountInput.value),
+                    purpose: document.getElementById('purposeSelect').value,
+                    message: document.getElementById('donorMessageInput').value.trim() || null,
+                    isAnonymous: document.getElementById('isAnonymousSwitch').checked,
+                    bkashWalletNumber: bkashWalletInput.value.trim(),
+                    otpCode: bkashOtpInput.value.trim(),
+                    pin: pin
+                };
+
+                fetch('/Donation/ProcessBkashPayment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.success) {
+                        // Redirect to receipt
+                        setTimeout(function () {
+                            window.location.href = data.redirectUrl;
+                        }, 1200);
+                    } else {
+                        bkashProcessing.classList.add('d-none');
+                        bkashStep3.classList.remove('d-none');
+                        bkashPinError.textContent = data.message || 'Payment failed. Please try again.';
+                        bkashPinError.classList.remove('d-none');
+                    }
+                })
+                .catch(err => {
+                    console.error('Payment execution error:', err);
+                    bkashProcessing.classList.add('d-none');
+                    bkashStep3.classList.remove('d-none');
+                    bkashPinError.textContent = 'Network error occurred. Please try again.';
+                    bkashPinError.classList.remove('d-none');
+                });
+            });
+        });
+    </script>
+}

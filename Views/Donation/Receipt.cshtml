@@ -1,0 +1,134 @@
+@model Onudhabon_ISD.Models.DonationReceiptViewModel
+
+@{
+    ViewData["Title"] = "Donation Receipt - Onudhabon Foundation";
+    var d = Model.Donation;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <!-- Back Action -->
+            <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                    ← Make Another Donation
+                </a>
+                <button onclick="window.print()" class="btn btn-outline-primary btn-sm px-3 rounded-pill d-inline-flex align-items-center gap-1.5 shadow-sm">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Print Receipt</span>
+                </button>
+            </div>
+
+            <!-- Receipt Card -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white p-4 p-md-5 position-relative">
+                
+                <!-- Success Ribbon -->
+                <div class="text-center mb-4">
+                    <div class="rounded-circle bg-success-subtle text-success d-inline-flex p-3 mb-2 shadow-sm">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h2 class="fw-bold text-dark mb-1">Thank You For Your Generosity!</h2>
+                    <p class="text-muted mb-0">Your contribution will directly impact underprivileged children's education in Bangladesh.</p>
+                </div>
+
+                <!-- Receipt Box -->
+                <div class="border rounded-4 p-4 mb-4" style="background-color: #f8fafc;">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom pb-3 mb-3">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Official Donation Receipt</span>
+                            <div class="fw-bold text-dark fs-5">Onudhabon ISD Foundation</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-semibold">
+                                ✓ Paid via bKash
+                            </span>
+                            <div class="text-muted small mt-1">Receipt #ONUD-@d.Id.ToString("D6")</div>
+                        </div>
+                    </div>
+
+                    <!-- Amount Highlight -->
+                    <div class="text-center py-3 my-2 bg-white rounded-3 border shadow-sm">
+                        <div class="text-muted small text-uppercase">Donation Amount</div>
+                        <div class="display-6 fw-black text-primary mb-0 font-monospace" style="color: #0d3b66 !important;">
+                            ৳ @d.Amount.ToString("N2") BDT
+                        </div>
+                    </div>
+
+                    <!-- Key Details Grid -->
+                    <div class="row g-3 small mt-1">
+                        <div class="col-sm-6">
+                            <div class="text-muted">Donor Name</div>
+                            <div class="fw-bold text-dark">@(d.IsAnonymous ? $"{d.DonorName} (Marked Anonymous on public lists)" : d.DonorName)</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted">Donor Mobile / Wallet</div>
+                            <div class="fw-bold text-dark font-monospace">@d.DonorPhone</div>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(d.DonorEmail))
+                        {
+                            <div class="col-sm-6">
+                                <div class="text-muted">Donor Email</div>
+                                <div class="fw-bold text-dark">@d.DonorEmail</div>
+                            </div>
+                        }
+
+                        <div class="col-sm-6">
+                            <div class="text-muted">Payment Date & Time</div>
+                            <div class="fw-bold text-dark">@d.CreatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt") UTC</div>
+                        </div>
+
+                        <div class="col-12 border-top pt-2">
+                            <div class="text-muted">Supported Program / Cause</div>
+                            <div class="fw-bold text-primary">@d.Purpose</div>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(d.Message))
+                        {
+                            <div class="col-12 bg-white p-3 rounded-3 border">
+                                <div class="text-muted mb-1">Donor Note / Dedication:</div>
+                                <div class="fst-italic text-dark">“@d.Message”</div>
+                            </div>
+                        }
+
+                        <!-- bKash Transaction Details -->
+                        <div class="col-12 border-top pt-3">
+                            <div class="p-3 rounded-3" style="background-color: #fdf2f8; border: 1px solid #fbcfe8;">
+                                <div class="row g-2">
+                                    <div class="col-sm-6">
+                                        <div class="text-muted" style="font-size: 0.75rem;">bKash Transaction ID (TRXID)</div>
+                                        <div class="fw-bold font-monospace text-dark" style="color: #e2136e !important;">@(d.BkashTransactionId ?? "N/A")</div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="text-muted" style="font-size: 0.75rem;">bKash Payment Ref ID</div>
+                                        <div class="fw-bold font-monospace text-dark">@(d.BkashPaymentId ?? "N/A")</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Note inside card -->
+                <div class="text-center text-muted small">
+                    <p class="mb-1">This is an automated system-generated electronic receipt for tax exemption and charitable verification purposes.</p>
+                    <div>Onudhabon ISD Foundation • <a href="mailto:support@onudhabon.com" class="text-decoration-none">support@onudhabon.com</a></div>
+                </div>
+
+                <!-- Bottom Action Buttons -->
+                <div class="mt-4 pt-3 border-top d-flex justify-content-center gap-3 d-print-none">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                        Back to Home
+                    </a>
+                    <a asp-controller="Donation" asp-action="Index" class="btn btn-primary rounded-pill px-4 text-white" style="background-color: #e2136e; border-color: #e2136e;">
+                        Donate Again 💖
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

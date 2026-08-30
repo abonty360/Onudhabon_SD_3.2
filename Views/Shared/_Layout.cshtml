@@ -79,6 +79,11 @@
                         <li class="nav-item">
                             <a class="nav-link @(currentController == "Forum" ? "active" : "")" asp-area="" asp-controller="Forum" asp-action="Index">Forum</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning fw-semibold @(currentController == "Donation" ? "active text-white" : "")" asp-area="" asp-controller="Donation" asp-action="Index">
+                                Donate
+                            </a>
+                        </li>
                         @if (userRole == "Admin" || User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
@@ -258,6 +263,7 @@
                     <li><a asp-controller="Material" asp-action="Index">Materials</a></li>
                     <li><a asp-controller="Home" asp-action="About">About Us</a></li>
                     <li><a asp-controller="Forum" asp-action="Index">Forum</a></li>
+                    <li><a asp-controller="Donation" asp-action="Index" class="text-warning fw-semibold">💖 Donate to Onudhabon</a></li>
                 </ul>
             </div>
 
