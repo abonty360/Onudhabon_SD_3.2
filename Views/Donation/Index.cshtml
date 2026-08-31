@@ -1,281 +1,210 @@
 @model Onudhabon_ISD.Models.DonationInitiateViewModel
 
 @{
-    ViewData["Title"] = "Donate to Onudhabon - Support Underprivileged Education in Bangladesh";
+    ViewData["Title"] = "Donate - Onudhabon Foundation";
     var recentDonations = (List<Onudhabon_ISD.Models.Donation>?)ViewBag.RecentDonations ?? new List<Onudhabon_ISD.Models.Donation>();
     decimal totalDonated = (decimal)(ViewBag.TotalDonated ?? 0m);
     int totalDonorsCount = (int)(ViewBag.TotalDonorsCount ?? 0);
 }
 
-<!-- Hero Section -->
-<section class="py-5 text-white position-relative" style="background: linear-gradient(135deg, #0b1329 0%, #0f172a 45%, #1e3a8a 100%);">
-    <div class="container py-4">
-        <div class="row align-items-center g-4">
-            <div class="col-lg-7">
-                <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15 text-white small fw-semibold mb-3">
-                    <i class="bi bi-shield-check text-info"></i>
-                    <span>Onudhabon Educational Philanthropy & Welfare Foundation</span>
-                </div>
-                <h1 class="display-5 fw-bold mb-3 tracking-tight" style="letter-spacing: -0.02em;">Support Educational Equity Across Bangladesh</h1>
-                <p class="lead text-light mb-4" style="opacity: 0.92; font-size: 1.05rem; line-height: 1.65;">
-                    Your philanthropic contributions directly finance accredited textbooks, certified educator stipends, community classroom infrastructure, and digital learning devices for underprivileged students.
-                </p>
-                <div class="d-flex flex-wrap gap-3 text-white-50 small">
-                    <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-2 rounded-pill border border-white border-opacity-10">
-                        <i class="bi bi-bank text-info fs-6"></i>
-                        <span class="text-white fw-semibold">৳@totalDonated.ToString("N0") BDT Contributed</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-2 rounded-pill border border-white border-opacity-10">
-                        <i class="bi bi-people-fill text-info fs-6"></i>
-                        <span class="text-white fw-semibold">@totalDonorsCount Verified Benefactors</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-2 rounded-pill border border-white border-opacity-10">
-                        <i class="bi bi-shield-lock-fill text-info fs-6"></i>
-                        <span class="text-white fw-semibold">256-Bit SSL Encrypted</span>
-                    </div>
-                </div>
-            </div>
+<!-- Minimal Hero Header -->
+<section class="py-5 text-white" style="background: linear-gradient(135deg, #0b1329 0%, #1e293b 60%, #1e3a8a 100%);">
+    <div class="container text-center py-3" style="max-width: 780px;">
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15 text-white small fw-semibold mb-3">
+            <i class="bi bi-shield-heart text-warning"></i>
+            <span>Educational Welfare Initiative</span>
+        </div>
+        <h1 class="fw-bold display-6 mb-3 tracking-tight">Support Educational Equity</h1>
+        <p class="text-white text-opacity-80 mb-4" style="line-height: 1.65; font-size: 1.05rem;">
+            Your contribution directly funds textbooks, volunteer educator stipends, and learning materials for underprivileged students across Bangladesh.
+        </p>
 
-            <div class="col-lg-5">
-                <div class="bg-white text-dark p-4 p-md-5 rounded-4 shadow-lg border text-center position-relative overflow-hidden">
-                    <div class="d-inline-flex p-3 rounded-circle mb-3 bg-primary-subtle text-primary">
-                        <i class="bi bi-wallet2 fs-2"></i>
-                    </div>
-                    <h4 class="fw-bold text-dark mb-1">Make an Official Contribution</h4>
-                    <p class="text-muted small mb-4">Complete your secure transaction via the official bKash Merchant Gateway. Instant electronic voucher and tax receipt generated.</p>
-                    <a href="#donation-form-card" class="btn btn-primary btn-lg w-100 rounded-pill fw-semibold shadow-sm d-inline-flex align-items-center justify-content-center gap-2 py-2.5">
-                        <i class="bi bi-arrow-down-circle"></i>
-                        <span>Proceed to Contribution Form</span>
-                    </a>
-                </div>
+        <!-- Subtle Stats Badges -->
+        <div class="d-flex justify-content-center flex-wrap gap-2 gap-sm-3 text-white small">
+            <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-10">
+                <span class="text-white-50">Total Contributed:</span>
+                <strong class="text-white font-monospace ms-1">৳@totalDonated.ToString("N0") BDT</strong>
+            </div>
+            <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-10">
+                <span class="text-white-50">Verified Donors:</span>
+                <strong class="text-white font-monospace ms-1">@totalDonorsCount</strong>
+            </div>
+            <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-10 d-none d-sm-inline-block">
+                <i class="bi bi-shield-lock text-info me-1"></i>
+                <span class="text-white">256-Bit SSL Encrypted</span>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Main Donation Form & Impact Details Container -->
-<div class="container py-5" id="donation-form-card">
+<!-- Main Container -->
+<div class="container py-5" style="max-width: 1040px;">
     <div class="row g-4 justify-content-center">
-        <!-- Left: Donation Form -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+        <!-- Donation Form -->
+        <div class="col-lg-7">
+            <div class="card border shadow-sm rounded-4 p-4 p-md-5 bg-white">
                 <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-3 p-2.5 d-flex align-items-center justify-content-center text-white bg-primary" style="width: 44px; height: 44px;">
-                            <i class="bi bi-cash-stack fs-5"></i>
-                        </div>
-                        <div>
-                            <h4 class="fw-bold text-dark mb-0">Contribution & Sponsorship Portal</h4>
-                            <p class="text-muted small mb-0">Select your contribution tier and allocate funds to specific educational programs.</p>
-                        </div>
+                    <div>
+                        <h4 class="fw-bold text-dark mb-1">Contribution Form</h4>
+                        <p class="text-muted small mb-0">Select your contribution amount and allocate funds.</p>
                     </div>
-                    <span class="badge bg-light text-secondary border px-3 py-1.5 rounded-pill small d-none d-sm-inline-block">
-                        <i class="bi bi-lock-fill me-1 text-primary"></i> Secure Portal
+                    <span class="badge bg-light text-secondary border px-3 py-1.5 rounded-pill small">
+                        <i class="bi bi-lock-fill me-1 text-primary"></i> Secure Gateway
                     </span>
                 </div>
 
                 <form id="donationForm">
                     @Html.AntiForgeryToken()
-
                     <div id="formErrorMessage" class="alert alert-danger rounded-3 mb-3 d-none"></div>
 
-                    <!-- Step 1: Select Amount -->
+                    <!-- Amount Selection -->
                     <div class="mb-4">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <span class="badge bg-primary text-white rounded-pill px-2.5 py-1" style="font-size: 0.75rem;">01</span>
-                            <label class="form-label fw-bold text-dark mb-0">Contribution Amount (BDT) *</label>
-                        </div>
-                        
+                        <label class="form-label fw-bold text-dark small text-uppercase" style="letter-spacing: 0.04em;">Select Amount (BDT)</label>
                         <div class="row g-2 mb-3" id="presetAmountsContainer">
-                            <div class="col-4 col-sm-4 col-md-2">
-                                <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="100">
-                                    ৳100
+                            <div class="col-3">
+                                <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="200">
+                                    ৳200
                                 </button>
                             </div>
-                            <div class="col-4 col-sm-4 col-md-2">
+                            <div class="col-3">
                                 <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn active btn-primary text-white border-primary font-monospace" data-amount="500">
                                     ৳500
                                 </button>
                             </div>
-                            <div class="col-4 col-sm-4 col-md-2">
+                            <div class="col-3">
                                 <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="1000">
                                     ৳1,000
                                 </button>
                             </div>
-                            <div class="col-4 col-sm-4 col-md-2">
+                            <div class="col-3">
                                 <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="2500">
                                     ৳2,500
                                 </button>
                             </div>
-                            <div class="col-4 col-sm-4 col-md-2">
-                                <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="5000">
-                                    ৳5,000
-                                </button>
-                            </div>
-                            <div class="col-4 col-sm-4 col-md-2">
-                                <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="10000">
-                                    ৳10,000
-                                </button>
-                            </div>
                         </div>
 
-                        <div class="input-group input-group-lg">
-                            <span class="input-group-text bg-light text-dark fw-bold border-end-0 rounded-start-3" style="font-size: 0.95rem;">BDT (৳)</span>
-                            <input asp-for="Amount" type="number" id="customAmountInput" class="form-control form-control-lg border-start-0 rounded-end-3 fw-bold text-dark font-monospace" min="10" max="500000" placeholder="Enter custom amount (Minimum ৳10)" value="500" required />
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-dark fw-bold border-end-0 rounded-start-3">BDT (৳)</span>
+                            <input asp-for="Amount" type="number" id="customAmountInput" class="form-control border-start-0 rounded-end-3 fw-bold text-dark font-monospace py-2" min="10" max="500000" placeholder="Custom amount (Min ৳10)" value="500" required />
                         </div>
                         <span asp-validation-for="Amount" class="text-danger small"></span>
-                        <div class="form-text small text-muted mt-1.5">
-                            <i class="bi bi-info-circle me-1"></i> A contribution of ৳500 finances study supplies and workbooks for one student for a full academic month.
-                        </div>
                     </div>
 
-                    <!-- Step 2: Choose Purpose / Cause -->
+                    <!-- Program Allocation -->
                     <div class="mb-4">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <span class="badge bg-primary text-white rounded-pill px-2.5 py-1" style="font-size: 0.75rem;">02</span>
-                            <label asp-for="Purpose" class="form-label fw-bold text-dark mb-0">Program Allocation *</label>
-                        </div>
-                        <select asp-for="Purpose" id="purposeSelect" class="form-select form-select-lg rounded-3 fs-6">
-                            <option value="General Education & Child Support Fund">General Education & Student Welfare Fund (Highest Priority)</option>
-                            <option value="Student Learning Materials & Textbooks">Core Curriculum Textbooks, Stationery & Learning Kits</option>
-                            <option value="Community Classrooms & Educator Support">Community Learning Centers & Educator Stipends</option>
-                            <option value="Digital Learning & Video Lecture Hardware">Digital Learning Infrastructure & Media Hardware</option>
-                            <option value="Nutritional & Healthcare Welfare">Student Nutrition & Health Assistance Program</option>
+                        <label asp-for="Purpose" class="form-label fw-bold text-dark small text-uppercase" style="letter-spacing: 0.04em;">Program Allocation</label>
+                        <select asp-for="Purpose" id="purposeSelect" class="form-select rounded-3 py-2">
+                            <option value="General Education & Child Support Fund">General Education & Student Welfare Fund</option>
+                            <option value="Student Learning Materials & Textbooks">Core Textbooks, Stationery & Learning Kits</option>
+                            <option value="Community Classrooms & Educator Support">Community Classrooms & Educator Support</option>
+                            <option value="Digital Learning & Video Lecture Hardware">Digital Learning & Video Lecture Hardware</option>
                         </select>
                         <span asp-validation-for="Purpose" class="text-danger small"></span>
                     </div>
 
-                    <!-- Step 3: Donor Information -->
-                    <div class="mb-4 p-4 bg-light bg-opacity-50 rounded-4 border">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <span class="badge bg-primary text-white rounded-pill px-2 py-1" style="font-size: 0.75rem;">03</span>
-                            <h5 class="fw-bold text-dark mb-0" style="font-size: 1.05rem;">Donor Contact & Verification Details</h5>
-                        </div>
+                    <!-- Donor Details -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark small text-uppercase mb-2" style="letter-spacing: 0.04em;">Donor Information</label>
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label asp-for="DonorName" class="form-label fw-semibold text-dark small">Full Name *</label>
-                                <input asp-for="DonorName" id="donorNameInput" class="form-control rounded-3" placeholder="e.g. Tanvir Ahmed" required />
+                            <div class="col-sm-6">
+                                <input asp-for="DonorName" id="donorNameInput" class="form-control rounded-3 py-2" placeholder="Full Name *" required />
                                 <span asp-validation-for="DonorName" class="text-danger small"></span>
                             </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="DonorPhone" class="form-label fw-semibold text-dark small">Mobile Number *</label>
-                                <input asp-for="DonorPhone" id="donorPhoneInput" class="form-control rounded-3" placeholder="e.g. 017XXXXXXXX" required />
-                                <span class="text-muted" style="font-size: 0.72rem;">Required for transaction SMS and receipt validation</span>
+                            <div class="col-sm-6">
+                                <input asp-for="DonorPhone" id="donorPhoneInput" class="form-control rounded-3 py-2" placeholder="Mobile Number (e.g. 017XXXXXXXX) *" required />
                                 <span asp-validation-for="DonorPhone" class="text-danger small"></span>
                             </div>
-
                             <div class="col-12">
-                                <label asp-for="DonorEmail" class="form-label fw-semibold text-dark small">Email Address (Optional)</label>
-                                <input asp-for="DonorEmail" id="donorEmailInput" class="form-control rounded-3" placeholder="e.g. name@organization.org" />
-                                <span class="text-muted" style="font-size: 0.72rem;">An electronic receipt for tax exemption will be dispatched to this address</span>
+                                <input asp-for="DonorEmail" id="donorEmailInput" class="form-control rounded-3 py-2" placeholder="Email Address (Optional, for tax receipt)" />
                             </div>
-
                             <div class="col-12">
-                                <label asp-for="Message" class="form-label fw-semibold text-dark small">Dedication or Program Note (Optional)</label>
-                                <textarea asp-for="Message" id="donorMessageInput" rows="2" class="form-control rounded-3" placeholder="e.g. Dedicated to community educator development..."></textarea>
+                                <input asp-for="Message" id="donorMessageInput" class="form-control rounded-3 py-2" placeholder="Dedication or Note (Optional)" />
                             </div>
-
                             <div class="col-12">
-                                <div class="form-check form-switch mt-1">
+                                <div class="form-check form-switch">
                                     <input asp-for="IsAnonymous" class="form-check-input" type="checkbox" id="isAnonymousSwitch" />
-                                    <label class="form-check-label fw-semibold text-secondary small" for="isAnonymousSwitch">
-                                        Record contribution anonymously on public benefactor ledgers
+                                    <label class="form-check-label text-secondary small" for="isAnonymousSwitch">
+                                        Make contribution anonymous on public list
                                     </label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Payment Gateway Banner -->
-                    <div class="p-3 rounded-4 mb-4 bg-white border shadow-sm">
-                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="p-2 rounded-3 bg-light border d-flex align-items-center justify-content-center" style="width: 58px; height: 38px;">
-                                    <span class="fw-bold font-monospace" style="color: #e2136e; font-size: 1.05rem; letter-spacing: -0.02em;">bKash</span>
-                                </div>
-                                <div>
-                                    <div class="fw-bold text-dark small">Official bKash Payment Gateway</div>
-                                    <div class="text-muted" style="font-size: 0.76rem;">Merchant: <strong>Onudhabon Foundation</strong> • 0% Transaction Surcharge</div>
-                                </div>
-                            </div>
-                            <div>
-                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
-                                    <i class="bi bi-shield-check"></i>
-                                    <span>Verified Gateway</span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="button" id="openBkashModalBtn" class="btn btn-primary btn-lg w-100 rounded-pill text-white fw-bold shadow py-3 d-flex align-items-center justify-content-center gap-2" style="background-color: #0f172a; border-color: #0f172a; font-size: 1.05rem;">
+                    <!-- Payment Button -->
+                    <button type="button" id="openBkashModalBtn" class="btn btn-primary btn-lg w-100 rounded-pill text-white fw-bold shadow-sm py-3 d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
                         <i class="bi bi-shield-lock-fill"></i>
-                        <span>Authorize Payment of ৳<span id="btnAmountDisplay">500</span> via bKash</span>
+                        <span>Donate ৳<span id="btnAmountDisplay">500</span> via bKash</span>
                     </button>
-                    <p class="text-center text-muted small mt-2.5 mb-0" style="font-size: 0.76rem;">
-                        By authorizing payment, you confirm agreement with Onudhabon's charitable governance and transparent fund disbursement policies.
-                    </p>
+
+                    <div class="d-flex align-items-center justify-content-center gap-3 text-muted small mt-3" style="font-size: 0.76rem;">
+                        <span><i class="bi bi-check-circle text-success me-1"></i>Official bKash Merchant</span>
+                        <span>•</span>
+                        <span><i class="bi bi-file-earmark-text text-primary me-1"></i>Instant Receipt</span>
+                        <span>•</span>
+                        <span><i class="bi bi-shield-check text-info me-1"></i>Secure Checkout</span>
+                    </div>
                 </form>
             </div>
         </div>
 
-        <!-- Right Sidebar: Impact & Live Donors -->
-        <div class="col-lg-4">
-            <!-- Impact Card -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
-                <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 1.05rem;">
-                    <i class="bi bi-journal-check text-primary"></i>
-                    <span>Fund Allocation & Impact</span>
+        <!-- Right Side: Impact & Recent Donors -->
+        <div class="col-lg-5">
+            <!-- Impact Summary -->
+            <div class="card border shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 1rem;">
+                    <i class="bi bi-heart-pulse text-primary"></i>
+                    <span>Your Impact</span>
                 </h5>
                 <div class="d-flex flex-column gap-3 small text-muted">
-                    <div class="d-flex gap-3">
-                        <div class="rounded-3 bg-primary-subtle text-primary p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
-                            <i class="bi bi-book-half"></i>
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="about-icon-badge badge-blue flex-shrink-0" style="width: 42px; height: 42px; font-size: 1.1rem; margin-bottom: 0;">
+                            <i class="bi bi-journal-bookmark-fill"></i>
                         </div>
                         <div>
-                            <div class="fw-bold text-dark">৳100 — Academic Essentials</div>
-                            <div class="text-muted">Standard stationery kits, writing workbooks, and geometry instruments for one student.</div>
+                            <strong class="text-dark d-block">৳200 — Learning Materials</strong>
+                            <span>Supplies textbooks and notebooks for one student.</span>
                         </div>
                     </div>
-                    <div class="d-flex gap-3">
-                        <div class="rounded-3 bg-success-subtle text-success p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="about-icon-badge badge-green flex-shrink-0" style="width: 42px; height: 42px; font-size: 1.1rem; margin-bottom: 0;">
                             <i class="bi bi-mortarboard-fill"></i>
                         </div>
                         <div>
-                            <div class="fw-bold text-dark">৳500 — Monthly Student Sponsorship</div>
-                            <div class="text-muted">Comprehensive curriculum materials, local educator mentorship, and examination support.</div>
+                            <strong class="text-dark d-block">৳500 — Monthly Sponsorship</strong>
+                            <span>Covers monthly study materials and educator mentoring.</span>
                         </div>
                     </div>
-                    <div class="d-flex gap-3">
-                        <div class="rounded-3 bg-info-subtle text-info p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
-                            <i class="bi bi-display"></i>
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="about-icon-badge badge-teal flex-shrink-0" style="width: 42px; height: 42px; font-size: 1.1rem; margin-bottom: 0;">
+                            <i class="bi bi-display-fill"></i>
                         </div>
                         <div>
-                            <div class="fw-bold text-dark">৳2,500 — Digital Learning Hub</div>
-                            <div class="text-muted">Equips community study hubs with offline media hardware, video lectures, and learning tablets.</div>
+                            <strong class="text-dark d-block">৳2,500 — Community Study Hub</strong>
+                            <span>Supports classroom supplies and digital learning devices.</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Donors Live Feed -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <!-- Recent Contributions -->
+            <div class="card border shadow-sm rounded-4 p-4 bg-white">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" style="font-size: 1.05rem;">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" style="font-size: 1rem;">
                         <i class="bi bi-people-fill text-primary"></i>
                         <span>Recent Contributions</span>
                     </h5>
                     <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 small">Verified</span>
                 </div>
 
-                <div id="recentDonorsList" class="d-flex flex-column gap-2.5">
+                <div id="recentDonorsList" class="d-flex flex-column gap-2">
                     @if (recentDonations.Any())
                     {
-                        @foreach (var d in recentDonations)
+                        @foreach (var d in recentDonations.Take(5))
                         {
-                            <div class="p-2.5 bg-light bg-opacity-75 rounded-3 d-flex justify-content-between align-items-center small border">
+                            <div class="p-2.5 bg-light bg-opacity-50 rounded-3 d-flex justify-content-between align-items-center small border">
                                 <div>
-                                    <div class="fw-bold text-dark">@(d.IsAnonymous ? "Anonymous Benefactor" : d.DonorName)</div>
+                                    <div class="fw-semibold text-dark">@(d.IsAnonymous ? "Anonymous Benefactor" : d.DonorName)</div>
                                     <div class="text-muted" style="font-size: 0.72rem;">@d.Purpose</div>
                                 </div>
                                 <div class="text-end">
@@ -293,26 +222,13 @@
                     }
                 </div>
             </div>
-
-            <!-- Governance & Transparency Card -->
-            <div class="card border-0 shadow-sm rounded-4 p-3 mt-4 bg-white border">
-                <div class="d-flex align-items-start gap-2">
-                    <i class="bi bi-patch-check-fill text-primary fs-5 mt-0.5"></i>
-                    <div>
-                        <div class="fw-bold text-dark small">Institutional Transparency</div>
-                        <div class="text-muted" style="font-size: 0.75rem; line-height: 1.5;">
-                            All disbursements undergo quarterly compliance reviews and are audited under non-profit educational development standards.
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
 <!-- ================= BKASH PAYMENT GATEWAY MODAL ================= -->
 <div class="modal fade" id="bkashPaymentModal" tabindex="-1" aria-labelledby="bkashModalTitle" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
         <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden bg-white">
             
             <!-- bKash Brand Header -->
@@ -365,7 +281,7 @@
 
                 <div class="d-flex gap-2 pt-1">
                     <button type="button" class="btn btn-outline-secondary w-50 py-2.5 rounded-pill fw-semibold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="btnProceedToOtp" class="btn btn-primary w-50 py-2.5 rounded-pill fw-bold" style="background-color: #0f172a; border-color: #0f172a;">
+                    <button type="button" id="btnProceedToOtp" class="btn btn-primary w-50 py-2.5 rounded-pill fw-bold" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
                         Proceed to OTP →
                     </button>
                 </div>
@@ -391,7 +307,7 @@
 
                 <div class="d-flex gap-2 pt-1">
                     <button type="button" id="btnBackToStep1" class="btn btn-outline-secondary w-50 py-2.5 rounded-pill fw-semibold">← Back</button>
-                    <button type="button" id="btnProceedToPin" class="btn btn-primary w-50 py-2.5 rounded-pill fw-bold" style="background-color: #0f172a; border-color: #0f172a;">
+                    <button type="button" id="btnProceedToPin" class="btn btn-primary w-50 py-2.5 rounded-pill fw-bold" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
                         Verify Code →
                     </button>
                 </div>
@@ -417,7 +333,7 @@
 
                 <div class="d-flex gap-2 pt-1">
                     <button type="button" id="btnBackToStep2" class="btn btn-outline-secondary w-50 py-2.5 rounded-pill fw-semibold">← Back</button>
-                    <button type="button" id="btnConfirmFinalPayment" class="btn btn-primary w-50 py-2.5 rounded-pill fw-bold" style="background-color: #0f172a; border-color: #0f172a;">
+                    <button type="button" id="btnConfirmFinalPayment" class="btn btn-primary w-50 py-2.5 rounded-pill fw-bold" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
                         <span>Confirm Payment</span>
                     </button>
                 </div>

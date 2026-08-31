@@ -2,169 +2,265 @@
 @inject Onudhabon_ISD.Services.ICloudinaryService CloudinaryService
 
 @{
-    ViewData["Title"] = $"{Model.FullName} - User Profile";
+    ViewData["Title"] = $"{Model.FullName} - Institutional Profile";
 }
 
 <div class="container py-5">
     <div class="row g-4">
-        <!-- Left Sidebar: Profile Card -->
+        <!-- Left Sidebar: Formal Profile Identity Card -->
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 text-center p-4">
-                <div class="position-relative d-inline-block mx-auto mb-3">
-                    @if (!string.IsNullOrWhiteSpace(Model.Picture))
+            <div class="profile-sidebar-card">
+                <!-- Top Brand Banner -->
+                <div class="profile-sidebar-banner"></div>
+
+                <!-- Avatar and Summary Header -->
+                <div class="p-4 pt-0 text-center">
+                    <div class="profile-avatar-wrapper mb-3">
+                        @if (!string.IsNullOrWhiteSpace(Model.Picture))
+                        {
+                            <img src="@CloudinaryService.GetAvatarUrl(Model.Picture, 220)" 
+                                 alt="@Model.FullName" 
+                                 class="profile-avatar-img" />
+                        }
+                        else
+                        {
+                            <div class="profile-avatar-fallback mx-auto">
+                                @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName.Substring(0, 1).ToUpper())
+                            </div>
+                        }
+                    </div>
+
+                    <h4 class="fw-bold text-dark mb-1">@Model.FullName</h4>
+                    <p class="text-muted small mb-3">
+                        <a href="mailto:@Model.Email" class="text-decoration-none text-muted">@Model.Email</a>
+                    </p>
+
+                    <!-- Institutional Badges -->
+                    <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
+                        @if (Model.Role == "Educator")
+                        {
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill fw-semibold">
+                                <i class="bi bi-mortarboard-fill me-1"></i> Educator
+                            </span>
+                        }
+                        else if (Model.Role == "Local Guardian")
+                        {
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-semibold">
+                                <i class="bi bi-shield-check me-1"></i> Local Guardian
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill fw-semibold">
+                                <i class="bi bi-person-badge me-1"></i> @Model.Role
+                            </span>
+                        }
+
+                        @if (Model.VerificationStatus?.ToLower() == "verified")
+                        {
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-semibold">
+                                <i class="bi bi-patch-check-fill me-1"></i> Verified
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1.5 rounded-pill fw-semibold text-dark">
+                                <i class="bi bi-clock-history me-1"></i> @(Model.VerificationStatus ?? "Pending Review")
+                            </span>
+                        }
+                    </div>
+
+                    <!-- Meta Information Table -->
+                    <div class="border-top pt-3 text-start">
+                        <div class="profile-meta-row">
+                            <span class="text-muted"><i class="bi bi-hash text-primary me-1"></i> User ID:</span>
+                            <span class="fw-bold text-dark font-monospace">#@Model.Id</span>
+                        </div>
+                        <div class="profile-meta-row">
+                            <span class="text-muted"><i class="bi bi-calendar-event text-primary me-1"></i> Member Since:</span>
+                            <span class="fw-semibold text-dark">@Model.CreatedAt.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                        <div class="profile-meta-row">
+                            <span class="text-muted"><i class="bi bi-person-badge text-primary me-1"></i> Age:</span>
+                            <span class="fw-semibold text-dark">@(Model.Age.HasValue ? $"{Model.Age} years" : "—")</span>
+                        </div>
+                    </div>
+
+                    @if (Model.Role == "Educator")
                     {
-                        <img src="@CloudinaryService.GetAvatarUrl(Model.Picture, 180)" 
-                             alt="@Model.FullName" 
-                             class="rounded-circle shadow-sm border border-3 border-primary" 
-                             style="width: 130px; height: 130px; object-fit: cover;" />
-                    }
-                    else
-                    {
-                        <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center mx-auto shadow-sm" 
-                             style="width: 130px; height: 130px; font-size: 2.8rem; border: 3px solid var(--bs-primary);">
-                            @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName.Substring(0, 1).ToUpper())
+                        <div class="border-top pt-3 mt-3 d-grid gap-2">
+                            <a asp-controller="Lecture" asp-action="Upload" class="btn btn-primary btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1.5" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
+                                <i class="bi bi-camera-video"></i>
+                                <span>Upload Lecture Video</span>
+                            </a>
+                            <a asp-controller="Material" asp-action="Upload" class="btn btn-outline-primary btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1.5">
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Upload Study Material</span>
+                            </a>
                         </div>
                     }
                 </div>
-
-                <h4 class="fw-bold text-dark mb-1">@Model.FullName</h4>
-                <p class="text-muted small mb-2"><a href="mailto:@Model.Email" class="text-decoration-none text-muted">@Model.Email</a></p>
-
-                <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
-                    @if (Model.Role == "Educator")
-                    {
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill fs-6">
-                            Educator
-                        </span>
-                    }
-                    else if (Model.Role == "Local Guardian")
-                    {
-                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fs-6">
-                            Local Guardian
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill fs-6">
-                            @Model.Role
-                        </span>
-                    }
-
-                    <span class="badge @(Model.VerificationStatus?.ToLower() == "verified" ? "bg-success" : "bg-warning text-dark") px-2.5 py-1.5 rounded-pill">
-                        @(Model.VerificationStatus ?? "Pending")
-                    </span>
-                </div>
-
-                <div class="border-top pt-3 text-start small">
-                    <div class="d-flex justify-content-between py-1.5 border-bottom">
-                        <span class="text-muted">User ID:</span>
-                        <span class="fw-semibold">#@Model.Id</span>
-                    </div>
-                    <div class="d-flex justify-content-between py-1.5 border-bottom">
-                        <span class="text-muted">Member Since:</span>
-                        <span class="fw-semibold">@Model.CreatedAt.ToString("MMM dd, yyyy")</span>
-                    </div>
-                    <div class="d-flex justify-content-between py-1.5">
-                        <span class="text-muted">Age:</span>
-                        <span class="fw-semibold">@(Model.Age.HasValue ? $"{Model.Age} years" : "—")</span>
-                    </div>
-                </div>
-
-                @if (Model.Role == "Educator")
-                {
-                    <div class="border-top pt-3 mt-2 d-grid gap-2">
-                        <a asp-controller="Lecture" asp-action="Upload" class="btn btn-primary btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1.5">
-                            <i class="bi bi-camera-video"></i>
-                            <span>Upload Lecture Video</span>
-                        </a>
-                        <a asp-controller="Material" asp-action="Upload" class="btn btn-outline-primary btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1.5">
-                            <i class="bi bi-file-earmark-text"></i>
-                            <span>Upload Study Material</span>
-                        </a>
-                    </div>
-                }
             </div>
         </div>
 
-        <!-- Right Main Column: Full Details -->
+        <!-- Right Main Column: Structured Information Cards -->
         <div class="col-lg-8">
-            <!-- Contact & Location Card -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Personal & Contact Information</h5>
+            <!-- 1. Personal & Contact Information -->
+            <div class="profile-section-card">
+                <div class="profile-section-header">
+                    <h5 class="profile-section-title">
+                        <i class="bi bi-person-lines-fill text-primary"></i>
+                        <span>Personal & Contact Information</span>
+                    </h5>
+                    <span class="badge bg-light text-secondary border rounded-pill px-3 py-1 font-monospace small">Verified Record</span>
+                </div>
+
                 <div class="row g-3">
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Email Address</div>
-                        <div class="fw-semibold text-dark">@Model.Email</div>
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-envelope"></i> Email Address
+                            </div>
+                            <div class="profile-data-value">@Model.Email</div>
+                        </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Phone Number</div>
-                        <div class="fw-semibold font-monospace text-dark">@Model.PhoneNumber</div>
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-telephone"></i> Phone Number
+                            </div>
+                            <div class="profile-data-value font-monospace">@Model.PhoneNumber</div>
+                        </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">City</div>
-                        <div class="fw-semibold text-dark">@Model.City</div>
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-geo-alt"></i> City
+                            </div>
+                            <div class="profile-data-value">@(string.IsNullOrWhiteSpace(Model.City) ? "—" : Model.City)</div>
+                        </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Region / Area</div>
-                        <div class="fw-semibold text-dark">@Model.Area</div>
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-map"></i> Region / Area
+                            </div>
+                            <div class="profile-data-value">@(string.IsNullOrWhiteSpace(Model.Area) ? "—" : Model.Area)</div>
+                        </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Detailed Address</div>
-                        <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.Location) ? "—" : Model.Location)</div>
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-house-door"></i> Detailed Address
+                            </div>
+                            <div class="profile-data-value">@(string.IsNullOrWhiteSpace(Model.Location) ? "—" : Model.Location)</div>
+                        </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">NID / Identification Number</div>
-                        <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.NidNumber) ? "—" : Model.NidNumber)</div>
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-card-text"></i> NID / Identification Number
+                            </div>
+                            <div class="profile-data-value font-monospace">@(string.IsNullOrWhiteSpace(Model.NidNumber) ? "—" : Model.NidNumber)</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Academic & Educational Background Card -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Academic & Educational Qualifications</h5>
+            <!-- 2. Academic & Educational Background -->
+            <div class="profile-section-card">
+                <div class="profile-section-header">
+                    <h5 class="profile-section-title">
+                        <i class="bi bi-mortarboard-fill text-primary"></i>
+                        <span>Academic Qualifications & Background</span>
+                    </h5>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 small">Accredited</span>
+                </div>
+
                 <div class="row g-3">
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Highest Education Level</div>
-                        <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.EducationLevel) ? "—" : Model.EducationLevel)</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Currently Enrolled / Studying</div>
-                        <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.CurrentlyStudying) ? "—" : Model.CurrentlyStudying)</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Major / Department</div>
-                        <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.Major) ? "—" : Model.Major)</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">University / College</div>
-                        <div class="fw-semibold text-dark">
-                            @(string.IsNullOrWhiteSpace(Model.UniversityName) ? "—" : Model.UniversityName)
-                            @(!string.IsNullOrWhiteSpace(Model.UniversityPassingYear) ? $" (Batch: {Model.UniversityPassingYear})" : "")
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-award"></i> Highest Education Level
+                            </div>
+                            <div class="profile-data-value">@(string.IsNullOrWhiteSpace(Model.EducationLevel) ? "—" : Model.EducationLevel)</div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">HSC / College Institute</div>
-                        <div class="fw-semibold text-dark">
-                            @(string.IsNullOrWhiteSpace(Model.HscInstitute) ? "—" : Model.HscInstitute)
-                            @(!string.IsNullOrWhiteSpace(Model.HscPassingYear) ? $" ({Model.HscPassingYear})" : "")
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-book"></i> Current Enrollment Status
+                            </div>
+                            <div class="profile-data-value">@(string.IsNullOrWhiteSpace(Model.CurrentlyStudying) ? "—" : Model.CurrentlyStudying)</div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">SSC / School Institute</div>
-                        <div class="fw-semibold text-dark">
-                            @(string.IsNullOrWhiteSpace(Model.SscInstitute) ? "—" : Model.SscInstitute)
-                            @(!string.IsNullOrWhiteSpace(Model.SscPassingYear) ? $" ({Model.SscPassingYear})" : "")
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-journal-code"></i> Major / Department
+                            </div>
+                            <div class="profile-data-value">@(string.IsNullOrWhiteSpace(Model.Major) ? "—" : Model.Major)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-building"></i> University / College
+                            </div>
+                            <div class="profile-data-value">
+                                @(string.IsNullOrWhiteSpace(Model.UniversityName) ? "—" : Model.UniversityName)
+                                @if (!string.IsNullOrWhiteSpace(Model.UniversityPassingYear))
+                                {
+                                    <span class="badge bg-light text-dark border font-monospace ms-1 small">Batch: @Model.UniversityPassingYear</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-bank"></i> HSC / College Institute
+                            </div>
+                            <div class="profile-data-value">
+                                @(string.IsNullOrWhiteSpace(Model.HscInstitute) ? "—" : Model.HscInstitute)
+                                @if (!string.IsNullOrWhiteSpace(Model.HscPassingYear))
+                                {
+                                    <span class="badge bg-light text-dark border font-monospace ms-1 small">@Model.HscPassingYear</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="profile-data-tile">
+                            <div class="profile-data-label">
+                                <i class="bi bi-building-check"></i> SSC / School Institute
+                            </div>
+                            <div class="profile-data-value">
+                                @(string.IsNullOrWhiteSpace(Model.SscInstitute) ? "—" : Model.SscInstitute)
+                                @if (!string.IsNullOrWhiteSpace(Model.SscPassingYear))
+                                {
+                                    <span class="badge bg-light text-dark border font-monospace ms-1 small">@Model.SscPassingYear</span>
+                                }
+                            </div>
                         </div>
                     </div>
 
                     @if (!string.IsNullOrWhiteSpace(Model.CertificatePicture))
                     {
-                        <div class="col-12 border-top pt-2">
-                            <div class="text-muted small mb-1">Attached Certificate / Education Document:</div>
-                            <div class="d-flex align-items-center gap-2">
-                                <a href="@Model.CertificatePicture" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
-                                    <i class="bi bi-file-earmark-pdf"></i>
-                                    <span>View Document on Cloudinary</span>
+                        <div class="col-12 mt-2">
+                            <div class="profile-credential-box">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-3 bg-white p-2.5 shadow-sm border text-primary d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.3rem;">
+                                        <i class="bi bi-file-earmark-check-fill text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark small">Verified Educational Credential / Certificate</div>
+                                        <div class="text-muted small" style="font-size: 0.76rem;">Document securely verified and stored</div>
+                                    </div>
+                                </div>
+                                <a href="@Model.CertificatePicture" target="_blank" class="btn btn-primary btn-sm rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                    <span>View Credential</span>
                                 </a>
                             </div>
                         </div>
@@ -172,24 +268,38 @@
                 </div>
             </div>
 
-            <!-- Bio & Community Card -->
+            <!-- 3. Bio & Statement Card -->
             @if (!string.IsNullOrWhiteSpace(Model.Bio) || !string.IsNullOrWhiteSpace(Model.VolunteerReason))
             {
-                <div class="card border-0 shadow-sm rounded-4 p-4">
-                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">About & Volunteer Motivation</h5>
+                <div class="profile-section-card">
+                    <div class="profile-section-header">
+                        <h5 class="profile-section-title">
+                            <i class="bi bi-chat-left-quote-fill text-primary"></i>
+                            <span>Statement & Community Motivation</span>
+                        </h5>
+                    </div>
+
                     @if (!string.IsNullOrWhiteSpace(Model.Bio))
                     {
                         <div class="mb-3">
-                            <div class="text-muted small">Bio</div>
-                            <p class="mb-0 text-dark">@Model.Bio</p>
+                            <div class="profile-data-label mb-2">
+                                <i class="bi bi-person-lines-fill"></i> Personal Bio / Introduction
+                            </div>
+                            <div class="profile-statement-box">
+                                @Model.Bio
+                            </div>
                         </div>
                     }
 
                     @if (!string.IsNullOrWhiteSpace(Model.VolunteerReason))
                     {
                         <div>
-                            <div class="text-muted small">Motivation for Joining / Volunteering</div>
-                            <p class="mb-0 text-dark">@Model.VolunteerReason</p>
+                            <div class="profile-data-label mb-2">
+                                <i class="bi bi-heart-pulse"></i> Volunteer Motivation & Objective
+                            </div>
+                            <div class="profile-statement-box">
+                                @Model.VolunteerReason
+                            </div>
                         </div>
                     }
                 </div>

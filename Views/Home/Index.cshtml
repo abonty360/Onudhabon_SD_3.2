@@ -15,34 +15,65 @@
     </section>
 
     <div class="home-content-body">
-        <section class="home-stats">
-            <div class="stat-item">
-                <div class="stat-icon" style="background-color: #eff6ff; color: #2563eb;">
-                    <i class="bi bi-people-fill"></i>
+        <section class="home-stats" aria-label="Key Impact Statistics">
+            <div class="stat-card stat-blue">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
                 </div>
-                <div class="stat-value">10,000+</div>
-                <div class="stat-label">Students Reached</div>
+                <div class="stat-info">
+                    <div class="stat-value-container">
+                        <span class="stat-value counter-value" data-target="10000">10,000</span><span class="stat-plus">+</span>
+                    </div>
+                    <div class="stat-label">Students Reached</div>
+                    <span class="stat-tag">Across Bangladesh</span>
+                </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon" style="background-color: #f0fdfa; color: #0d9488;">
-                    <i class="bi bi-book-half"></i>
+
+            <div class="stat-card stat-teal">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </div>
                 </div>
-                <div class="stat-value">2,500+</div>
-                <div class="stat-label">Learning Materials</div>
+                <div class="stat-info">
+                    <div class="stat-value-container">
+                        <span class="stat-value counter-value" data-target="2500">2,500</span><span class="stat-plus">+</span>
+                    </div>
+                    <div class="stat-label">Learning Materials</div>
+                    <span class="stat-tag">Free & Accessible</span>
+                </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon" style="background-color: #f0fdf4; color: #16a34a;">
-                    <i class="bi bi-patch-check-fill"></i>
+
+            <div class="stat-card stat-green">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon">
+                        <i class="bi bi-patch-check-fill"></i>
+                    </div>
                 </div>
-                <div class="stat-value">850+</div>
-                <div class="stat-label">Active Volunteers</div>
+                <div class="stat-info">
+                    <div class="stat-value-container">
+                        <span class="stat-value counter-value" data-target="850">850</span><span class="stat-plus">+</span>
+                    </div>
+                    <div class="stat-label">Active Volunteers</div>
+                    <span class="stat-tag">Dedicated Mentors</span>
+                </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon" style="background-color: #fffbeb; color: #d97706;">
-                    <i class="bi bi-award-fill"></i>
+
+            <div class="stat-card stat-amber">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon">
+                        <i class="bi bi-award-fill"></i>
+                    </div>
                 </div>
-                <div class="stat-value">1,200+</div>
-                <div class="stat-label">Success Stories</div>
+                <div class="stat-info">
+                    <div class="stat-value-container">
+                        <span class="stat-value counter-value" data-target="1200">1,200</span><span class="stat-plus">+</span>
+                    </div>
+                    <div class="stat-label">Success Stories</div>
+                    <span class="stat-tag">Lives Transformed</span>
+                </div>
             </div>
         </section>
 
@@ -156,5 +187,55 @@
                 }
             });
         });
+
+        // Smooth Counter Animation
+        const statCounters = document.querySelectorAll('.counter-value');
+        let hasAnimatedStats = false;
+
+        function animateCounters() {
+            statCounters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'), 10);
+                if (isNaN(target)) return;
+
+                const duration = 1800; // ms
+                const startTime = performance.now();
+
+                function updateCount(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    // Ease out quartic function
+                    const easeProgress = 1 - Math.pow(1 - progress, 4);
+                    const currentVal = Math.floor(easeProgress * target);
+
+                    counter.textContent = currentVal.toLocaleString('en-US');
+
+                    if (progress < 1) {
+                        requestAnimationFrame(updateCount);
+                    } else {
+                        counter.textContent = target.toLocaleString('en-US');
+                    }
+                }
+
+                requestAnimationFrame(updateCount);
+            });
+        }
+
+        if ('IntersectionObserver' in window) {
+            const statsSection = document.querySelector('.home-stats');
+            if (statsSection) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && !hasAnimatedStats) {
+                            hasAnimatedStats = true;
+                            animateCounters();
+                            observer.unobserve(statsSection);
+                        }
+                    });
+                }, { threshold: 0.2 });
+                observer.observe(statsSection);
+            }
+        } else {
+            animateCounters();
+        }
     });
 </script>
