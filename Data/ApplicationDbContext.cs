@@ -82,6 +82,13 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.GuardianName).HasMaxLength(150);
                 entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Pending");
                 entity.Property(e => e.CompletedClasses).HasDefaultValue(0);
+                entity.Property(e => e.Age).HasDefaultValue(14);
+                entity.Property(e => e.AttendancePercentage).HasDefaultValue(90);
+                entity.Property(e => e.ProgressPercentage).HasDefaultValue(75);
+                entity.Property(e => e.Notes).HasMaxLength(2000);
+                entity.Property(e => e.PhotoUrl).HasMaxLength(500);
+                entity.Property(e => e.SubjectProgressJson).HasMaxLength(4000);
+                entity.Property(e => e.LastActivityDate).HasDefaultValueSql("GETUTCDATE()");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });

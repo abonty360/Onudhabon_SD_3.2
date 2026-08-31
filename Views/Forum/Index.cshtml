@@ -7,25 +7,54 @@
     bool isAuthenticated = User.Identity != null && User.Identity.IsAuthenticated;
 }
 
-<div class="container py-4" style="max-width: 900px;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold text-dark mb-1">Community Forum</h2>
-            <p class="text-muted mb-0">Connect, ask questions, and share knowledge between Educators & Local Guardians.</p>
+<div class="forum-page">
+    <!-- Hero Section with Background Image -->
+    <section class="forum-hero">
+        <div class="forum-hero-overlay"></div>
+        <div class="forum-hero-content">
+            <div class="forum-hero-badge">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Community Exchange</span>
+            </div>
+            <h1>Collaborate, Ask & Share</h1>
+            <p>
+                Connect with educators, volunteers, and local guardians across Bangladesh. 
+                Exchange ideas, discuss curriculum questions, and empower students together.
+            </p>
+            <div>
+                @if (isAuthenticated)
+                {
+                    <button type="button" class="btn btn-primary btn-sm px-4 py-2.5 rounded-pill fw-bold shadow-sm d-inline-flex align-items-center gap-2" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Start New Discussion</span>
+                    </button>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="btn btn-primary btn-sm px-4 py-2.5 rounded-pill fw-bold shadow-sm d-inline-flex align-items-center gap-2" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        <span>Login to Participate</span>
+                    </a>
+                }
+            </div>
         </div>
-        @if (isAuthenticated)
-        {
-            <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createPostModal">
-                + New Discussion
-            </button>
-        }
-        else
-        {
-            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="btn btn-outline-primary rounded-pill px-4">
-                Login to Post
-            </a>
-        }
-    </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <div class="container py-5" style="max-width: 900px;">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+            <div>
+                <h4 class="fw-bold text-dark mb-1">Recent Discussions</h4>
+                <p class="text-muted small mb-0">Community posts from verified educators and guardians</p>
+            </div>
+            @if (isAuthenticated)
+            {
+                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3.5 py-1.5 d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>New Post</span>
+                </button>
+            }
+        </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -65,14 +94,16 @@
                         <h4 class="fw-bold text-dark mb-0">@post.Title</h4>
                         @if (post.Status == "Pending" || post.Status == "pending" || string.IsNullOrEmpty(post.Status))
                         {
-                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 text-nowrap">
-                                ⏳ Pending Admin Approval
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 text-nowrap d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-clock-history"></i>
+                                <span>Pending Admin Approval</span>
                             </span>
                         }
                         else if (post.Status == "Declined" || post.Status == "declined")
                         {
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 text-nowrap">
-                                ✕ Declined
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 text-nowrap d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span>Declined</span>
                             </span>
                         }
                     </div>
@@ -99,24 +130,27 @@
                     <p class="text-dark fs-6 mb-4" style="line-height: 1.6; white-space: pre-line;">@post.Content</p>
 
                     <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 fw-semibold toggle-details-btn" data-post-id="@post.Id">
-                            View Details (<span id="reply-count-@post.Id">@post.Replies</span> replies)
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 fw-semibold toggle-details-btn d-inline-flex align-items-center gap-1.5" data-post-id="@post.Id">
+                            <i class="bi bi-chat-dots"></i>
+                            <span>View Details (<span id="reply-count-@post.Id">@post.Replies</span> replies)</span>
                         </button>
 
                         <div class="d-flex gap-2">
                             <button type="button" 
-                                    class="btn @(isLiked ? "btn-success text-white" : "btn-outline-success") btn-sm rounded-3 px-3 py-1 fw-medium like-btn" 
+                                    class="btn @(isLiked ? "btn-success text-white" : "btn-outline-success") btn-sm rounded-3 px-3 py-1 fw-medium like-btn d-inline-flex align-items-center gap-1" 
                                     id="like-btn-@post.Id"
                                     data-post-id="@post.Id"
                                     data-is-active="@(isLiked ? "true" : "false")">
-                                Like (<span id="like-count-@post.Id">@post.Likes</span>)
+                                <i class="bi bi-hand-thumbs-up"></i>
+                                <span>Like (<span id="like-count-@post.Id">@post.Likes</span>)</span>
                             </button>
                             <button type="button" 
-                                    class="btn @(isDisliked ? "btn-danger text-white" : "btn-outline-danger") btn-sm rounded-3 px-3 py-1 fw-medium dislike-btn" 
+                                    class="btn @(isDisliked ? "btn-danger text-white" : "btn-outline-danger") btn-sm rounded-3 px-3 py-1 fw-medium dislike-btn d-inline-flex align-items-center gap-1" 
                                     id="dislike-btn-@post.Id"
                                     data-post-id="@post.Id"
                                     data-is-active="@(isDisliked ? "true" : "false")">
-                                Dislike (<span id="dislike-count-@post.Id">@post.Dislikes</span>)
+                                <i class="bi bi-hand-thumbs-down"></i>
+                                <span>Dislike (<span id="dislike-count-@post.Id">@post.Dislikes</span>)</span>
                             </button>
                         </div>
                     </div>
@@ -147,6 +181,7 @@
             }
         }
     </div>
+</div>
 </div>
 
 <!-- Modal for New Post -->

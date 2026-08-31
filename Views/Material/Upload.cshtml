@@ -76,7 +76,13 @@
 
                         <div class="col-md-6">
                             <label asp-for="Instructor" class="form-label fw-semibold">Author / Educator</label>
-                            <input asp-for="Instructor" class="form-control rounded-3" placeholder="e.g. Ayesha Rahman" />
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted border-end-0 rounded-start-3">
+                                    <i class="bi bi-person-fill"></i>
+                                </span>
+                                <input asp-for="Instructor" class="form-control rounded-end-3 bg-light" readonly tabindex="-1" style="cursor: not-allowed;" />
+                            </div>
+                            <span class="text-muted small">Fetched automatically from your profile name.</span>
                         </div>
                     </div>
 

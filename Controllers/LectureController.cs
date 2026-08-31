@@ -108,16 +108,17 @@ namespace Onudhabon_ISD.Controllers
                 _logger.LogInformation("Cloudinary video discovery skipped: {Message}", ex.Message);
             }
 
-            var isAdmin = User.IsInRole("Admin");
+            var isAdmin = User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin";
+            var isEducator = User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator";
             var query = _context.Lectures.AsQueryable();
 
-            if (isAdmin)
+            if (isAdmin || isEducator)
             {
-                // Admins see all lectures
+                // Admins and Educators see all lectures (active, approved, pending, declined)
             }
             else if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                // Logged-in educators/users see all approved lectures PLUS their own uploaded pending/declined lectures
+                // Logged-in users see all approved lectures PLUS their own uploaded pending/declined lectures
                 var userIdentifiers = await GetCurrentUserIdentifiersAsync();
                 query = query.Where(l => l.Status == "Active" || l.Status == "Approved" || l.Status == "approved" 
                     || (l.Instructor != null && userIdentifiers.Contains(l.Instructor.ToLower())));
@@ -165,7 +166,8 @@ namespace Onudhabon_ISD.Controllers
                 return NotFound();
             }
 
-            var isAdmin = User.IsInRole("Admin");
+            var isAdmin = User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin";
+            var isEducator = User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator";
             bool isApproved = lecture.Status == "Active" || lecture.Status == "Approved" || lecture.Status == "approved";
             bool isOwner = false;
 
@@ -175,7 +177,7 @@ namespace Onudhabon_ISD.Controllers
                 isOwner = !string.IsNullOrEmpty(lecture.Instructor) && userIdentifiers.Contains(lecture.Instructor.Trim().ToLower());
             }
 
-            if (!isApproved && !isAdmin && !isOwner)
+            if (!isApproved && !isAdmin && !isEducator && !isOwner)
             {
                 return NotFound();
             }
@@ -186,11 +188,22 @@ namespace Onudhabon_ISD.Controllers
         // GET: /Lecture/Upload
         [HttpGet]
         [Authorize(Roles = "Educator")]
-        public IActionResult Upload()
+        public async Task<IActionResult> Upload()
         {
+            var userFullName = User.Identity?.Name;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdClaim, out int uid))
+            {
+                var dbUser = await _context.Users.FindAsync(uid);
+                if (dbUser != null && !string.IsNullOrWhiteSpace(dbUser.FullName))
+                {
+                    userFullName = dbUser.FullName;
+                }
+            }
+
             return View(new LectureUploadViewModel
             {
-                Instructor = User.Identity?.Name
+                Instructor = userFullName ?? "Educator"
             });
         }
 
@@ -200,6 +213,20 @@ namespace Onudhabon_ISD.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upload(LectureUploadViewModel model)
         {
+            var userFullName = User.Identity?.Name;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdClaim, out int uid))
+            {
+                var dbUser = await _context.Users.FindAsync(uid);
+                if (dbUser != null && !string.IsNullOrWhiteSpace(dbUser.FullName))
+                {
+                    userFullName = dbUser.FullName;
+                }
+            }
+
+            // Always enforce user profile name as Instructor
+            model.Instructor = userFullName ?? (!string.IsNullOrWhiteSpace(model.Instructor) ? model.Instructor.Trim() : "Educator");
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -226,9 +253,7 @@ namespace Onudhabon_ISD.Controllers
             {
                 Title = model.Title.Trim(),
                 Description = model.Description?.Trim(),
-                Instructor = !string.IsNullOrWhiteSpace(model.Instructor)
-                    ? model.Instructor.Trim()
-                    : (User.Identity?.Name ?? "Educator"),
+                Instructor = model.Instructor,
                 Version = model.Version?.Trim() ?? "Bangla",
                 ClassLevel = model.ClassLevel.Trim(),
                 Subject = model.Subject.Trim(),

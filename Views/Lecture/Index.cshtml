@@ -130,6 +130,15 @@
             <div class="lecture-grid" id="lectureGrid">
                 @foreach (var lecture in Model)
                 {
+                    var isPending = string.Equals(lecture.Status, "pending", StringComparison.OrdinalIgnoreCase);
+                    var isDeclined = string.Equals(lecture.Status, "declined", StringComparison.OrdinalIgnoreCase);
+                    var isOwner = (User.Identity != null && User.Identity.IsAuthenticated) && !string.IsNullOrWhiteSpace(lecture.Instructor) && (
+                        string.Equals(lecture.Instructor.Trim(), User.Identity?.Name, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(lecture.Instructor.Trim(), User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value, StringComparison.OrdinalIgnoreCase)
+                    );
+                    var isAdmin = (User.Identity != null && User.Identity.IsAuthenticated) && (User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin");
+                    var showStatus = isAdmin || isOwner || isPending || isDeclined;
+
                     <article class="lecture-card"
                              data-title="@lecture.Title"
                              data-instructor="@lecture.Instructor"
@@ -156,7 +165,9 @@
                                     </div>
                                 }
                                 <div class="video-overlay">
-                                    <span class="play-icon">▶</span>
+                                    <span class="play-icon d-inline-flex align-items-center justify-content-center">
+                                        <i class="bi bi-play-fill fs-5"></i>
+                                    </span>
                                     <span class="time-label" style="display: none;">0:00</span>
                                 </div>
                             </div>
@@ -165,27 +176,53 @@
                                 <div class="meta-row d-flex align-items-center flex-wrap gap-1">
                                     <span class="grade-pill">Class @lecture.ClassLevel</span>
                                     <span class="subject-pill">@lecture.Subject</span>
-                                    @if (lecture.Status?.ToLower() == "pending")
+                                    @if (showStatus)
                                     {
-                                        <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill px-2 py-0.5 ms-auto" style="font-size: 0.75rem;">
-                                            ⏳ Pending Approval
-                                        </span>
-                                    }
-                                    else if (lecture.Status?.ToLower() == "declined")
-                                    {
-                                        <span class="badge bg-danger text-white border rounded-pill px-2 py-0.5 ms-auto" style="font-size: 0.75rem;">
-                                            ✕ Declined
+                                        <span class="lecture-status @(isPending ? "pending" : (isDeclined ? "declined" : "active")) ms-auto d-inline-flex align-items-center gap-1">
+                                            @if (isPending)
+                                            {
+                                                <i class="bi bi-clock-history"></i>
+                                                <span>Pending Approval</span>
+                                            }
+                                            else if (isDeclined)
+                                            {
+                                                <i class="bi bi-x-circle-fill"></i>
+                                                <span>Declined</span>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-check-circle-fill"></i>
+                                                <span>Active</span>
+                                            }
                                         </span>
                                     }
                                 </div>
 
                                 <h3>@lecture.Title</h3>
                                 <p>@(string.IsNullOrWhiteSpace(lecture.Description) ? "Recorded video lecture for students." : lecture.Description)</p>
-                                <div class="author-row">👨‍🏫 @(lecture.Instructor ?? "Educator")</div>
+                                <div class="author-row d-inline-flex align-items-center gap-1.5 text-muted small">
+                                    <i class="bi bi-person-video3"></i>
+                                    <span>@(lecture.Instructor ?? "Educator")</span>
+                                </div>
                             </div>
                         </a>
                     </article>
                 }
+            </div>
+
+            <!-- Pagination Container -->
+            <div class="custom-pagination-wrapper" id="lecturePagination" style="display: none;">
+                <div class="pagination-summary" id="lecturePaginationSummary">
+                    Showing 1–6 of @Model.Count() lectures
+                </div>
+                <ul class="pagination-controls" id="lecturePaginationControls"></ul>
+            </div>
+
+            <!-- Empty Filter Search Result Message -->
+            <div class="no-lectures text-center py-5 d-none" id="noFilterResultsMessage">
+                <div class="text-muted mb-2"><i class="bi bi-search fs-1"></i></div>
+                <h5 class="fw-bold text-dark">No matching lectures found</h5>
+                <p class="text-muted small">Try adjusting your filters or search keywords.</p>
             </div>
         }
     </div>
@@ -193,7 +230,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // 1. Calculate & display static total duration for each video card (fixed, never increases)
+        // 1. Calculate & display static total duration for each video card
         function formatDuration(seconds) {
             if (!seconds || isNaN(seconds) || !isFinite(seconds)) return '0:00';
             const totalSecs = Math.round(seconds);
@@ -227,7 +264,7 @@
                     video.addEventListener('loadedmetadata', updateDuration, { once: true });
                 }
 
-                // Optional smooth hover preview without affecting static total duration
+                // Smooth hover preview
                 card.addEventListener('mouseenter', function () {
                     if (video.readyState >= 2) {
                         video.play().catch(function() {});
@@ -241,12 +278,16 @@
             }
         });
 
-        // 2. Search & filter logic
+        // 2. Search, Filter & Pagination Logic
         const searchInput = document.getElementById('search');
         const classSelect = document.getElementById('classLevel');
         const subjectSelect = document.getElementById('subject');
         const topicSelect = document.getElementById('topic');
         const versionSelect = document.getElementById('version');
+
+        const itemsPerPage = 6;
+        let currentPage = 1;
+        let filteredCards = [...cards];
 
         function getValue(element) {
             return element ? element.value.trim().toLowerCase() : '';
@@ -259,7 +300,7 @@
             const topicFilter = getValue(topicSelect);
             const versionFilter = getValue(versionSelect);
 
-            cards.forEach(function (card) {
+            filteredCards = cards.filter(function (card) {
                 const title = (card.dataset.title || '').toLowerCase();
                 const instructor = (card.dataset.instructor || '').toLowerCase();
                 const className = (card.dataset.class || '').toLowerCase();
@@ -273,9 +314,109 @@
                 const matchesTopic = !topicFilter || topic === topicFilter;
                 const matchesVersion = !versionFilter || version === versionFilter;
 
-                const visible = matchesSearch && matchesClass && matchesSubject && matchesTopic && matchesVersion;
-                card.style.display = visible ? '' : 'none';
+                return matchesSearch && matchesClass && matchesSubject && matchesTopic && matchesVersion;
             });
+
+            currentPage = 1;
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalItems = filteredCards.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const noResults = document.getElementById('noFilterResultsMessage');
+            const paginationWrapper = document.getElementById('lecturePagination');
+            const paginationSummary = document.getElementById('lecturePaginationSummary');
+            const paginationControls = document.getElementById('lecturePaginationControls');
+
+            if (totalItems === 0) {
+                cards.forEach(c => c.style.display = 'none');
+                if (noResults) noResults.classList.remove('d-none');
+                if (paginationWrapper) paginationWrapper.style.display = 'none';
+                return;
+            }
+
+            if (noResults) noResults.classList.add('d-none');
+
+            // Clamp current page
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            // Show/hide cards for current page
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+
+            cards.forEach(c => c.style.display = 'none');
+            for (let i = startIndex; i < endIndex; i++) {
+                filteredCards[i].style.display = '';
+            }
+
+            // Update summary
+            if (paginationSummary) {
+                paginationSummary.textContent = `Showing ${startIndex + 1}–${endIndex} of ${totalItems} lectures`;
+            }
+
+            // Build controls
+            if (paginationControls) {
+                paginationControls.innerHTML = '';
+
+                if (totalPages <= 1) {
+                    if (paginationWrapper) paginationWrapper.style.display = 'none';
+                    return;
+                }
+
+                if (paginationWrapper) paginationWrapper.style.display = 'flex';
+
+                // Prev Button
+                const prevLi = document.createElement('li');
+                const prevBtn = document.createElement('button');
+                prevBtn.className = `page-btn ${currentPage === 1 ? 'disabled' : ''}`;
+                prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
+                prevBtn.setAttribute('aria-label', 'Previous Page');
+                prevBtn.addEventListener('click', function () {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderPagination();
+                        const filterEl = document.getElementById('lectureFilters');
+                        if (filterEl) window.scrollTo({ top: filterEl.offsetTop - 90, behavior: 'smooth' });
+                    }
+                });
+                prevLi.appendChild(prevBtn);
+                paginationControls.appendChild(prevLi);
+
+                // Page Number Buttons
+                for (let p = 1; p <= totalPages; p++) {
+                    const pageLi = document.createElement('li');
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `page-btn ${p === currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = p;
+                    pageBtn.addEventListener('click', function () {
+                        currentPage = p;
+                        renderPagination();
+                        const filterEl = document.getElementById('lectureFilters');
+                        if (filterEl) window.scrollTo({ top: filterEl.offsetTop - 90, behavior: 'smooth' });
+                    });
+                    pageLi.appendChild(pageBtn);
+                    paginationControls.appendChild(pageLi);
+                }
+
+                // Next Button
+                const nextLi = document.createElement('li');
+                const nextBtn = document.createElement('button');
+                nextBtn.className = `page-btn ${currentPage === totalPages ? 'disabled' : ''}`;
+                nextBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
+                nextBtn.setAttribute('aria-label', 'Next Page');
+                nextBtn.addEventListener('click', function () {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderPagination();
+                        const filterEl = document.getElementById('lectureFilters');
+                        if (filterEl) window.scrollTo({ top: filterEl.offsetTop - 90, behavior: 'smooth' });
+                    }
+                });
+                nextLi.appendChild(nextBtn);
+                paginationControls.appendChild(nextLi);
+            }
         }
 
         [searchInput, classSelect, subjectSelect, topicSelect, versionSelect].forEach(function (element) {
@@ -284,5 +425,8 @@
                 element.addEventListener('change', applyFilters);
             }
         });
+
+        // Initialize pagination on load
+        applyFilters();
     });
 </script>

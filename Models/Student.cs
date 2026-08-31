@@ -62,10 +62,91 @@ namespace Onudhabon_ISD.Models
         [Display(Name = "Completed Classes")]
         public int CompletedClasses { get; set; } = 0;
 
+        [Display(Name = "Age")]
+        public int Age { get; set; } = 14;
+
+        [Display(Name = "Attendance Percentage")]
+        [Range(0, 100)]
+        public int AttendancePercentage { get; set; } = 90;
+
+        [Display(Name = "Progress Percentage")]
+        [Range(0, 100)]
+        public int ProgressPercentage { get; set; } = 75;
+
+        [MaxLength(2000)]
+        [Display(Name = "Notes")]
+        public string? Notes { get; set; }
+
+        [MaxLength(500)]
+        [Display(Name = "Photo URL")]
+        public string? PhotoUrl { get; set; }
+
+        [MaxLength(4000)]
+        [Display(Name = "Subject Progress (JSON)")]
+        public string? SubjectProgressJson { get; set; }
+
+        [NotMapped]
+        public List<StudentSubjectProgress> SubjectProgressList
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(SubjectProgressJson))
+                    return new List<StudentSubjectProgress>();
+                try
+                {
+                    return System.Text.Json.JsonSerializer.Deserialize<List<StudentSubjectProgress>>(SubjectProgressJson)
+                           ?? new List<StudentSubjectProgress>();
+                }
+                catch
+                {
+                    return new List<StudentSubjectProgress>();
+                }
+            }
+            set
+            {
+                SubjectProgressJson = value != null ? System.Text.Json.JsonSerializer.Serialize(value) : null;
+            }
+        }
+
+        public void SyncProgressFromSubjects()
+        {
+            var list = SubjectProgressList;
+            if (list.Any())
+            {
+                int totalPlanned = list.Sum(s => Math.Max(1, s.TotalLectures));
+                int totalDone = list.Sum(s => s.CompletedLectures);
+                CompletedClasses = totalDone;
+                if (totalPlanned > 0)
+                {
+                    ProgressPercentage = (int)Math.Clamp(Math.Round((double)totalDone / totalPlanned * 100), 0, 100);
+                }
+            }
+        }
+
+        [Display(Name = "Last Activity Date")]
+        public DateTime? LastActivityDate { get; set; } = DateTime.UtcNow;
+
         [Display(Name = "Created At")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Version")]
         public int? __v { get; set; } = 0;
+    }
+
+    public class StudentSubjectProgress
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string SubjectName { get; set; } = string.Empty;
+
+        [System.Text.Json.Serialization.JsonPropertyName("totalLectures")]
+        public int TotalLectures { get; set; } = 12;
+
+        [System.Text.Json.Serialization.JsonPropertyName("completedLectures")]
+        public int CompletedLectures { get; set; } = 0;
+
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int ProgressPercentage => TotalLectures > 0
+            ? (int)Math.Clamp(Math.Round((double)CompletedLectures / TotalLectures * 100), 0, 100)
+            : 0;
     }
 }

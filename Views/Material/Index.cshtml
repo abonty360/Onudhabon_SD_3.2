@@ -97,10 +97,25 @@
     }
     else
     {
-        <div class="material-grid">
+        <div class="material-grid" id="materialGrid">
             @foreach (var material in Model)
             {
-                <article class="material-card">
+                var isPending = string.Equals(material.Status, "pending", StringComparison.OrdinalIgnoreCase);
+                var isDeclined = string.Equals(material.Status, "declined", StringComparison.OrdinalIgnoreCase);
+                var isOwner = (User.Identity != null && User.Identity.IsAuthenticated) && !string.IsNullOrWhiteSpace(material.Instructor) && (
+                    string.Equals(material.Instructor.Trim(), User.Identity?.Name, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(material.Instructor.Trim(), User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value, StringComparison.OrdinalIgnoreCase)
+                );
+                var isAdmin = (User.Identity != null && User.Identity.IsAuthenticated) && (User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin");
+                var showStatus = isAdmin || isOwner || isPending || isDeclined;
+
+                <article class="material-card"
+                         data-title="@material.Title"
+                         data-instructor="@material.Instructor"
+                         data-class="@material.ClassLevel"
+                         data-subject="@material.Subject"
+                         data-topic="@material.Topic"
+                         data-version="@material.Version">
                     <div class="material-card-body">
                             <div class="material-card-top">
                                 <div class="material-file-icon">
@@ -108,9 +123,26 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                     </svg>
                                 </div>
-                                <span class="material-status @(material.Status?.ToLower() == "pending" ? "pending" : (material.Status?.ToLower() == "declined" ? "declined" : "active"))">
-                                    @(material.Status?.ToLower() == "pending" ? "⏳ Pending Approval" : (material.Status?.ToLower() == "declined" ? "✕ Declined" : "Active"))
-                                </span>
+                                @if (showStatus)
+                                {
+                                    <span class="material-status @(isPending ? "pending" : (isDeclined ? "declined" : "active")) d-inline-flex align-items-center gap-1">
+                                        @if (isPending)
+                                        {
+                                            <i class="bi bi-clock-history"></i>
+                                            <span>Pending Approval</span>
+                                        }
+                                        else if (isDeclined)
+                                        {
+                                            <i class="bi bi-x-circle-fill"></i>
+                                            <span>Declined</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>Active</span>
+                                        }
+                                    </span>
+                                }
                             </div>
 
                             <div class="material-meta">
@@ -146,6 +178,176 @@
                 </article>
             }
         </div>
+
+        <!-- Pagination Container -->
+        <div class="custom-pagination-wrapper" id="materialPagination" style="display: none;">
+            <div class="pagination-summary" id="materialPaginationSummary">
+                Showing 1–6 of @Model.Count() materials
+            </div>
+            <ul class="pagination-controls" id="materialPaginationControls"></ul>
+        </div>
+
+        <!-- Empty Filter Search Result Message -->
+        <div class="no-materials text-center py-5 d-none" id="noMaterialFilterResultsMessage">
+            <div class="text-muted mb-2"><i class="bi bi-search fs-1"></i></div>
+            <h5 class="fw-bold text-dark">No matching materials found</h5>
+            <p class="text-muted small">Try adjusting your search criteria or category filters.</p>
+        </div>
     }
     </main>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cards = Array.from(document.querySelectorAll('.material-card'));
+        const searchInput = document.getElementById('material-search');
+        const classSelect = document.getElementById('classLevel');
+        const subjectSelect = document.getElementById('subject');
+        const topicSelect = document.getElementById('topic');
+        const versionSelect = document.getElementById('version');
+
+        const itemsPerPage = 6;
+        let currentPage = 1;
+        let filteredCards = [...cards];
+
+        function getValue(element) {
+            return element ? element.value.trim().toLowerCase() : '';
+        }
+
+        function applyFilters() {
+            const search = getValue(searchInput);
+            const classFilter = getValue(classSelect);
+            const subjectFilter = getValue(subjectSelect);
+            const topicFilter = getValue(topicSelect);
+            const versionFilter = getValue(versionSelect);
+
+            filteredCards = cards.filter(function (card) {
+                const title = (card.dataset.title || '').toLowerCase();
+                const instructor = (card.dataset.instructor || '').toLowerCase();
+                const className = (card.dataset.class || '').toLowerCase();
+                const subject = (card.dataset.subject || '').toLowerCase();
+                const topic = (card.dataset.topic || '').toLowerCase();
+                const version = (card.dataset.version || '').toLowerCase();
+
+                const matchesSearch = !search || title.includes(search) || instructor.includes(search) || topic.includes(search);
+                const matchesClass = !classFilter || className === classFilter;
+                const matchesSubject = !subjectFilter || subject === subjectFilter;
+                const matchesTopic = !topicFilter || topic === topicFilter;
+                const matchesVersion = !versionFilter || version === versionFilter;
+
+                return matchesSearch && matchesClass && matchesSubject && matchesTopic && matchesVersion;
+            });
+
+            currentPage = 1;
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalItems = filteredCards.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const noResults = document.getElementById('noMaterialFilterResultsMessage');
+            const paginationWrapper = document.getElementById('materialPagination');
+            const paginationSummary = document.getElementById('materialPaginationSummary');
+            const paginationControls = document.getElementById('materialPaginationControls');
+
+            if (totalItems === 0) {
+                cards.forEach(c => c.style.display = 'none');
+                if (noResults) noResults.classList.remove('d-none');
+                if (paginationWrapper) paginationWrapper.style.display = 'none';
+                return;
+            }
+
+            if (noResults) noResults.classList.add('d-none');
+
+            // Clamp current page
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            // Show/hide cards for current page
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+
+            cards.forEach(c => c.style.display = 'none');
+            for (let i = startIndex; i < endIndex; i++) {
+                filteredCards[i].style.display = '';
+            }
+
+            // Update summary
+            if (paginationSummary) {
+                paginationSummary.textContent = `Showing ${startIndex + 1}–${endIndex} of ${totalItems} materials`;
+            }
+
+            // Build controls
+            if (paginationControls) {
+                paginationControls.innerHTML = '';
+
+                if (totalPages <= 1) {
+                    if (paginationWrapper) paginationWrapper.style.display = 'none';
+                    return;
+                }
+
+                if (paginationWrapper) paginationWrapper.style.display = 'flex';
+
+                // Prev Button
+                const prevLi = document.createElement('li');
+                const prevBtn = document.createElement('button');
+                prevBtn.className = `page-btn ${currentPage === 1 ? 'disabled' : ''}`;
+                prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
+                prevBtn.setAttribute('aria-label', 'Previous Page');
+                prevBtn.addEventListener('click', function () {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderPagination();
+                        const filterEl = document.querySelector('.material-filters');
+                        if (filterEl) window.scrollTo({ top: filterEl.offsetTop - 90, behavior: 'smooth' });
+                    }
+                });
+                prevLi.appendChild(prevBtn);
+                paginationControls.appendChild(prevLi);
+
+                // Page Number Buttons
+                for (let p = 1; p <= totalPages; p++) {
+                    const pageLi = document.createElement('li');
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `page-btn ${p === currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = p;
+                    pageBtn.addEventListener('click', function () {
+                        currentPage = p;
+                        renderPagination();
+                        const filterEl = document.querySelector('.material-filters');
+                        if (filterEl) window.scrollTo({ top: filterEl.offsetTop - 90, behavior: 'smooth' });
+                    });
+                    pageLi.appendChild(pageBtn);
+                    paginationControls.appendChild(pageLi);
+                }
+
+                // Next Button
+                const nextLi = document.createElement('li');
+                const nextBtn = document.createElement('button');
+                nextBtn.className = `page-btn ${currentPage === totalPages ? 'disabled' : ''}`;
+                nextBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
+                nextBtn.setAttribute('aria-label', 'Next Page');
+                nextBtn.addEventListener('click', function () {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderPagination();
+                        const filterEl = document.querySelector('.material-filters');
+                        if (filterEl) window.scrollTo({ top: filterEl.offsetTop - 90, behavior: 'smooth' });
+                    }
+                });
+                nextLi.appendChild(nextBtn);
+                paginationControls.appendChild(nextLi);
+            }
+        }
+
+        [searchInput, classSelect, subjectSelect, topicSelect, versionSelect].forEach(function (element) {
+            if (element) {
+                element.addEventListener('input', applyFilters);
+                element.addEventListener('change', applyFilters);
+            }
+        });
+
+        // Initialize pagination on load
+        applyFilters();
+    });
+</script>

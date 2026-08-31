@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Onudhabon_ISD.Data;
 
@@ -11,9 +12,11 @@ using Onudhabon_ISD.Data;
 namespace Onudhabon_ISD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260831144509_AddSubjectProgressJsonToStudent")]
+    partial class AddSubjectProgressJsonToStudent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -782,7 +785,7 @@ namespace Onudhabon_ISD.Migrations
 
                             b1.HasKey("ClassPlanId", "__synthesizedOrdinal");
 
-                            b1.ToTable("ClassPlans", (string)null);
+                            b1.ToTable("ClassPlans");
 
                             b1
                                 .ToJson("Subjects")

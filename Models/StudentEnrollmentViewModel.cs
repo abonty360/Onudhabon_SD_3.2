@@ -32,6 +32,10 @@ namespace Onudhabon_ISD.Models
         [Display(Name = "Class Level *")]
         public string ClassLevel { get; set; } = string.Empty;
 
+        [Range(4, 25, ErrorMessage = "Age must be between 4 and 25.")]
+        [Display(Name = "Student Age (Years)")]
+        public int? Age { get; set; } = 14;
+
         [MaxLength(500)]
         [Display(Name = "Enrolled Subjects")]
         public string? Subjects { get; set; }
@@ -48,5 +52,8 @@ namespace Onudhabon_ISD.Models
 
         [Display(Name = "Local Guardian ID")]
         public string? GuardianId { get; set; }
+
+        [Display(Name = "Certification & Declaration")]
+        public bool DeclarationCertified { get; set; } = true;
     }
 }

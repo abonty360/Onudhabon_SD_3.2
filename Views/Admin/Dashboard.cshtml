@@ -42,69 +42,165 @@
         </div>
     }
 
-    <!-- Stat KPI Overview Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-md-4 col-xl">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
-                <div class="text-muted small mb-1">Total Users</div>
-                <div class="h3 fw-bold text-dark mb-0">@Model.TotalUsers</div>
-                <div class="small text-muted mt-1">Registered accounts</div>
+    <!-- Modern SaaS Metric Cards Section -->
+    <div class="mb-4">
+        <!-- Top Primary KPI Highlights -->
+        <div class="row g-3 mb-3">
+            <div class="col-sm-6 col-xl-3">
+                <div class="saas-metric-card highlight-primary">
+                    <div>
+                        <div class="metric-header">
+                            <span class="metric-title">Total Users</span>
+                            <div class="metric-icon-badge bg-primary-subtle text-primary">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">@Model.TotalUsers</div>
+                    </div>
+                    <div class="metric-subtext">
+                        <i class="bi bi-person-check text-primary"></i>
+                        <span>Registered accounts</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="saas-metric-card highlight-success">
+                    <div>
+                        <div class="metric-header">
+                            <span class="metric-title">Active Volunteers</span>
+                            <div class="metric-icon-badge bg-success-subtle text-success">
+                                <i class="bi bi-patch-check-fill"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value text-success">@Model.ActiveVolunteersCount</div>
+                    </div>
+                    <div class="metric-subtext">
+                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0.5">
+                            <i class="bi bi-check-circle-fill me-1"></i>Verified Active
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="saas-metric-card highlight-rose">
+                    <div>
+                        <div class="metric-header">
+                            <span class="metric-title">bKash Donations</span>
+                            <div class="metric-icon-badge" style="background-color: #fdf2f8; color: #e2136e;">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value" style="color: #be185d;">৳@Model.TotalDonationsAmount.ToString("N0")</div>
+                    </div>
+                    <div class="metric-subtext">
+                        <i class="bi bi-heart-fill text-danger"></i>
+                        <span>@Model.CompletedDonationsCount gifts (@Model.TotalDonorsCount donors)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="saas-metric-card highlight-warning">
+                    <div>
+                        <div class="metric-header">
+                            <span class="metric-title">Review Queue</span>
+                            <div class="metric-icon-badge bg-warning-subtle text-warning">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value text-warning-emphasis">
+                            @(Model.PendingVolunteersCount + Model.PendingLecturesCount + Model.PendingMaterialsCount + Model.PendingForumPostsCount + Model.PendingStudentsCount)
+                        </div>
+                    </div>
+                    <div class="metric-subtext">
+                        <span class="badge bg-warning text-dark rounded-pill px-2 py-0.5">
+                            <i class="bi bi-clock-history me-1"></i>Total Pending Tasks
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-6 col-md-4 col-xl">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-warning-subtle border-warning-subtle">
-                <div class="text-warning-emphasis small mb-1 fw-semibold">Pending Volunteers</div>
-                <div class="h3 fw-bold text-warning-emphasis mb-0">@Model.PendingVolunteersCount</div>
-                <div class="small text-muted mt-1">Awaiting verification</div>
+
+        <!-- Secondary Moderation Queue Metric Row -->
+        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-6 g-3">
+            <div class="col">
+                <div class="saas-metric-card p-3">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-semibold">Pending Users</span>
+                        <div class="metric-icon-badge bg-warning-subtle text-warning" style="width: 34px; height: 34px; font-size: 1rem; border-radius: 9px;">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">@Model.PendingVolunteersCount</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Volunteers review</div>
+                </div>
             </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-success-subtle border-success-subtle">
-                <div class="text-success-emphasis small mb-1 fw-semibold">Active Volunteers</div>
-                <div class="h3 fw-bold text-success-emphasis mb-0">@Model.ActiveVolunteersCount</div>
-                <div class="small text-muted mt-1">Verified & active</div>
+
+            <div class="col">
+                <div class="saas-metric-card p-3">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-semibold">Pending Lectures</span>
+                        <div class="metric-icon-badge bg-primary-subtle text-primary" style="width: 34px; height: 34px; font-size: 1rem; border-radius: 9px;">
+                            <i class="bi bi-camera-video-fill"></i>
+                        </div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">@Model.PendingLecturesCount</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Videos review</div>
+                </div>
             </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-primary-subtle border-primary-subtle">
-                <div class="text-primary-emphasis small mb-1 fw-semibold">Pending Lectures</div>
-                <div class="h3 fw-bold text-primary-emphasis mb-0">@Model.PendingLecturesCount</div>
-                <div class="small text-muted mt-1">Uploads to review</div>
+
+            <div class="col">
+                <div class="saas-metric-card p-3">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-semibold">Pending Materials</span>
+                        <div class="metric-icon-badge bg-info-subtle text-info" style="width: 34px; height: 34px; font-size: 1rem; border-radius: 9px;">
+                            <i class="bi bi-file-earmark-text-fill"></i>
+                        </div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">@Model.PendingMaterialsCount</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Docs review</div>
+                </div>
             </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-info-subtle border-info-subtle">
-                <div class="text-info-emphasis small mb-1 fw-semibold">Pending Materials</div>
-                <div class="h3 fw-bold text-info-emphasis mb-0">@Model.PendingMaterialsCount</div>
-                <div class="small text-muted mt-1">Documents to review</div>
+
+            <div class="col">
+                <div class="saas-metric-card p-3">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-semibold">Pending Posts</span>
+                        <div class="metric-icon-badge text-white" style="width: 34px; height: 34px; font-size: 1rem; border-radius: 9px; background-color: #9333ea;">
+                            <i class="bi bi-chat-dots-fill"></i>
+                        </div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">@Model.PendingForumPostsCount</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Forum topics</div>
+                </div>
             </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-purple-subtle border-purple-subtle" style="background-color: #f3e8ff; border: 1px solid #e9d5ff;">
-                <div class="small mb-1 fw-semibold" style="color: #6b21a8;">Pending Posts</div>
-                <div class="h3 fw-bold mb-0" style="color: #6b21a8;">@Model.PendingForumPostsCount</div>
-                <div class="small text-muted mt-1">Forum topics to review</div>
+
+            <div class="col">
+                <div class="saas-metric-card p-3">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-semibold">Pending Students</span>
+                        <div class="metric-icon-badge text-white" style="width: 34px; height: 34px; font-size: 1rem; border-radius: 9px; background-color: #d97706;">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                    </div>
+                    <div class="h4 fw-bold text-dark mb-0">@Model.PendingStudentsCount</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Enrollments review</div>
+                </div>
             </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100" style="background-color: #fef3c7; border: 1px solid #fde68a;">
-                <div class="small mb-1 fw-semibold" style="color: #92400e;">Pending Students</div>
-                <div class="h3 fw-bold mb-0" style="color: #92400e;">@Model.PendingStudentsCount</div>
-                <div class="small text-muted mt-1">Enrollments to review</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100" style="background-color: #fdf2f8; border: 1px solid #fbcfe8;">
-                <div class="small mb-1 fw-semibold" style="color: #be185d;">Total Donations (bKash)</div>
-                <div class="h3 fw-bold mb-0" style="color: #be185d;">৳@Model.TotalDonationsAmount.ToString("N0")</div>
-                <div class="small text-muted mt-1">@Model.CompletedDonationsCount gifts (@Model.TotalDonorsCount donors)</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4 col-xl">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-danger-subtle border-danger-subtle">
-                <div class="text-danger-emphasis small mb-1 fw-semibold">Restricted Users</div>
-                <div class="h3 fw-bold text-danger-emphasis mb-0">@Model.RestrictedUsersCount</div>
-                <div class="small text-muted mt-1">Blocked from login</div>
+
+            <div class="col">
+                <div class="saas-metric-card p-3 @(Model.RestrictedUsersCount > 0 ? "border-danger-subtle bg-danger-subtle bg-opacity-25" : "")">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-semibold">Restricted</span>
+                        <div class="metric-icon-badge bg-danger-subtle text-danger" style="width: 34px; height: 34px; font-size: 1rem; border-radius: 9px;">
+                            <i class="bi bi-slash-circle-fill"></i>
+                        </div>
+                    </div>
+                    <div class="h4 fw-bold @(Model.RestrictedUsersCount > 0 ? "text-danger" : "text-dark") mb-0">@Model.RestrictedUsersCount</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Blocked accounts</div>
+                </div>
             </div>
         </div>
     </div>
@@ -116,7 +212,7 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "volunteers" ? "active fw-semibold" : "text-dark")" 
                             id="volunteers-tab" data-bs-toggle="tab" data-bs-target="#volunteers-tab-pane" type="button" role="tab">
-                        👥 Registered Users & Volunteers
+                        <i class="bi bi-people me-1.5"></i> Registered Users & Volunteers
                         @if (Model.PendingVolunteersCount > 0)
                         {
                             <span class="badge bg-warning text-dark rounded-pill ms-1.5">@Model.PendingVolunteersCount</span>
@@ -126,7 +222,7 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "lectures" ? "active fw-semibold" : "text-dark")" 
                             id="lectures-tab" data-bs-toggle="tab" data-bs-target="#lectures-tab-pane" type="button" role="tab">
-                        🎥 Lectures Moderation
+                        <i class="bi bi-camera-video me-1.5"></i> Lectures Moderation
                         @if (Model.PendingLecturesCount > 0)
                         {
                             <span class="badge bg-primary text-white rounded-pill ms-1.5">@Model.PendingLecturesCount</span>
@@ -136,7 +232,7 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "materials" ? "active fw-semibold" : "text-dark")" 
                             id="materials-tab" data-bs-toggle="tab" data-bs-target="#materials-tab-pane" type="button" role="tab">
-                        📄 Materials Moderation
+                        <i class="bi bi-file-earmark-text me-1.5"></i> Materials Moderation
                         @if (Model.PendingMaterialsCount > 0)
                         {
                             <span class="badge bg-info text-dark rounded-pill ms-1.5">@Model.PendingMaterialsCount</span>
@@ -146,7 +242,7 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "forum" ? "active fw-semibold" : "text-dark")" 
                             id="forum-tab" data-bs-toggle="tab" data-bs-target="#forum-tab-pane" type="button" role="tab">
-                        💬 Forum Moderation
+                        <i class="bi bi-chat-dots me-1.5"></i> Forum Moderation
                         @if (Model.PendingForumPostsCount > 0)
                         {
                             <span class="badge rounded-pill ms-1.5" style="background-color: #7e22ce; color: #fff;">@Model.PendingForumPostsCount</span>
@@ -156,7 +252,7 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "students" ? "active fw-semibold" : "text-dark")" 
                             id="students-tab" data-bs-toggle="tab" data-bs-target="#students-tab-pane" type="button" role="tab">
-                        🎓 Student Enrollments
+                        <i class="bi bi-mortarboard me-1.5"></i> Student Enrollments
                         @if (Model.PendingStudentsCount > 0)
                         {
                             <span class="badge bg-warning text-dark rounded-pill ms-1.5">@Model.PendingStudentsCount</span>
@@ -166,7 +262,7 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "donations" ? "active fw-semibold" : "text-dark")" 
                             id="donations-tab" data-bs-toggle="tab" data-bs-target="#donations-tab-pane" type="button" role="tab">
-                        💰 Donations & bKash
+                        <i class="bi bi-cash-stack me-1.5"></i> Donations & bKash
                         <span class="badge bg-success text-white rounded-pill ms-1.5">@Model.CompletedDonationsCount</span>
                     </button>
                 </li>
@@ -291,8 +387,9 @@
                                                     {
                                                         <form asp-action="ApproveUser" asp-route-id="@user.Id" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5" title="Approve Volunteer (Sets Active)">
-                                                                ✓ Approve
+                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5 d-inline-flex align-items-center gap-1" title="Approve Volunteer (Sets Active)">
+                                                                <i class="bi bi-check-lg"></i>
+                                                                <span>Approve</span>
                                                             </button>
                                                         </form>
                                                     }
@@ -301,16 +398,18 @@
                                                     {
                                                         <form asp-action="DeclineUser" asp-route-id="@user.Id" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5" title="Decline Volunteer">
-                                                                ✕ Decline
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 d-inline-flex align-items-center gap-1" title="Decline Volunteer">
+                                                                <i class="bi bi-x-lg"></i>
+                                                                <span>Decline</span>
                                                             </button>
                                                         </form>
                                                     }
 
                                                     <form asp-action="ToggleRestrictUser" asp-route-id="@user.Id" method="post" class="d-inline">
                                                         @Html.AntiForgeryToken()
-                                                        <button type="submit" class="btn btn-sm @(user.IsRestricted ? "btn-warning" : "btn-outline-dark") rounded-pill px-2.5" title="@(user.IsRestricted ? "Unrestrict User" : "Restrict User (Blocks Login)")">
-                                                            @(user.IsRestricted ? "Unrestrict" : "Restrict")
+                                                        <button type="submit" class="btn btn-sm @(user.IsRestricted ? "btn-warning" : "btn-outline-dark") rounded-pill px-2.5 d-inline-flex align-items-center gap-1" title="@(user.IsRestricted ? "Unrestrict User" : "Restrict User (Blocks Login)")">
+                                                            <i class="bi @(user.IsRestricted ? "bi-unlock" : "bi-slash-circle")"></i>
+                                                            <span>@(user.IsRestricted ? "Unrestrict" : "Restrict")</span>
                                                         </button>
                                                     </form>
                                                 }
@@ -388,8 +487,9 @@
                                                         {
                                                             <div class="col-12 border-top pt-2">
                                                                 <div class="text-muted mb-1">Attached Certificate Document:</div>
-                                                                <a href="@user.CertificatePicture" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill">
-                                                                    📄 Open Uploaded Document on Cloudinary
+                                                                <a href="@user.CertificatePicture" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill d-inline-flex align-items-center gap-1.5">
+                                                                    <i class="bi bi-file-earmark-pdf"></i>
+                                                                    <span>Open Uploaded Document on Cloudinary</span>
                                                                 </a>
                                                             </div>
                                                         }
@@ -416,8 +516,9 @@
                                                         {
                                                             <form asp-action="ToggleRestrictUser" asp-route-id="@user.Id" method="post" class="d-inline">
                                                                 @Html.AntiForgeryToken()
-                                                                <button type="submit" class="btn btn-sm @(user.IsRestricted ? "btn-warning" : "btn-danger") rounded-pill px-3">
-                                                                    @(user.IsRestricted ? "Unrestrict User" : "🚫 Restrict User")
+                                                                <button type="submit" class="btn btn-sm @(user.IsRestricted ? "btn-warning" : "btn-danger") rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                    <i class="bi @(user.IsRestricted ? "bi-unlock" : "bi-slash-circle")"></i>
+                                                                    <span>@(user.IsRestricted ? "Unrestrict User" : "Restrict User")</span>
                                                                 </button>
                                                             </form>
                                                         }
@@ -427,8 +528,9 @@
                                                         {
                                                             <form asp-action="ApproveUser" asp-route-id="@user.Id" method="post" class="d-inline">
                                                                 @Html.AntiForgeryToken()
-                                                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
-                                                                    ✓ Approve Volunteer
+                                                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                    <i class="bi bi-check-lg"></i>
+                                                                    <span>Approve Volunteer</span>
                                                                 </button>
                                                             </form>
                                                         }
@@ -436,8 +538,9 @@
                                                         {
                                                             <form asp-action="DeclineUser" asp-route-id="@user.Id" method="post" class="d-inline">
                                                                 @Html.AntiForgeryToken()
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                                                                    ✕ Decline
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                    <i class="bi bi-x-lg"></i>
+                                                                    <span>Decline</span>
                                                                 </button>
                                                             </form>
                                                         }
@@ -533,8 +636,9 @@
                                                     {
                                                         <form asp-action="ApproveLecture" asp-route-id="@lecture.Id" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5">
-                                                                ✓ Approve
+                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5 d-inline-flex align-items-center gap-1">
+                                                                <i class="bi bi-check-lg"></i>
+                                                                <span>Approve</span>
                                                             </button>
                                                         </form>
                                                     }
@@ -542,8 +646,9 @@
                                                     {
                                                         <form asp-action="DeclineLecture" asp-route-id="@lecture.Id" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5">
-                                                                ✕ Decline
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 d-inline-flex align-items-center gap-1">
+                                                                <i class="bi bi-x-lg"></i>
+                                                                <span>Decline</span>
                                                             </button>
                                                         </form>
                                                     }
@@ -625,8 +730,9 @@
                                                                     @Html.AntiForgeryToken()
                                                                     <input type="hidden" name="educatorName" value="@lecture.Instructor" />
                                                                     <input type="hidden" name="returnTab" value="lectures" />
-                                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3" onclick="return confirm('Are you sure you want to restrict educator @lecture.Instructor? They will be blocked from logging in.');">
-                                                                        🚫 Restrict Educator (@lecture.Instructor)
+                                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5" onclick="return confirm('Are you sure you want to restrict educator @lecture.Instructor? They will be blocked from logging in.');">
+                                                                        <i class="bi bi-slash-circle"></i>
+                                                                        <span>Restrict Educator (@lecture.Instructor)</span>
                                                                     </button>
                                                                 </form>
                                                             }
@@ -636,14 +742,20 @@
                                                             {
                                                                 <form asp-action="ApproveLecture" asp-route-id="@lecture.Id" method="post" class="d-inline">
                                                                     @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">✓ Approve Lecture</button>
+                                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                        <i class="bi bi-check-lg"></i>
+                                                                        <span>Approve Lecture</span>
+                                                                    </button>
                                                                 </form>
                                                             }
                                                             @if (lecture.Status != "Declined")
                                                             {
                                                                 <form asp-action="DeclineLecture" asp-route-id="@lecture.Id" method="post" class="d-inline">
                                                                     @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">✕ Decline Lecture</button>
+                                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                        <i class="bi bi-x-lg"></i>
+                                                                        <span>Decline</span>
+                                                                    </button>
                                                                 </form>
                                                             }
                                                             <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
@@ -741,8 +853,9 @@
                                                     {
                                                         <form asp-action="ApproveMaterial" asp-route-id="@material.Id" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5">
-                                                                ✓ Approve
+                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5 d-inline-flex align-items-center gap-1">
+                                                                <i class="bi bi-check-lg"></i>
+                                                                <span>Approve</span>
                                                             </button>
                                                         </form>
                                                     }
@@ -750,8 +863,9 @@
                                                     {
                                                         <form asp-action="DeclineMaterial" asp-route-id="@material.Id" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5">
-                                                                ✕ Decline
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 d-inline-flex align-items-center gap-1">
+                                                                <i class="bi bi-x-lg"></i>
+                                                                <span>Decline</span>
                                                             </button>
                                                         </form>
                                                     }
@@ -831,8 +945,9 @@
                                                                     @Html.AntiForgeryToken()
                                                                     <input type="hidden" name="educatorName" value="@material.Instructor" />
                                                                     <input type="hidden" name="returnTab" value="materials" />
-                                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3" onclick="return confirm('Are you sure you want to restrict educator @material.Instructor? They will be blocked from logging in.');">
-                                                                        🚫 Restrict Educator (@material.Instructor)
+                                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5" onclick="return confirm('Are you sure you want to restrict educator @material.Instructor? They will be blocked from logging in.');">
+                                                                        <i class="bi bi-slash-circle"></i>
+                                                                        <span>Restrict Educator (@material.Instructor)</span>
                                                                     </button>
                                                                 </form>
                                                             }
@@ -840,22 +955,29 @@
                                                         <div class="d-flex gap-2">
                                                             @if (!string.IsNullOrWhiteSpace(material.FileUrl))
                                                             {
-                                                                <a href="@material.FileUrl" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                                                                    📄 Open in Tab
+                                                                <a href="@material.FileUrl" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                    <i class="bi bi-box-arrow-up-right"></i>
+                                                                    <span>Open in Tab</span>
                                                                 </a>
                                                             }
                                                             @if (material.Status != "Active" && material.Status != "Approved")
                                                             {
                                                                 <form asp-action="ApproveMaterial" asp-route-id="@material.Id" method="post" class="d-inline">
                                                                     @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">✓ Approve Material</button>
+                                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                        <i class="bi bi-check-lg"></i>
+                                                                        <span>Approve Material</span>
+                                                                    </button>
                                                                 </form>
                                                             }
                                                             @if (material.Status != "Declined")
                                                             {
                                                                 <form asp-action="DeclineMaterial" asp-route-id="@material.Id" method="post" class="d-inline">
                                                                     @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">✕ Decline Material</button>
+                                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                        <i class="bi bi-x-lg"></i>
+                                                                        <span>Decline</span>
+                                                                    </button>
                                                                 </form>
                                                             }
                                                             <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
@@ -958,10 +1080,10 @@
                                                 </div>
                                             </td>
                                             <td class="small">
-                                                <span class="text-success fw-medium">👍 @post.Likes</span>
+                                                <span class="text-success fw-medium"><i class="bi bi-hand-thumbs-up me-1"></i>@post.Likes</span>
                                                 <span class="text-muted mx-1">/</span>
-                                                <span class="text-danger fw-medium">👎 @post.Dislikes</span>
-                                                <div class="text-muted mt-0.5">💬 @post.Replies replies</div>
+                                                <span class="text-danger fw-medium"><i class="bi bi-hand-thumbs-down me-1"></i>@post.Dislikes</span>
+                                                <div class="text-muted mt-0.5"><i class="bi bi-chat-dots me-1"></i>@post.Replies replies</div>
                                             </td>
                                             <td>
                                                 @if (post.Status == "Active" || post.Status == "Approved" || post.Status == "approved")
@@ -988,8 +1110,9 @@
                                                     {
                                                         <form asp-action="ApproveForumPost" asp-route-id="@post.Id" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5" title="Approve Post">
-                                                                ✓ Approve
+                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5 d-inline-flex align-items-center gap-1" title="Approve Post">
+                                                                <i class="bi bi-check-lg"></i>
+                                                                <span>Approve</span>
                                                             </button>
                                                         </form>
                                                     }
@@ -997,8 +1120,9 @@
                                                     {
                                                         <form asp-action="DeclineForumPost" asp-route-id="@post.Id" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5" title="Decline Post">
-                                                                ✕ Decline
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 d-inline-flex align-items-center gap-1" title="Decline Post">
+                                                                <i class="bi bi-x-lg"></i>
+                                                                <span>Decline</span>
                                                             </button>
                                                         </form>
                                                     }
@@ -1036,9 +1160,9 @@
                                                                 </div>
                                                             }
                                                             <div class="d-flex gap-3 text-muted small mt-2 pt-2 border-top">
-                                                                <span>👍 Likes: <strong>@post.Likes</strong></span>
-                                                                <span>👎 Dislikes: <strong>@post.Dislikes</strong></span>
-                                                                <span>💬 Replies: <strong>@post.Replies</strong></span>
+                                                                <span><i class="bi bi-hand-thumbs-up me-1"></i> Likes: <strong>@post.Likes</strong></span>
+                                                                <span><i class="bi bi-hand-thumbs-down me-1"></i> Dislikes: <strong>@post.Dislikes</strong></span>
+                                                                <span><i class="bi bi-chat-dots me-1"></i> Replies: <strong>@post.Replies</strong></span>
                                                             </div>
                                                         </div>
 
@@ -1134,8 +1258,9 @@
                                                                     @Html.AntiForgeryToken()
                                                                     <input type="hidden" name="educatorName" value="@post.Author" />
                                                                     <input type="hidden" name="returnTab" value="forum" />
-                                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3" onclick="return confirm('Are you sure you want to restrict user @post.Author? They will be blocked from logging in.');">
-                                                                        🚫 Restrict User (@post.Author)
+                                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5" onclick="return confirm('Are you sure you want to restrict user @post.Author? They will be blocked from logging in.');">
+                                                                        <i class="bi bi-slash-circle"></i>
+                                                                        <span>Restrict User (@post.Author)</span>
                                                                     </button>
                                                                 </form>
                                                             }
@@ -1145,14 +1270,20 @@
                                                             {
                                                                 <form asp-action="ApproveForumPost" asp-route-id="@post.Id" method="post" class="d-inline">
                                                                     @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">✓ Approve Post</button>
+                                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                        <i class="bi bi-check-lg"></i>
+                                                                        <span>Approve Post</span>
+                                                                    </button>
                                                                 </form>
                                                             }
                                                             @if (post.Status != "Declined")
                                                             {
                                                                 <form asp-action="DeclineForumPost" asp-route-id="@post.Id" method="post" class="d-inline">
                                                                     @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">✕ Decline Post</button>
+                                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                        <i class="bi bi-x-lg"></i>
+                                                                        <span>Decline Post</span>
+                                                                    </button>
                                                                 </form>
                                                             }
                                                             <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
@@ -1266,8 +1397,9 @@
                                             <td>
                                                 @if (!string.IsNullOrWhiteSpace(student.ConsentLetterUrl))
                                                 {
-                                                    <a href="@student.ConsentLetterUrl" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5" title="View Consent Letter">
-                                                        📄 View Letter
+                                                    <a href="@student.ConsentLetterUrl" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 d-inline-flex align-items-center gap-1" title="View Consent Letter">
+                                                        <i class="bi bi-file-earmark-text"></i>
+                                                        <span>View Letter</span>
                                                     </a>
                                                 }
                                                 else
@@ -1300,8 +1432,9 @@
                                                     {
                                                         <form asp-action="ApproveStudent" asp-route-id="@student.Id" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5" title="Approve Student">
-                                                                ✓ Approve
+                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5 d-inline-flex align-items-center gap-1" title="Approve Student">
+                                                                <i class="bi bi-check-lg"></i>
+                                                                <span>Approve</span>
                                                             </button>
                                                         </form>
                                                     }
@@ -1309,8 +1442,9 @@
                                                     {
                                                         <form asp-action="DeclineStudent" asp-route-id="@student.Id" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5" title="Decline Student">
-                                                                ✕ Decline
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 d-inline-flex align-items-center gap-1" title="Decline Student">
+                                                                <i class="bi bi-x-lg"></i>
+                                                                <span>Decline</span>
                                                             </button>
                                                         </form>
                                                     }
@@ -1360,11 +1494,13 @@
                                                             @if (!string.IsNullOrWhiteSpace(student.ConsentLetterUrl))
                                                             {
                                                                 <div class="d-flex justify-content-between align-items-center p-2.5 bg-light rounded-3 border">
-                                                                    <div class="text-truncate me-2 small" style="max-width: 440px;">
-                                                                        📄 @student.ConsentLetterUrl
+                                                                    <div class="text-truncate me-2 small d-flex align-items-center gap-1" style="max-width: 440px;">
+                                                                        <i class="bi bi-file-earmark-text text-muted"></i>
+                                                                        <span>@student.ConsentLetterUrl</span>
                                                                     </div>
-                                                                    <a href="@student.ConsentLetterUrl" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-                                                                        Open Document ↗
+                                                                    <a href="@student.ConsentLetterUrl" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1">
+                                                                        <span>Open Document</span>
+                                                                        <i class="bi bi-box-arrow-up-right"></i>
                                                                     </a>
                                                                 </div>
                                                             }
@@ -1459,8 +1595,9 @@
                                                                     @Html.AntiForgeryToken()
                                                                     <input type="hidden" name="educatorName" value="@student.GuardianName" />
                                                                     <input type="hidden" name="returnTab" value="students" />
-                                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3" onclick="return confirm('Are you sure you want to restrict guardian @student.GuardianName? They will be blocked from logging in.');">
-                                                                        🚫 Restrict Guardian (@student.GuardianName)
+                                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5" onclick="return confirm('Are you sure you want to restrict guardian @student.GuardianName? They will be blocked from logging in.');">
+                                                                        <i class="bi bi-slash-circle"></i>
+                                                                        <span>Restrict Guardian (@student.GuardianName)</span>
                                                                     </button>
                                                                 </form>
                                                             }
@@ -1470,14 +1607,20 @@
                                                             {
                                                                 <form asp-action="ApproveStudent" asp-route-id="@student.Id" method="post" class="d-inline">
                                                                     @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">✓ Approve Student</button>
+                                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                        <i class="bi bi-check-lg"></i>
+                                                                        <span>Approve Student</span>
+                                                                    </button>
                                                                 </form>
                                                             }
                                                             @if (student.Status != "Declined")
                                                             {
                                                                 <form asp-action="DeclineStudent" asp-route-id="@student.Id" method="post" class="d-inline">
                                                                     @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">✕ Decline Student</button>
+                                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1.5">
+                                                                        <i class="bi bi-x-lg"></i>
+                                                                        <span>Decline Student</span>
+                                                                    </button>
                                                                 </form>
                                                             }
                                                             <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
@@ -1511,7 +1654,7 @@
                     @if (!Model.Donations.Any())
                     {
                         <div class="p-5 text-center bg-light rounded-4">
-                            <div class="text-muted fs-1 mb-2">💸</div>
+                            <div class="text-muted fs-1 mb-2"><i class="bi bi-wallet2 text-secondary"></i></div>
                             <h5 class="fw-bold text-dark">No Donations Recorded Yet</h5>
                             <p class="text-muted small mb-0">Donation transactions received via bKash payment gateway will be logged here in real-time.</p>
                         </div>
@@ -1557,11 +1700,11 @@
                                                         <span class="badge bg-secondary-subtle text-secondary rounded-pill small ms-1" style="font-size: 0.68rem;">Anonymous Donor</span>
                                                     }
                                                 </div>
-                                                <div class="text-muted small">
-                                                    <span>📱 @donation.DonorPhone</span>
+                                                <div class="text-muted small d-flex align-items-center flex-wrap gap-2">
+                                                    <span><i class="bi bi-phone me-1"></i>@donation.DonorPhone</span>
                                                     @if (!string.IsNullOrWhiteSpace(donation.DonorEmail))
                                                     {
-                                                        <span class="ms-1.5">• ✉️ @donation.DonorEmail</span>
+                                                        <span><i class="bi bi-envelope me-1"></i>@donation.DonorEmail</span>
                                                     }
                                                 </div>
                                             </td>
@@ -1581,16 +1724,19 @@
                                                 }
                                             </td>
                                             <td>
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">
-                                                    ✓ @donation.Status
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1">
+                                                    <i class="bi bi-check-lg"></i>
+                                                    <span>@donation.Status</span>
                                                 </span>
                                             </td>
                                             <td class="text-end text-nowrap">
-                                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#donationDetailModal-@donation.Id">
-                                                    Details ↗
+                                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#donationDetailModal-@donation.Id">
+                                                    <span>Details</span>
+                                                    <i class="bi bi-box-arrow-up-right"></i>
                                                 </button>
-                                                <a asp-controller="Donation" asp-action="Receipt" asp-route-id="@donation.Id" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-2.5" title="View Electronic Receipt">
-                                                    📄 Receipt
+                                                <a asp-controller="Donation" asp-action="Receipt" asp-route-id="@donation.Id" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-2.5 d-inline-flex align-items-center gap-1" title="View Electronic Receipt">
+                                                    <i class="bi bi-file-earmark-text"></i>
+                                                    <span>Receipt</span>
                                                 </a>
                                             </td>
                                         </tr>
@@ -1673,8 +1819,9 @@
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer border-top-0 pt-0">
-                                                        <a asp-controller="Donation" asp-action="Receipt" asp-route-id="@donation.Id" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-                                                            View Full Receipt 📄
+                                                        <a asp-controller="Donation" asp-action="Receipt" asp-route-id="@donation.Id" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1">
+                                                            <span>View Full Receipt</span>
+                                                            <i class="bi bi-file-earmark-text"></i>
                                                         </a>
                                                         <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
                                                     </div>
