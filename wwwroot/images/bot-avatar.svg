@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <!-- Background Circle Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="60%" stop-color="#1d4ed8" />
+      <stop offset="100%" stop-color="#1e1b4b" />
+    </linearGradient>
+
+    <!-- Face Plate Gradient -->
+    <linearGradient id="faceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+
+    <!-- Visor Gradient -->
+    <linearGradient id="visorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+
+    <!-- Eye Glow Gradient -->
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+
+    <!-- Ear Accents -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+
+    <!-- Shadow filter for 3D depth -->
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <!-- Background Circular Base -->
+  <circle cx="24" cy="24" r="24" fill="url(#bgGrad)" />
+
+  <!-- Subtle Inner Ring Highlight -->
+  <circle cx="24" cy="24" r="23" stroke="#60a5fa" stroke-opacity="0.3" stroke-width="1" fill="none" />
+
+  <!-- Antenna -->
+  <path d="M24 14.5 V9" stroke="#93c5fd" stroke-width="2.5" stroke-linecap="round" />
+  <circle cx="24" cy="7.5" r="2.8" fill="#38bdf8" />
+  <circle cx="24" cy="7.5" r="1.2" fill="#ffffff" />
+
+  <!-- Ear Pieces / Headphones -->
+  <rect x="7" y="19" width="3.5" height="10" rx="1.75" fill="url(#accentGrad)" />
+  <rect x="37.5" y="19" width="3.5" height="10" rx="1.75" fill="url(#accentGrad)" />
+
+  <!-- Robot Head / Outer Shell -->
+  <rect x="9.5" y="13.5" width="29" height="21" rx="8" fill="url(#faceGrad)" filter="url(#softShadow)" />
+
+  <!-- Digital Visor Screen -->
+  <rect x="13" y="16.5" width="22" height="15" rx="5" fill="url(#visorGrad)" />
+
+  <!-- Visor Reflection Highlight -->
+  <path d="M14.5 18 C19 18, 29 18, 33.5 18" stroke="#334155" stroke-width="0.75" stroke-linecap="round" />
+
+  <!-- Expressive Eyes -->
+  <!-- Left Eye -->
+  <ellipse cx="18.5" cy="23.5" rx="2.6" ry="3" fill="url(#cyanGlow)" />
+  <circle cx="19.4" cy="22.5" r="0.9" fill="#ffffff" />
+  <!-- Right Eye -->
+  <ellipse cx="29.5" cy="23.5" rx="2.6" ry="3" fill="url(#cyanGlow)" />
+  <circle cx="30.4" cy="22.5" r="0.9" fill="#ffffff" />
+
+  <!-- Friendly Digital Smile Arc -->
+  <path d="M21 27.5 Q 24 30.2 27 27.5" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" fill="none" />
+
+  <!-- Sparkle Accent in top right of circle -->
+  <path d="M38 7 L39 9.5 L41.5 10.5 L39 11.5 L38 14 L37 11.5 L34.5 10.5 L37 9.5 Z" fill="#67e8f9" opacity="0.9" />
+</svg>

@@ -18,6 +18,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Cloudinary & Storage Services
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
+// HttpClient and Memory Cache
+builder.Services.AddHttpClient();
+builder.Services.AddMemoryCache();
+
+// AI & Knowledge Services (Gemini Cloud API & PDF Knowledge Base)
+builder.Services.AddSingleton<ILlmChatService, GeminiChatService>();
+builder.Services.AddScoped<IPdfKnowledgeService, PdfKnowledgeService>();
+
 // Password Hasher for User
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
