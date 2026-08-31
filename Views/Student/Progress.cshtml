@@ -1,0 +1,610 @@
+@model Onudhabon_ISD.Models.StudentProgressViewModel
+
+@{
+    ViewData["Title"] = "Track Student Progress - Onudhabon";
+}
+
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Student" asp-action="Index" class="text-decoration-none">Students</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Progress Tracker</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                <span>➤</span> Track Student Progress
+            </h2>
+            <p class="text-muted mb-0">View detailed progress reports of the children local guardians have registered, including performance, and assessments.</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3.5 py-2 small shadow-sm">
+                📋 All Enrolled List
+            </a>
+            <a asp-action="Enroll" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm d-inline-flex align-items-center gap-2">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Enroll New Student
+            </a>
+        </div>
+    </div>
+
+    <!-- Feedback Alerts -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Search & Filter Bar -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+        <form method="get" asp-action="Progress" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 rounded-start-pill text-muted">🔍</span>
+                    <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control bg-light border-start-0 rounded-end-pill" placeholder="Search by student name, birth cert ID, father..." />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <select name="selectedClass" class="form-select rounded-pill">
+                    <option value="">All Classes</option>
+                    @for (int i = 1; i <= 12; i++)
+                    {
+                        var isSelected = (Model.SelectedClass?.Replace("Class", "").Trim() == i.ToString());
+                        <option value="@i" selected="@isSelected">Class @i</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 flex-grow-1">Filter</button>
+                @if (!string.IsNullOrWhiteSpace(Model.SearchQuery) || !string.IsNullOrWhiteSpace(Model.SelectedClass))
+                {
+                    <a asp-action="Progress" class="btn btn-outline-secondary rounded-pill px-3">Clear</a>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Section: My Students -->
+    <div class="mb-4">
+        <h4 class="fw-bold text-dark mb-3">My Students</h4>
+
+        @if (!Model.Cards.Any())
+        {
+            <div class="card border-0 shadow-sm rounded-4 text-center py-5 px-4 bg-white">
+                <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex p-4 mx-auto mb-3">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                    </svg>
+                </div>
+                <h5 class="fw-bold text-dark">No Students Found</h5>
+                <p class="text-muted mx-auto mb-4" style="max-width: 480px;">
+                    No student records match your filter criteria. Enroll students under your local guardianship to begin tracking their subject and lecture progress.
+                </p>
+                <div>
+                    <a asp-action="Enroll" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+                        Enroll New Student
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var card in Model.Cards)
+                {
+                    var student = card.Student;
+                    var donutId = $"donutChart_{student.Id}";
+                    var barId = $"barChart_{student.Id}";
+                    var overallPercent = card.OverallProgressPercent;
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 bg-white d-flex flex-column p-4 student-progress-card">
+                            <!-- Card Header Info -->
+                            <div class="mb-3">
+                                <h5 class="fw-bold text-dark mb-1">@student.FullName</h5>
+                                <div class="text-muted small mb-0.5">
+                                    Birth Cert ID: @(string.IsNullOrWhiteSpace(student.BirthCertificateId) ? "N/A" : student.BirthCertificateId)
+                                </div>
+                                <div class="text-muted small mb-0.5">
+                                    Current Class: @(student.ClassLevel?.Replace("Class", "").Trim() ?? "1")
+                                </div>
+                                <div class="text-muted small">
+                                    Enrollment Year: @(student.EnrollmentYear ?? "2025")
+                                </div>
+                            </div>
+
+                            <!-- Overall Progress Section -->
+                            <div class="mb-3 text-center">
+                                <h6 class="fw-bold text-dark text-start mb-2" style="font-size: 0.95rem;">Overall Progress</h6>
+                                <div class="position-relative d-inline-block mx-auto my-2" style="width: 170px; height: 170px;">
+                                    <canvas id="@donutId" width="170" height="170"></canvas>
+                                    <div class="position-absolute top-50 start-50 translate-middle text-center pointer-events-none">
+                                        <div class="fw-bold text-dark" style="font-size: 1.15rem;" id="overallPercentText_@student.Id">
+                                            @overallPercent.ToString("0.0")%
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Donut Legend matching the mockup -->
+                                <div class="d-flex justify-content-center align-items-center gap-3 small text-muted mt-1">
+                                    <span class="d-inline-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
+                                        <span class="d-inline-block rounded-1" style="width: 12px; height: 6px; background-color: #38bdf8;"></span>
+                                        Completed
+                                    </span>
+                                    <span class="d-inline-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
+                                        <span class="d-inline-block rounded-1" style="width: 12px; height: 6px; background-color: #e2e8f0;"></span>
+                                        Remaining
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Per Subject Progress Section -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-dark mb-2" style="font-size: 0.95rem;">Per Subject Progress</h6>
+                                <div style="height: 160px;" class="position-relative">
+                                    <canvas id="@barId"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-auto d-flex flex-column gap-2 mb-3">
+                                <!-- Update Progress Button (Yellow/Amber) -->
+                                <button type="button" 
+                                        class="btn w-100 fw-bold py-2 rounded-2 shadow-sm text-white btn-update-progress" 
+                                        style="background-color: #f59e0b; border: none; font-size: 0.85rem;"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#updateProgressModal-@student.Id">
+                                    Update Progress
+                                </button>
+
+                                <!-- Complete all lectures to unlock promotion Button (Blue) -->
+                                @if (card.CanPromote)
+                                {
+                                    <form asp-action="PromoteStudent" method="post" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@student.Id" />
+                                        <button type="submit" class="btn btn-success w-100 fw-bold py-2 rounded-2 shadow-sm" style="font-size: 0.85rem;" onclick="return confirm('Promote @student.FullName to Class @card.NextClassLevel?');">
+                                            🎓 Promote to Class @card.NextClassLevel
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button type="button" 
+                                            class="btn btn-primary w-100 fw-medium py-2 rounded-2 shadow-sm text-center" 
+                                            style="background-color: #0d6efd; border: none; font-size: 0.82rem; cursor: not-allowed; opacity: 0.95;"
+                                            title="Complete all lectures across all subjects to unlock promotion">
+                                        Complete all lectures to unlock promotion
+                                    </button>
+                                }
+                            </div>
+
+                            <!-- Card Footer -->
+                            <div class="pt-2 border-top d-flex justify-content-between align-items-center text-muted small" style="font-size: 0.8rem;">
+                                <div>
+                                    Status: 
+                                    @if (card.StatusDisplay == "verified")
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5" style="font-size: 0.75rem;">verified</span>
+                                    }
+                                    else if (card.StatusDisplay == "declined")
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5" style="font-size: 0.75rem;">declined</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-0.5" style="font-size: 0.75rem;">pending</span>
+                                    }
+                                </div>
+
+                                <div class="text-truncate" style="max-width: 150px;" title="@student.FatherName">
+                                    Father: @(string.IsNullOrWhiteSpace(student.FatherName) ? "N/A" : student.FatherName)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal for Updating Progress for this Student -->
+                    <div class="modal fade" id="updateProgressModal-@student.Id" tabindex="-1" aria-labelledby="modalLabel-@student.Id" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content rounded-4 border-0 shadow">
+                                <div class="modal-header bg-light border-bottom-0 rounded-top-4 pb-3">
+                                    <div>
+                                        <h5 class="modal-title fw-bold text-dark mb-0" id="modalLabel-@student.Id">
+                                            Update Learning Progress: @student.FullName
+                                        </h5>
+                                        <span class="text-muted small">
+                                            Class @student.ClassLevel | Birth Cert ID: @(student.BirthCertificateId ?? "N/A") | Enrollment: @(student.EnrollmentYear ?? "2025")
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <form id="progressForm_@student.Id" onsubmit="submitProgressUpdate(event, @student.Id)">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="StudentId" value="@student.Id" />
+
+                                    <div class="modal-body p-4">
+                                        <div class="alert alert-info border-0 rounded-3 d-flex align-items-center gap-2 p-2.5 mb-3 small" style="background-color: #f0fdf4; color: #166534;">
+                                            <span>💡</span>
+                                            <span>
+                                                Each class curriculum is configured via <strong>ClassPlan</strong> in the database. Update the completed lectures for each subject below.
+                                            </span>
+                                        </div>
+
+                                        <h6 class="fw-bold text-dark mb-3">Subjects & Lecture Completion</h6>
+
+                                        <div class="row g-3 mb-4">
+                                            @for (int sIdx = 0; sIdx < card.SubjectProgress.Count; sIdx++)
+                                            {
+                                                var sub = card.SubjectProgress[sIdx];
+                                                var subPercent = sub.ProgressPercentage;
+
+                                                <div class="col-md-6">
+                                                    <div class="p-3 bg-light rounded-3 border subject-input-row" data-total="@sub.TotalLectures">
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <strong class="text-dark small text-truncate" style="max-width: 170px;" title="@sub.SubjectName">
+                                                                @sub.SubjectName
+                                                            </strong>
+                                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill small">
+                                                                @sub.TotalLectures Total Lectures
+                                                            </span>
+                                                        </div>
+
+                                                        <input type="hidden" name="SubjectProgress[@sIdx].SubjectName" value="@sub.SubjectName" />
+                                                        <input type="hidden" name="SubjectProgress[@sIdx].TotalLectures" value="@sub.TotalLectures" />
+
+                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                            <label class="text-muted small mb-0 flex-shrink-0">Completed:</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <button type="button" class="btn btn-outline-secondary px-2.5" onclick="stepLectureInput(@student.Id, @sIdx, -1)">-</button>
+                                                                <input type="number" 
+                                                                       id="completedInput_@(student.Id)_@sIdx"
+                                                                       name="SubjectProgress[@sIdx].CompletedLectures" 
+                                                                       value="@sub.CompletedLectures" 
+                                                                       min="0" 
+                                                                       max="@sub.TotalLectures" 
+                                                                       class="form-control text-center fw-bold" 
+                                                                       oninput="updateSubjectBarPreview(@student.Id, @sIdx, @sub.TotalLectures)" />
+                                                                <button type="button" class="btn btn-outline-secondary px-2.5" onclick="stepLectureInput(@student.Id, @sIdx, 1)">+</button>
+                                                            </div>
+                                                            <span class="small fw-semibold text-primary flex-shrink-0" id="subPercentBadge_@(student.Id)_@sIdx" style="min-width: 45px; text-align: right;">
+                                                                @subPercent.ToString("0.0")%
+                                                            </span>
+                                                        </div>
+
+                                                        <!-- Live Mini Progress Bar -->
+                                                        <div class="progress" style="height: 6px;">
+                                                            <div class="progress-bar bg-success" 
+                                                                 id="subProgressBar_@(student.Id)_@sIdx"
+                                                                 role="progressbar" 
+                                                                 style="width: @subPercent%;" 
+                                                                 aria-valuenow="@subPercent" 
+                                                                 aria-valuemin="0" 
+                                                                 aria-valuemax="100"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-md-5">
+                                                <label class="form-label fw-semibold small text-dark">Attendance Percentage (%)</label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" name="AttendancePercentage" value="@student.AttendancePercentage" min="0" max="100" class="form-control rounded-3" />
+                                                    <span class="input-group-text">%</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-7">
+                                                <label class="form-label fw-semibold small text-dark">Guardian Notes / Assessment</label>
+                                                <input type="text" name="Notes" value="@student.Notes" placeholder="e.g. Regular study, showing strong improvement" class="form-control form-control-sm rounded-3" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer bg-light border-top-0 rounded-bottom-4 pt-0">
+                                        <button type="button" class="btn btn-secondary rounded-pill px-3.5 btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" id="saveProgressBtn_@student.Id" class="btn btn-primary rounded-pill px-4 btn-sm fw-bold">
+                                            💾 Save Progress
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Load Chart.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <script>
+        const studentCharts = {};
+
+        // Subject labels & completion percentages per student
+        const studentDataMap = {
+            @foreach (var card in Model.Cards)
+            {
+                var student = card.Student;
+                var subjectsJson = System.Text.Json.JsonSerializer.Serialize(card.SubjectProgress.Select(s => s.SubjectName).ToList());
+                var percentagesJson = System.Text.Json.JsonSerializer.Serialize(card.SubjectProgress.Select(s => s.ProgressPercentage).ToList());
+                var completedLecturesJson = System.Text.Json.JsonSerializer.Serialize(card.SubjectProgress.Select(s => s.CompletedLectures).ToList());
+                var totalLecturesJson = System.Text.Json.JsonSerializer.Serialize(card.SubjectProgress.Select(s => s.TotalLectures).ToList());
+                <text>
+                "@student.Id": {
+                    overall: @card.OverallProgressPercent,
+                    subjects: @Html.Raw(subjectsJson),
+                    percentages: @Html.Raw(percentagesJson),
+                    completed: @Html.Raw(completedLecturesJson),
+                    totals: @Html.Raw(totalLecturesJson)
+                },
+                </text>
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize charts for each student
+            Object.keys(studentDataMap).forEach(studentId => {
+                initStudentCharts(studentId);
+            });
+        });
+
+        function initStudentCharts(studentId) {
+            const data = studentDataMap[studentId];
+            if (!data) return;
+
+            // 1. Initialize Overall Progress Donut Chart
+            const donutCtx = document.getElementById('donutChart_' + studentId);
+            if (donutCtx) {
+                const completedVal = data.overall;
+                const remainingVal = Math.max(0, 100 - completedVal);
+
+                if (studentCharts['donut_' + studentId]) {
+                    studentCharts['donut_' + studentId].destroy();
+                }
+
+                studentCharts['donut_' + studentId] = new Chart(donutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Completed', 'Remaining'],
+                        datasets: [{
+                            data: [completedVal, remainingVal],
+                            backgroundColor: ['#38bdf8', '#e2e8f0'],
+                            borderWidth: 0,
+                            hoverOffset: 2
+                        }]
+                    },
+                    options: {
+                        cutout: '75%',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (ctx) {
+                                        return ' ' + ctx.label + ': ' + ctx.parsed.toFixed(1) + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 2. Initialize Per Subject Progress Bar Chart
+            const barCtx = document.getElementById('barChart_' + studentId);
+            if (barCtx) {
+                if (studentCharts['bar_' + studentId]) {
+                    studentCharts['bar_' + studentId].destroy();
+                }
+
+                studentCharts['bar_' + studentId] = new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.subjects,
+                        datasets: [{
+                            data: data.percentages,
+                            backgroundColor: '#22c55e',
+                            borderRadius: 2,
+                            barPercentage: 0.5,
+                            categoryPercentage: 0.8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (ctx) {
+                                        const idx = ctx.dataIndex;
+                                        const comp = data.completed[idx] || 0;
+                                        const tot = data.totals[idx] || 0;
+                                        return ' ' + ctx.parsed.y.toFixed(1) + '% (' + comp + '/' + tot + ' lectures)';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                min: 0,
+                                max: 100,
+                                ticks: {
+                                    stepSize: 20,
+                                    font: { size: 9 },
+                                    color: '#64748b'
+                                },
+                                grid: {
+                                    color: '#f1f5f9'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { size: 9 },
+                                    color: '#64748b',
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    autoSkip: false
+                                },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Stepper for Lecture Input in Modal
+        function stepLectureInput(studentId, sIdx, step) {
+            const input = document.getElementById('completedInput_' + studentId + '_' + sIdx);
+            if (!input) return;
+            const cur = parseInt(input.value) || 0;
+            const min = parseInt(input.min) || 0;
+            const max = parseInt(input.max) || 12;
+            const nextVal = Math.min(Math.max(cur + step, min), max);
+            input.value = nextVal;
+            updateSubjectBarPreview(studentId, sIdx, max);
+        }
+
+        // Live preview of bar & badge percentage when typing in modal
+        function updateSubjectBarPreview(studentId, sIdx, totalLectures) {
+            const input = document.getElementById('completedInput_' + studentId + '_' + sIdx);
+            const badge = document.getElementById('subPercentBadge_' + studentId + '_' + sIdx);
+            const pBar = document.getElementById('subProgressBar_' + studentId + '_' + sIdx);
+            if (!input) return;
+
+            let completed = parseInt(input.value) || 0;
+            if (completed < 0) completed = 0;
+            if (completed > totalLectures) completed = totalLectures;
+            input.value = completed;
+
+            const pct = totalLectures > 0 ? ((completed / totalLectures) * 100).toFixed(1) : 0;
+            if (badge) badge.textContent = pct + '%';
+            if (pBar) {
+                pBar.style.width = pct + '%';
+                pBar.setAttribute('aria-valuenow', pct);
+            }
+        }
+
+        // Handle AJAX Submit of Progress Update
+        function submitProgressUpdate(event, studentId) {
+            event.preventDefault();
+            const form = document.getElementById('progressForm_' + studentId);
+            const saveBtn = document.getElementById('saveProgressBtn_' + studentId);
+            if (!form || !saveBtn) return;
+
+            const formData = new FormData(form);
+            const subjectProgress = [];
+
+            let sIdx = 0;
+            while (formData.has(`SubjectProgress[${sIdx}].SubjectName`)) {
+                subjectProgress.push({
+                    SubjectName: formData.get(`SubjectProgress[${sIdx}].SubjectName`),
+                    TotalLectures: parseInt(formData.get(`SubjectProgress[${sIdx}].TotalLectures`)) || 12,
+                    CompletedLectures: parseInt(formData.get(`SubjectProgress[${sIdx}].CompletedLectures`)) || 0
+                });
+                sIdx++;
+            }
+
+            const payload = {
+                StudentId: studentId,
+                AttendancePercentage: parseInt(formData.get('AttendancePercentage')) || 90,
+                Notes: formData.get('Notes') || '',
+                SubjectProgress: subjectProgress
+            };
+
+            const token = form.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '⏳ Saving...';
+
+            fetch('/Student/UpdateProgress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '💾 Save Progress';
+
+                if (data.success) {
+                    // Update local state map
+                    const sData = studentDataMap[studentId];
+                    if (sData) {
+                        sData.overall = data.overallProgress;
+                        sData.completed = subjectProgress.map(s => s.CompletedLectures);
+                        sData.percentages = subjectProgress.map(s => s.TotalLectures > 0 ? (s.CompletedLectures / s.TotalLectures * 100) : 0);
+                        
+                        // Update donut chart
+                        if (studentCharts['donut_' + studentId]) {
+                            studentCharts['donut_' + studentId].data.datasets[0].data = [data.overallProgress, Math.max(0, 100 - data.overallProgress)];
+                            studentCharts['donut_' + studentId].update();
+                        }
+
+                        // Update bar chart
+                        if (studentCharts['bar_' + studentId]) {
+                            studentCharts['bar_' + studentId].data.datasets[0].data = sData.percentages;
+                            studentCharts['bar_' + studentId].update();
+                        }
+
+                        // Update text percentage
+                        const pctText = document.getElementById('overallPercentText_' + studentId);
+                        if (pctText) {
+                            pctText.textContent = data.overallProgress.toFixed(1) + '%';
+                        }
+                    }
+
+                    // Close modal
+                    const modalEl = document.getElementById('updateProgressModal-' + studentId);
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    // If eligible for promotion, reload to update promotion button state
+                    if (data.canPromote) {
+                        window.location.reload();
+                    }
+                } else {
+                    alert(data.message || 'Failed to update progress.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '💾 Save Progress';
+                alert('An error occurred while updating student progress.');
+            });
+        }
+    </script>
+}

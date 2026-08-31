@@ -249,5 +249,87 @@ namespace Onudhabon_ISD.Data
                 context.SaveChanges();
             }
         }
+
+        public static void SeedStudents(ApplicationDbContext context)
+        {
+            if (!context.Students.Any())
+            {
+                var students = new List<Student>
+                {
+                    new Student
+                    {
+                        FullName = "New Student",
+                        BirthCertificateId = "2694262689036",
+                        Address = "Sreepur, Gazipur",
+                        FatherName = "John Doe",
+                        MotherName = "Jane Doe",
+                        ClassLevel = "5",
+                        EnrollmentYear = "2025",
+                        GuardianName = "Local Guardian",
+                        GuardianId = "localguardian@example.com",
+                        Status = "Active",
+                        CompletedClasses = 4,
+                        Age = 11,
+                        AttendancePercentage = 95,
+                        ProgressPercentage = 14,
+                        Notes = "Active student showing great aptitude in Bangla 2nd paper and Social Science.",
+                        Subjects = "Bangla 1st paper, Bangla 2nd paper, English 1st paper, English 2nd paper, Math, Social Science, General Science",
+                        SubjectProgressJson = "[{\"subjectName\":\"Bangla 1st paper\",\"totalLectures\":12,\"completedLectures\":0},{\"subjectName\":\"Bangla 2nd paper\",\"totalLectures\":12,\"completedLectures\":6},{\"subjectName\":\"English 1st paper\",\"totalLectures\":12,\"completedLectures\":0},{\"subjectName\":\"English 2nd paper\",\"totalLectures\":12,\"completedLectures\":0},{\"subjectName\":\"Math\",\"totalLectures\":12,\"completedLectures\":0},{\"subjectName\":\"Social Science\",\"totalLectures\":12,\"completedLectures\":6},{\"subjectName\":\"General Science\",\"totalLectures\":12,\"completedLectures\":0}]",
+                        CreatedAt = new DateTime(2025, 1, 15, 10, 0, 0, DateTimeKind.Utc),
+                        LastActivityDate = DateTime.UtcNow.AddDays(-1),
+                        __v = 0
+                    },
+                    new Student
+                    {
+                        FullName = "Janet Doe",
+                        BirthCertificateId = "1307259",
+                        Address = "Mohakhali, Dhaka",
+                        FatherName = "John Doe",
+                        MotherName = "Mary Doe",
+                        ClassLevel = "11",
+                        EnrollmentYear = "2025",
+                        GuardianName = "Local Guardian",
+                        GuardianId = "localguardian@example.com",
+                        Status = "Active",
+                        CompletedClasses = 10,
+                        Age = 17,
+                        AttendancePercentage = 92,
+                        ProgressPercentage = 8,
+                        Notes = "Focused on HSC preparation. Excelling in Bangla papers.",
+                        Subjects = "Bangla 1st paper, Bangla 2nd paper, English 1st paper, English 2nd paper, Physics 1st paper, Physics 2nd paper, Chemistry 1st paper, Chemistry 2nd paper, Higher Math 1st paper, Higher Math 2nd paper, Biology 1st paper, Biology 2nd paper",
+                        SubjectProgressJson = "[{\"subjectName\":\"Bangla 1st paper\",\"totalLectures\":20,\"completedLectures\":10},{\"subjectName\":\"Bangla 2nd paper\",\"totalLectures\":20,\"completedLectures\":10},{\"subjectName\":\"English 1st paper\",\"totalLectures\":20,\"completedLectures\":0},{\"subjectName\":\"English 2nd paper\",\"totalLectures\":20,\"completedLectures\":0},{\"subjectName\":\"Physics 1st paper\",\"totalLectures\":20,\"completedLectures\":0},{\"subjectName\":\"Physics 2nd paper\",\"totalLectures\":20,\"completedLectures\":0},{\"subjectName\":\"Chemistry 1st paper\",\"totalLectures\":20,\"completedLectures\":0},{\"subjectName\":\"Chemistry 2nd paper\",\"totalLectures\":20,\"completedLectures\":0},{\"subjectName\":\"Higher Math 1st paper\",\"totalLectures\":20,\"completedLectures\":0},{\"subjectName\":\"Higher Math 2nd paper\",\"totalLectures\":20,\"completedLectures\":0},{\"subjectName\":\"Biology 1st paper\",\"totalLectures\":20,\"completedLectures\":0},{\"subjectName\":\"Biology 2nd paper\",\"totalLectures\":20,\"completedLectures\":0}]",
+                        CreatedAt = new DateTime(2025, 2, 10, 11, 30, 0, DateTimeKind.Utc),
+                        LastActivityDate = DateTime.UtcNow.AddDays(-2),
+                        __v = 0
+                    },
+                    new Student
+                    {
+                        FullName = "Student New",
+                        BirthCertificateId = "2694262689038",
+                        Address = "Mirpur, Dhaka",
+                        FatherName = "John Doe",
+                        MotherName = "Salma Khatun",
+                        ClassLevel = "1",
+                        EnrollmentYear = "2025",
+                        GuardianName = "Local Guardian",
+                        GuardianId = "localguardian@example.com",
+                        Status = "Declined",
+                        CompletedClasses = 0,
+                        Age = 7,
+                        AttendancePercentage = 80,
+                        ProgressPercentage = 0,
+                        Notes = "Application submitted for primary class enrollment.",
+                        Subjects = "Bangla, English, Math",
+                        SubjectProgressJson = "[{\"subjectName\":\"Bangla\",\"totalLectures\":10,\"completedLectures\":0},{\"subjectName\":\"English\",\"totalLectures\":10,\"completedLectures\":0},{\"subjectName\":\"Math\",\"totalLectures\":10,\"completedLectures\":0}]",
+                        CreatedAt = new DateTime(2025, 3, 5, 9, 15, 0, DateTimeKind.Utc),
+                        LastActivityDate = DateTime.UtcNow.AddDays(-5),
+                        __v = 0
+                    }
+                };
+
+                context.Students.AddRange(students);
+                context.SaveChanges();
+            }
+        }
     }
 }

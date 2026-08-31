@@ -122,7 +122,12 @@
                             @if (userRole == "Local Guardian" || User.IsInRole("Local Guardian"))
                             {
                                 <li class="nav-item me-2">
-                                    <a class="btn btn-outline-light btn-sm rounded-pill px-3 py-1.5" asp-controller="Student" asp-action="Enroll">
+                                    <a class="btn btn-outline-light btn-sm rounded-pill px-3 py-1.5" asp-controller="Student" asp-action="Progress">
+                                        📊 Track Progress
+                                    </a>
+                                </li>
+                                <li class="nav-item me-2">
+                                    <a class="btn btn-light text-primary btn-sm rounded-pill px-3 py-1.5 fw-semibold" asp-controller="Student" asp-action="Enroll">
                                         + Enroll Student
                                     </a>
                                 </li>
@@ -179,6 +184,11 @@
                                                 🛡️ Admin Dashboard
                                             </a>
                                         </li>
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Student" asp-action="Progress">
+                                                📊 Track Student Progress
+                                            </a>
+                                        </li>
                                     }
                                     <li>
                                         <a class="dropdown-item rounded-3 py-2" asp-controller="Account" asp-action="Profile">
@@ -200,6 +210,11 @@
                                     }
                                     @if (userRole == "Local Guardian" || User.IsInRole("Local Guardian"))
                                     {
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2 fw-semibold text-primary" asp-controller="Student" asp-action="Progress">
+                                                📊 Track Student Progress
+                                            </a>
+                                        </li>
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2" asp-controller="Student" asp-action="Index">
                                                 🎓 My Enrolled Students
