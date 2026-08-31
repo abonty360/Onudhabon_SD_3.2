@@ -194,13 +194,28 @@
                     </article>
                 }
             </div>
+
+            <!-- Pagination Container -->
+            <div class="custom-pagination-wrapper" id="lecturePagination" style="display: none;">
+                <div class="pagination-summary" id="lecturePaginationSummary">
+                    Showing 1–6 of @Model.Count() lectures
+                </div>
+                <ul class="pagination-controls" id="lecturePaginationControls"></ul>
+            </div>
+
+            <!-- Empty Filter Search Result Message -->
+            <div class="no-lectures text-center py-5 d-none" id="noFilterResultsMessage">
+                <div class="text-muted mb-2"><i class="bi bi-search fs-1"></i></div>
+                <h5 class="fw-bold text-dark">No matching lectures found</h5>
+                <p class="text-muted small">Try adjusting your filters or search keywords.</p>
+            </div>
         }
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // 1. Calculate & display static total duration for each video card (fixed, never increases)
+        // 1. Calculate & display static total duration for each video card
         function formatDuration(seconds) {
             if (!seconds || isNaN(seconds) || !isFinite(seconds)) return '0:00';
             const totalSecs = Math.round(seconds);
@@ -234,7 +249,7 @@
                     video.addEventListener('loadedmetadata', updateDuration, { once: true });
                 }
 
-                // Optional smooth hover preview without affecting static total duration
+                // Smooth hover preview
                 card.addEventListener('mouseenter', function () {
                     if (video.readyState >= 2) {
                         video.play().catch(function() {});
@@ -248,12 +263,16 @@
             }
         });
 
-        // 2. Search & filter logic
+        // 2. Search, Filter & Pagination Logic
         const searchInput = document.getElementById('search');
         const classSelect = document.getElementById('classLevel');
         const subjectSelect = document.getElementById('subject');
         const topicSelect = document.getElementById('topic');
         const versionSelect = document.getElementById('version');
+
+        const itemsPerPage = 6;
+        let currentPage = 1;
+        let filteredCards = [...cards];
 
         function getValue(element) {
             return element ? element.value.trim().toLowerCase() : '';
@@ -266,7 +285,7 @@
             const topicFilter = getValue(topicSelect);
             const versionFilter = getValue(versionSelect);
 
-            cards.forEach(function (card) {
+            filteredCards = cards.filter(function (card) {
                 const title = (card.dataset.title || '').toLowerCase();
                 const instructor = (card.dataset.instructor || '').toLowerCase();
                 const className = (card.dataset.class || '').toLowerCase();
@@ -280,9 +299,109 @@
                 const matchesTopic = !topicFilter || topic === topicFilter;
                 const matchesVersion = !versionFilter || version === versionFilter;
 
-                const visible = matchesSearch && matchesClass && matchesSubject && matchesTopic && matchesVersion;
-                card.style.display = visible ? '' : 'none';
+                return matchesSearch && matchesClass && matchesSubject && matchesTopic && matchesVersion;
             });
+
+            currentPage = 1;
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalItems = filteredCards.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const noResults = document.getElementById('noFilterResultsMessage');
+            const paginationWrapper = document.getElementById('lecturePagination');
+            const paginationSummary = document.getElementById('lecturePaginationSummary');
+            const paginationControls = document.getElementById('lecturePaginationControls');
+
+            if (totalItems === 0) {
+                cards.forEach(c => c.style.display = 'none');
+                if (noResults) noResults.classList.remove('d-none');
+                if (paginationWrapper) paginationWrapper.style.display = 'none';
+                return;
+            }
+
+            if (noResults) noResults.classList.add('d-none');
+
+            // Clamp current page
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            // Show/hide cards for current page
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+
+            cards.forEach(c => c.style.display = 'none');
+            for (let i = startIndex; i < endIndex; i++) {
+                filteredCards[i].style.display = '';
+            }
+
+            // Update summary
+            if (paginationSummary) {
+                paginationSummary.textContent = `Showing ${startIndex + 1}–${endIndex} of ${totalItems} lectures`;
+            }
+
+            // Build controls
+            if (paginationControls) {
+                paginationControls.innerHTML = '';
+
+                if (totalPages <= 1) {
+                    if (paginationWrapper) paginationWrapper.style.display = 'none';
+                    return;
+                }
+
+                if (paginationWrapper) paginationWrapper.style.display = 'flex';
+
+                // Prev Button
+                const prevLi = document.createElement('li');
+                const prevBtn = document.createElement('button');
+                prevBtn.className = `page-btn ${currentPage === 1 ? 'disabled' : ''}`;
+                prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
+                prevBtn.setAttribute('aria-label', 'Previous Page');
+                prevBtn.addEventListener('click', function () {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderPagination();
+                        const filterEl = document.getElementById('lectureFilters');
+                        if (filterEl) window.scrollTo({ top: filterEl.offsetTop - 90, behavior: 'smooth' });
+                    }
+                });
+                prevLi.appendChild(prevBtn);
+                paginationControls.appendChild(prevLi);
+
+                // Page Number Buttons
+                for (let p = 1; p <= totalPages; p++) {
+                    const pageLi = document.createElement('li');
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `page-btn ${p === currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = p;
+                    pageBtn.addEventListener('click', function () {
+                        currentPage = p;
+                        renderPagination();
+                        const filterEl = document.getElementById('lectureFilters');
+                        if (filterEl) window.scrollTo({ top: filterEl.offsetTop - 90, behavior: 'smooth' });
+                    });
+                    pageLi.appendChild(pageBtn);
+                    paginationControls.appendChild(pageLi);
+                }
+
+                // Next Button
+                const nextLi = document.createElement('li');
+                const nextBtn = document.createElement('button');
+                nextBtn.className = `page-btn ${currentPage === totalPages ? 'disabled' : ''}`;
+                nextBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
+                nextBtn.setAttribute('aria-label', 'Next Page');
+                nextBtn.addEventListener('click', function () {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderPagination();
+                        const filterEl = document.getElementById('lectureFilters');
+                        if (filterEl) window.scrollTo({ top: filterEl.offsetTop - 90, behavior: 'smooth' });
+                    }
+                });
+                nextLi.appendChild(nextBtn);
+                paginationControls.appendChild(nextLi);
+            }
         }
 
         [searchInput, classSelect, subjectSelect, topicSelect, versionSelect].forEach(function (element) {
@@ -291,5 +410,8 @@
                 element.addEventListener('change', applyFilters);
             }
         });
+
+        // Initialize pagination on load
+        applyFilters();
     });
 </script>

@@ -7,38 +7,40 @@
     int totalDonorsCount = (int)(ViewBag.TotalDonorsCount ?? 0);
 }
 
-<!-- Minimal Hero Header -->
-<section class="py-5 text-white" style="background: linear-gradient(135deg, #0b1329 0%, #1e293b 60%, #1e3a8a 100%);">
-    <div class="container text-center py-3" style="max-width: 780px;">
-        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15 text-white small fw-semibold mb-3">
-            <i class="bi bi-shield-heart text-warning"></i>
-            <span>Educational Welfare Initiative</span>
-        </div>
-        <h1 class="fw-bold display-6 mb-3 tracking-tight">Support Educational Equity</h1>
-        <p class="text-white text-opacity-80 mb-4" style="line-height: 1.65; font-size: 1.05rem;">
-            Your contribution directly funds textbooks, volunteer educator stipends, and learning materials for underprivileged students across Bangladesh.
-        </p>
+<div class="donation-page">
+    <!-- Hero Section with Background Image -->
+    <section class="donation-hero">
+        <div class="donation-hero-overlay"></div>
+        <div class="donation-hero-content">
+            <div class="donation-hero-badge">
+                <i class="bi bi-shield-heart text-warning"></i>
+                <span>Educational Welfare Initiative</span>
+            </div>
+            <h1>Support Educational Equity</h1>
+            <p>
+                Your contribution directly funds textbooks, volunteer educator stipends, and learning materials for underprivileged students across Bangladesh.
+            </p>
 
-        <!-- Subtle Stats Badges -->
-        <div class="d-flex justify-content-center flex-wrap gap-2 gap-sm-3 text-white small">
-            <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-10">
-                <span class="text-white-50">Total Contributed:</span>
-                <strong class="text-white font-monospace ms-1">৳@totalDonated.ToString("N0") BDT</strong>
-            </div>
-            <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-10">
-                <span class="text-white-50">Verified Donors:</span>
-                <strong class="text-white font-monospace ms-1">@totalDonorsCount</strong>
-            </div>
-            <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-10 d-none d-sm-inline-block">
-                <i class="bi bi-shield-lock text-info me-1"></i>
-                <span class="text-white">256-Bit SSL Encrypted</span>
+            <!-- Subtle Stats Badges -->
+            <div class="d-flex justify-content-center flex-wrap gap-2 gap-sm-3 text-white small">
+                <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15">
+                    <span class="text-white-50">Total Contributed:</span>
+                    <strong class="text-white font-monospace ms-1">৳@totalDonated.ToString("N0") BDT</strong>
+                </div>
+                <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15">
+                    <span class="text-white-50">Verified Donors:</span>
+                    <strong class="text-white font-monospace ms-1">@totalDonorsCount</strong>
+                </div>
+                <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15 d-none d-sm-inline-block">
+                    <i class="bi bi-shield-lock text-info me-1"></i>
+                    <span class="text-white">256-Bit SSL Encrypted</span>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Main Container -->
-<div class="container py-5" style="max-width: 1040px;">
+    <!-- Main Container -->
+    <div class="container py-5" style="max-width: 1040px;">
     <div class="row g-4 justify-content-center">
         <!-- Donation Form -->
         <div class="col-lg-7">
@@ -224,6 +226,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <!-- ================= BKASH PAYMENT GATEWAY MODAL ================= -->

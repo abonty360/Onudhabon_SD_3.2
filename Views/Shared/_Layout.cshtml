@@ -27,9 +27,11 @@
 
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    bool isHeroPage = (currentController == "Home" && (currentAction == "Index" || string.IsNullOrEmpty(currentAction)))
+    bool isHeroPage = (currentController == "Home" && (currentAction == "Index" || string.IsNullOrEmpty(currentAction) || currentAction == "About"))
                    || (currentController == "Lecture" && currentAction == "Index")
-                   || (currentController == "Material" && currentAction == "Index");
+                   || (currentController == "Material" && currentAction == "Index")
+                   || (currentController == "Forum" && (currentAction == "Index" || string.IsNullOrEmpty(currentAction)))
+                   || (currentController == "Donation" && (currentAction == "Index" || string.IsNullOrEmpty(currentAction)));
 }
 
 <!DOCTYPE html>
@@ -47,8 +49,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Onudhabon_ISD.styles.css" asp-append-version="true" />
 </head>
-<body class="d-flex flex-column min-vh-100">
-    <header class="site-header @(isHeroPage ? "header-transparent" : "header-solid")">
+<body class="d-flex flex-column min-vh-100 @(isHeroPage ? "has-hero" : "")">
+    <header class="site-header @(isHeroPage ? "header-transparent" : "header-solid")" id="siteHeader">
         <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
             <div class="container-fluid px-lg-4 px-3">
                 <!-- Logo -->
@@ -81,7 +83,7 @@
                             <a class="nav-link @(currentController == "Forum" ? "active" : "")" asp-area="" asp-controller="Forum" asp-action="Index">Forum</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(currentController == "Donation" ? "active text-white" : "text-white-50")" asp-area="" asp-controller="Donation" asp-action="Index">
+                            <a class="nav-link nav-donate-link @(currentController == "Donation" ? "active" : "")" asp-area="" asp-controller="Donation" asp-action="Index">
                                 <i class="bi bi-shield-heart me-1 text-warning"></i> Donate
                             </a>
                         </li>
@@ -102,7 +104,7 @@
                             @if (userRole == "Educator" || User.IsInRole("Educator"))
                             {
                                 <li class="nav-item dropdown me-2">
-                                    <a class="btn btn-outline-light btn-sm dropdown-toggle rounded-pill px-3 py-1.5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <a class="btn btn-nav-action btn-sm dropdown-toggle rounded-pill px-3 py-1.5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-cloud-arrow-up me-1"></i> Upload
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2">
@@ -123,7 +125,7 @@
                             @if (userRole == "Local Guardian" || User.IsInRole("Local Guardian"))
                             {
                                 <li class="nav-item me-2">
-                                    <a class="btn btn-outline-light btn-sm rounded-pill px-3 py-1.5" asp-controller="Student" asp-action="Progress">
+                                    <a class="btn btn-nav-action btn-sm rounded-pill px-3 py-1.5" asp-controller="Student" asp-action="Progress">
                                         <i class="bi bi-graph-up-arrow me-1"></i> Track Progress
                                     </a>
                                 </li>
@@ -136,7 +138,7 @@
 
                             <!-- Notifications Dropdown -->
                             <li class="nav-item dropdown me-2">
-                                <a class="nav-link position-relative py-1 px-2.5 rounded-circle hover-bg text-white" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link position-relative py-1 px-2.5 rounded-circle nav-icon-link" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-bell fs-5"></i>
                                     <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
                                         0
@@ -169,13 +171,13 @@
                                             @(string.IsNullOrEmpty(User.Identity.Name) ? "U" : User.Identity.Name.Substring(0, 1).ToUpper())
                                         </div>
                                     }
-                                    <span class="fw-semibold text-white">@(User.Identity.Name)</span>
+                                    <span class="fw-semibold user-name-text">@(User.Identity.Name)</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2" style="min-width: 220px;">
                                     <li class="px-3 py-2 border-bottom mb-1">
                                         <div class="fw-bold text-dark">@(User.Identity.Name)</div>
                                         <div class="text-muted small">
-                                            Role: <span class="badge @(userRole == "Admin" ? "bg-danger" : "bg-secondary") rounded-pill">@(userRole ?? "User")</span>
+                                             Role: <span class="badge @(userRole == "Admin" ? "bg-danger" : "bg-secondary") rounded-pill">@(userRole ?? "User")</span>
                                         </div>
                                     </li>
                                     @if (userRole == "Admin" || User.IsInRole("Admin"))
@@ -230,12 +232,12 @@
                                 </ul>
                             </li>
 
-                            <!-- Small light/white Logout button -->
+                            <!-- Small Logout button -->
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline m-0">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-logout d-inline-flex align-items-center gap-1.5 rounded-pill px-3 py-1 fw-semibold text-white">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <button type="submit" class="btn btn-sm btn-logout d-inline-flex align-items-center gap-1.5 rounded-pill px-3 py-1 fw-semibold">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                                             <polyline points="16 17 21 12 16 7"></polyline>
                                             <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -248,10 +250,10 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link btn btn-outline-light btn-sm px-3.5 py-1 text-white rounded-pill" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                                <a class="nav-link btn-nav-login btn-sm px-3.5 py-1 rounded-pill" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn btn-warning btn-sm px-3.5 py-1 text-dark fw-semibold rounded-pill" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                                <a class="nav-link btn-nav-register btn-sm px-3.5 py-1 fw-semibold rounded-pill" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
                             </li>
                         }
                     </ul>
@@ -365,6 +367,31 @@
             });
         </script>
     }
+    <script>
+        (function () {
+            const siteHeader = document.getElementById('siteHeader');
+            if (!siteHeader) return;
+
+            function checkScroll() {
+                const scrollPos = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                if (scrollPos > 15) {
+                    siteHeader.classList.add('header-scrolled');
+                } else {
+                    siteHeader.classList.remove('header-scrolled');
+                }
+            }
+
+            window.addEventListener('scroll', checkScroll, { passive: true });
+            document.addEventListener('scroll', checkScroll, { passive: true });
+            window.addEventListener('resize', checkScroll, { passive: true });
+            window.addEventListener('load', checkScroll);
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', checkScroll);
+            } else {
+                checkScroll();
+            }
+        })();
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
