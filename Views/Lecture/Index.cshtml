@@ -130,6 +130,15 @@
             <div class="lecture-grid" id="lectureGrid">
                 @foreach (var lecture in Model)
                 {
+                    var isPending = string.Equals(lecture.Status, "pending", StringComparison.OrdinalIgnoreCase);
+                    var isDeclined = string.Equals(lecture.Status, "declined", StringComparison.OrdinalIgnoreCase);
+                    var isOwner = (User.Identity != null && User.Identity.IsAuthenticated) && !string.IsNullOrWhiteSpace(lecture.Instructor) && (
+                        string.Equals(lecture.Instructor.Trim(), User.Identity?.Name, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(lecture.Instructor.Trim(), User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value, StringComparison.OrdinalIgnoreCase)
+                    );
+                    var isAdmin = (User.Identity != null && User.Identity.IsAuthenticated) && (User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin");
+                    var showStatus = isAdmin || isOwner || isPending || isDeclined;
+
                     <article class="lecture-card"
                              data-title="@lecture.Title"
                              data-instructor="@lecture.Instructor"
@@ -167,18 +176,24 @@
                                 <div class="meta-row d-flex align-items-center flex-wrap gap-1">
                                     <span class="grade-pill">Class @lecture.ClassLevel</span>
                                     <span class="subject-pill">@lecture.Subject</span>
-                                    @if (lecture.Status?.ToLower() == "pending")
+                                    @if (showStatus)
                                     {
-                                        <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill px-2 py-0.5 ms-auto d-inline-flex align-items-center gap-1" style="font-size: 0.75rem;">
-                                            <i class="bi bi-clock-history"></i>
-                                            <span>Pending Approval</span>
-                                        </span>
-                                    }
-                                    else if (lecture.Status?.ToLower() == "declined")
-                                    {
-                                        <span class="badge bg-danger text-white border rounded-pill px-2 py-0.5 ms-auto d-inline-flex align-items-center gap-1" style="font-size: 0.75rem;">
-                                            <i class="bi bi-x-circle-fill"></i>
-                                            <span>Declined</span>
+                                        <span class="lecture-status @(isPending ? "pending" : (isDeclined ? "declined" : "active")) ms-auto d-inline-flex align-items-center gap-1">
+                                            @if (isPending)
+                                            {
+                                                <i class="bi bi-clock-history"></i>
+                                                <span>Pending Approval</span>
+                                            }
+                                            else if (isDeclined)
+                                            {
+                                                <i class="bi bi-x-circle-fill"></i>
+                                                <span>Declined</span>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-check-circle-fill"></i>
+                                                <span>Active</span>
+                                            }
                                         </span>
                                     }
                                 </div>

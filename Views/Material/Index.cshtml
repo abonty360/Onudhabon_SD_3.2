@@ -100,6 +100,15 @@
         <div class="material-grid" id="materialGrid">
             @foreach (var material in Model)
             {
+                var isPending = string.Equals(material.Status, "pending", StringComparison.OrdinalIgnoreCase);
+                var isDeclined = string.Equals(material.Status, "declined", StringComparison.OrdinalIgnoreCase);
+                var isOwner = (User.Identity != null && User.Identity.IsAuthenticated) && !string.IsNullOrWhiteSpace(material.Instructor) && (
+                    string.Equals(material.Instructor.Trim(), User.Identity?.Name, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(material.Instructor.Trim(), User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value, StringComparison.OrdinalIgnoreCase)
+                );
+                var isAdmin = (User.Identity != null && User.Identity.IsAuthenticated) && (User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin");
+                var showStatus = isAdmin || isOwner || isPending || isDeclined;
+
                 <article class="material-card"
                          data-title="@material.Title"
                          data-instructor="@material.Instructor"
@@ -114,23 +123,26 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                     </svg>
                                 </div>
-                                <span class="material-status @(material.Status?.ToLower() == "pending" ? "pending" : (material.Status?.ToLower() == "declined" ? "declined" : "active")) d-inline-flex align-items-center gap-1">
-                                    @if (material.Status?.ToLower() == "pending")
-                                    {
-                                        <i class="bi bi-clock-history"></i>
-                                        <span>Pending Approval</span>
-                                    }
-                                    else if (material.Status?.ToLower() == "declined")
-                                    {
-                                        <i class="bi bi-x-circle-fill"></i>
-                                        <span>Declined</span>
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-check-circle-fill"></i>
-                                        <span>Active</span>
-                                    }
-                                </span>
+                                @if (showStatus)
+                                {
+                                    <span class="material-status @(isPending ? "pending" : (isDeclined ? "declined" : "active")) d-inline-flex align-items-center gap-1">
+                                        @if (isPending)
+                                        {
+                                            <i class="bi bi-clock-history"></i>
+                                            <span>Pending Approval</span>
+                                        }
+                                        else if (isDeclined)
+                                        {
+                                            <i class="bi bi-x-circle-fill"></i>
+                                            <span>Declined</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>Active</span>
+                                        }
+                                    </span>
+                                }
                             </div>
 
                             <div class="material-meta">

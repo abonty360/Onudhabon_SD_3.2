@@ -519,6 +519,16 @@ namespace Onudhabon_ISD.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<int>("Age")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(14);
+
+                    b.Property<int>("AttendancePercentage")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(90);
+
                     b.Property<string>("BirthCertificateId")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -562,15 +572,37 @@ namespace Onudhabon_ISD.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<DateTime?>("LastActivityDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
                     b.Property<string>("MotherName")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("PhotoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ProgressPercentage")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(75);
 
                     b.Property<string>("Status")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasDefaultValue("Pending");
+
+                    b.Property<string>("SubjectProgressJson")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<string>("Subjects")
                         .HasMaxLength(500)
@@ -750,7 +782,7 @@ namespace Onudhabon_ISD.Migrations
 
                             b1.HasKey("ClassPlanId", "__synthesizedOrdinal");
 
-                            b1.ToTable("ClassPlans");
+                            b1.ToTable("ClassPlans", (string)null);
 
                             b1
                                 .ToJson("Subjects")

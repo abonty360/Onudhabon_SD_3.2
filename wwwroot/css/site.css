@@ -131,12 +131,17 @@ body:not(.has-hero) main {
     color: #ffffff !important;
     border: 1px solid rgba(255, 255, 255, 0.4) !important;
     background-color: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(4px);
     transition: all 0.2s ease;
 }
 
+.main-navbar .nav-link.btn-nav-login:hover,
 .btn-nav-login:hover {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    border-color: rgba(255, 255, 255, 0.75) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .btn-nav-register {
@@ -179,17 +184,34 @@ body:not(.has-hero) main {
     border-bottom: 1px solid rgba(226, 232, 240, 0.95) !important;
 }
 
+/* Scrolled Navbar Logo Switching */
+.site-header .navbar-logo-default {
+    display: inline-block !important;
+}
+
+.site-header .navbar-logo-scrolled {
+    display: none !important;
+}
+
+.site-header.header-scrolled .navbar-logo-default {
+    display: none !important;
+}
+
+.site-header.header-scrolled .navbar-logo-scrolled {
+    display: inline-block !important;
+}
+
 /* Scrolled Nav Links */
-.site-header.header-scrolled .main-navbar .nav-link {
+.site-header.header-scrolled .main-navbar .nav-link:not(.btn-nav-register):not(.btn-nav-login) {
     color: #475569 !important;
     font-weight: 600;
 }
 
-.site-header.header-scrolled .main-navbar .nav-link:hover {
+.site-header.header-scrolled .main-navbar .nav-link:not(.btn-nav-register):not(.btn-nav-login):hover {
     color: #1d4ed8 !important;
 }
 
-.site-header.header-scrolled .main-navbar .nav-link.active {
+.site-header.header-scrolled .main-navbar .nav-link:not(.btn-nav-register):not(.btn-nav-login).active {
     color: #1d4ed8 !important;
     font-weight: 700;
 }
@@ -241,27 +263,40 @@ body:not(.has-hero) main {
     color: #0f172a !important;
 }
 
+.site-header.header-scrolled .main-navbar .btn-nav-login,
+.site-header.header-scrolled .main-navbar .nav-link.btn-nav-login,
 .site-header.header-scrolled .btn-nav-login {
     color: #1e293b !important;
-    border-color: #cbd5e1 !important;
+    border: 1px solid #cbd5e1 !important;
     background-color: transparent !important;
 }
 
+.site-header.header-scrolled .main-navbar .btn-nav-login:hover,
+.site-header.header-scrolled .main-navbar .nav-link.btn-nav-login:hover,
 .site-header.header-scrolled .btn-nav-login:hover {
     background-color: #f1f5f9 !important;
     border-color: #94a3b8 !important;
     color: #0f172a !important;
 }
 
+.site-header.header-scrolled .main-navbar .btn-nav-register,
+.site-header.header-scrolled .main-navbar .nav-link.btn-nav-register,
 .site-header.header-scrolled .btn-nav-register {
     background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%) !important;
     color: #ffffff !important;
-    border: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
 }
 
-.site-header.header-scrolled .btn-nav-register:hover {
+.site-header.header-scrolled .main-navbar .btn-nav-register:hover,
+.site-header.header-scrolled .main-navbar .nav-link.btn-nav-register:hover,
+.site-header.header-scrolled .btn-nav-register:hover,
+.site-header.header-scrolled .main-navbar .nav-link.btn-nav-register:focus,
+.site-header.header-scrolled .main-navbar .nav-link.btn-nav-register.active {
     background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
     color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4);
+    transform: translateY(-1px);
 }
 
 .site-header.header-scrolled .btn-logout {
@@ -279,8 +314,8 @@ body:not(.has-hero) main {
     filter: invert(1) grayscale(100%);
 }
 
-/* Override any potential Bootstrap text-white utility classes on scrolled navbar */
-.site-header.header-scrolled .text-white {
+/* Override any potential Bootstrap text-white utility classes on scrolled navbar except for white-text buttons */
+.site-header.header-scrolled .text-white:not(.btn-nav-register):not(.btn-logout) {
     color: #0f172a !important;
 }
 
@@ -1720,6 +1755,7 @@ body:not(.has-hero) main {
 }
 
 .material-status,
+.lecture-status,
 .material-meta span {
     display: inline-flex;
     padding: 4px 8px;
@@ -1728,14 +1764,22 @@ body:not(.has-hero) main {
     font-weight: 700;
 }
 
-.material-status.active {
+.material-status.active,
+.lecture-status.active {
     background: #e6f7ed;
     color: #198754;
 }
 
-.material-status.pending {
+.material-status.pending,
+.lecture-status.pending {
     background: #fff3cd;
     color: #946c00;
+}
+
+.material-status.declined,
+.lecture-status.declined {
+    background: #ffebe9;
+    color: #cf222e;
 }
 
 .material-meta {

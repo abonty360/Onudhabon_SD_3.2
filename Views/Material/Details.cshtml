@@ -47,6 +47,17 @@
 
             <!-- Material Details Card -->
             <div class="card border-0 shadow-sm rounded-4 p-4">
+                @{
+                    var isAuthenticated = User.Identity != null && User.Identity.IsAuthenticated;
+                    var isAdmin = isAuthenticated && (User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin");
+                    var isOwner = isAuthenticated && !string.IsNullOrWhiteSpace(Model.Instructor) && (
+                        string.Equals(Model.Instructor.Trim(), User.Identity?.Name, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(Model.Instructor.Trim(), User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value, StringComparison.OrdinalIgnoreCase)
+                    );
+                    var isPending = string.Equals(Model.Status, "pending", StringComparison.OrdinalIgnoreCase);
+                    var isDeclined = string.Equals(Model.Status, "declined", StringComparison.OrdinalIgnoreCase);
+                    var showStatus = isAdmin || isOwner || isPending || isDeclined;
+                }
                 <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-pill">
                         Class @Model.ClassLevel
@@ -57,9 +68,12 @@
                     <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2.5 py-1 rounded-pill">
                         Topic: @Model.Topic
                     </span>
-                    <span class="badge @(Model.Status?.ToLower() == "pending" ? "bg-warning-subtle text-warning border-warning-subtle" : "bg-success-subtle text-success border-success-subtle") border px-2.5 py-1 rounded-pill ms-auto">
-                        Status: @Model.Status
-                    </span>
+                    @if (showStatus)
+                    {
+                        <span class="badge @(isPending ? "bg-warning-subtle text-warning border-warning-subtle" : (isDeclined ? "bg-danger-subtle text-danger border-danger-subtle" : "bg-success-subtle text-success border-success-subtle")) border px-2.5 py-1 rounded-pill ms-auto">
+                            Status: @Model.Status
+                        </span>
+                    }
                 </div>
 
                 <h3 class="fw-bold text-dark mt-2 mb-3">@Model.Title</h3>

@@ -55,7 +55,8 @@
             <div class="container-fluid px-lg-4 px-3">
                 <!-- Logo -->
                 <a class="navbar-brand d-flex align-items-center me-lg-4 me-2" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/navbar_logo.png" asp-append-version="true" alt="Onudhabon" style="height: 38px; width: auto;" />
+                    <img src="~/images/navbar_logo.png" asp-append-version="true" alt="Onudhabon" class="navbar-logo-default" style="height: 38px; width: auto;" />
+                    <img src="~/images/navbar_logo_scrolled.png" asp-append-version="true" alt="Onudhabon" class="navbar-logo-scrolled" style="height: 38px; width: auto;" />
                 </a>
 
                 <!-- Mobile toggler -->
@@ -185,11 +186,6 @@
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2 text-danger fw-semibold" asp-controller="Admin" asp-action="Dashboard">
                                                 <i class="bi bi-shield-lock me-1.5 text-danger"></i> Admin Dashboard
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Student" asp-action="Progress">
-                                                <i class="bi bi-graph-up me-1.5 text-primary"></i> Track Student Progress
                                             </a>
                                         </li>
                                     }
