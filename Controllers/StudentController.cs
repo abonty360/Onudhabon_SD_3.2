@@ -607,7 +607,7 @@ namespace Onudhabon_ISD.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = $"🎉 Congratulations! Student '{student.FullName}' has been promoted to Class {nextLvl}!";
+            TempData["SuccessMessage"] = $"Congratulations! Student '{student.FullName}' has been promoted to Class {nextLvl}.";
             return RedirectToAction(nameof(Progress));
         }
     }

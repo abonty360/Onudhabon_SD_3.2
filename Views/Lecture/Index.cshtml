@@ -156,7 +156,9 @@
                                     </div>
                                 }
                                 <div class="video-overlay">
-                                    <span class="play-icon">▶</span>
+                                    <span class="play-icon d-inline-flex align-items-center justify-content-center">
+                                        <i class="bi bi-play-fill fs-5"></i>
+                                    </span>
                                     <span class="time-label" style="display: none;">0:00</span>
                                 </div>
                             </div>
@@ -167,21 +169,26 @@
                                     <span class="subject-pill">@lecture.Subject</span>
                                     @if (lecture.Status?.ToLower() == "pending")
                                     {
-                                        <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill px-2 py-0.5 ms-auto" style="font-size: 0.75rem;">
-                                            ⏳ Pending Approval
+                                        <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill px-2 py-0.5 ms-auto d-inline-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                                            <i class="bi bi-clock-history"></i>
+                                            <span>Pending Approval</span>
                                         </span>
                                     }
                                     else if (lecture.Status?.ToLower() == "declined")
                                     {
-                                        <span class="badge bg-danger text-white border rounded-pill px-2 py-0.5 ms-auto" style="font-size: 0.75rem;">
-                                            ✕ Declined
+                                        <span class="badge bg-danger text-white border rounded-pill px-2 py-0.5 ms-auto d-inline-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                                            <i class="bi bi-x-circle-fill"></i>
+                                            <span>Declined</span>
                                         </span>
                                     }
                                 </div>
 
                                 <h3>@lecture.Title</h3>
                                 <p>@(string.IsNullOrWhiteSpace(lecture.Description) ? "Recorded video lecture for students." : lecture.Description)</p>
-                                <div class="author-row">👨‍🏫 @(lecture.Instructor ?? "Educator")</div>
+                                <div class="author-row d-inline-flex align-items-center gap-1.5 text-muted small">
+                                    <i class="bi bi-person-video3"></i>
+                                    <span>@(lecture.Instructor ?? "Educator")</span>
+                                </div>
                             </div>
                         </a>
                     </article>

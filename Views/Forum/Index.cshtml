@@ -15,14 +15,16 @@
         </div>
         @if (isAuthenticated)
         {
-            <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createPostModal">
-                + New Discussion
+            <button type="button" class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                <i class="bi bi-plus-lg"></i>
+                <span>New Discussion</span>
             </button>
         }
         else
         {
-            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="btn btn-outline-primary rounded-pill px-4">
-                Login to Post
+            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="btn btn-outline-primary rounded-pill px-4 d-inline-flex align-items-center gap-1.5">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Login to Post</span>
             </a>
         }
     </div>
@@ -65,14 +67,16 @@
                         <h4 class="fw-bold text-dark mb-0">@post.Title</h4>
                         @if (post.Status == "Pending" || post.Status == "pending" || string.IsNullOrEmpty(post.Status))
                         {
-                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 text-nowrap">
-                                ⏳ Pending Admin Approval
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 text-nowrap d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-clock-history"></i>
+                                <span>Pending Admin Approval</span>
                             </span>
                         }
                         else if (post.Status == "Declined" || post.Status == "declined")
                         {
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 text-nowrap">
-                                ✕ Declined
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 text-nowrap d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span>Declined</span>
                             </span>
                         }
                     </div>
@@ -99,24 +103,27 @@
                     <p class="text-dark fs-6 mb-4" style="line-height: 1.6; white-space: pre-line;">@post.Content</p>
 
                     <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 fw-semibold toggle-details-btn" data-post-id="@post.Id">
-                            View Details (<span id="reply-count-@post.Id">@post.Replies</span> replies)
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 fw-semibold toggle-details-btn d-inline-flex align-items-center gap-1.5" data-post-id="@post.Id">
+                            <i class="bi bi-chat-dots"></i>
+                            <span>View Details (<span id="reply-count-@post.Id">@post.Replies</span> replies)</span>
                         </button>
 
                         <div class="d-flex gap-2">
                             <button type="button" 
-                                    class="btn @(isLiked ? "btn-success text-white" : "btn-outline-success") btn-sm rounded-3 px-3 py-1 fw-medium like-btn" 
+                                    class="btn @(isLiked ? "btn-success text-white" : "btn-outline-success") btn-sm rounded-3 px-3 py-1 fw-medium like-btn d-inline-flex align-items-center gap-1" 
                                     id="like-btn-@post.Id"
                                     data-post-id="@post.Id"
                                     data-is-active="@(isLiked ? "true" : "false")">
-                                Like (<span id="like-count-@post.Id">@post.Likes</span>)
+                                <i class="bi bi-hand-thumbs-up"></i>
+                                <span>Like (<span id="like-count-@post.Id">@post.Likes</span>)</span>
                             </button>
                             <button type="button" 
-                                    class="btn @(isDisliked ? "btn-danger text-white" : "btn-outline-danger") btn-sm rounded-3 px-3 py-1 fw-medium dislike-btn" 
+                                    class="btn @(isDisliked ? "btn-danger text-white" : "btn-outline-danger") btn-sm rounded-3 px-3 py-1 fw-medium dislike-btn d-inline-flex align-items-center gap-1" 
                                     id="dislike-btn-@post.Id"
                                     data-post-id="@post.Id"
                                     data-is-active="@(isDisliked ? "true" : "false")">
-                                Dislike (<span id="dislike-count-@post.Id">@post.Dislikes</span>)
+                                <i class="bi bi-hand-thumbs-down"></i>
+                                <span>Dislike (<span id="dislike-count-@post.Id">@post.Dislikes</span>)</span>
                             </button>
                         </div>
                     </div>

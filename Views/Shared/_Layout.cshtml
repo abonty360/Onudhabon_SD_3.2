@@ -43,6 +43,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Onudhabon_ISD.styles.css" asp-append-version="true" />
 </head>
@@ -80,15 +81,15 @@
                             <a class="nav-link @(currentController == "Forum" ? "active" : "")" asp-area="" asp-controller="Forum" asp-action="Index">Forum</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-warning fw-semibold @(currentController == "Donation" ? "active text-white" : "")" asp-area="" asp-controller="Donation" asp-action="Index">
-                                Donate
+                            <a class="nav-link @(currentController == "Donation" ? "active text-white" : "text-white-50")" asp-area="" asp-controller="Donation" asp-action="Index">
+                                <i class="bi bi-shield-heart me-1 text-warning"></i> Donate
                             </a>
                         </li>
                         @if (userRole == "Admin" || User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-danger fw-semibold px-3 @(currentController == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Dashboard">
-                                    🛡️ Admin Dashboard
+                                    <i class="bi bi-shield-lock me-1"></i> Admin Dashboard
                                 </a>
                             </li>
                         }
@@ -102,17 +103,17 @@
                             {
                                 <li class="nav-item dropdown me-2">
                                     <a class="btn btn-outline-light btn-sm dropdown-toggle rounded-pill px-3 py-1.5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        + Upload
+                                        <i class="bi bi-cloud-arrow-up me-1"></i> Upload
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2">
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2" asp-controller="Lecture" asp-action="Upload">
-                                                🎥 Upload Lecture Video
+                                                <i class="bi bi-camera-video me-1.5 text-primary"></i> Upload Lecture Video
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2" asp-controller="Material" asp-action="Upload">
-                                                📄 Upload Study Material
+                                                <i class="bi bi-file-earmark-text me-1.5 text-info"></i> Upload Study Material
                                             </a>
                                         </li>
                                     </ul>
@@ -123,12 +124,12 @@
                             {
                                 <li class="nav-item me-2">
                                     <a class="btn btn-outline-light btn-sm rounded-pill px-3 py-1.5" asp-controller="Student" asp-action="Progress">
-                                        📊 Track Progress
+                                        <i class="bi bi-graph-up-arrow me-1"></i> Track Progress
                                     </a>
                                 </li>
                                 <li class="nav-item me-2">
                                     <a class="btn btn-light text-primary btn-sm rounded-pill px-3 py-1.5 fw-semibold" asp-controller="Student" asp-action="Enroll">
-                                        + Enroll Student
+                                        <i class="bi bi-person-plus me-1"></i> Enroll Student
                                     </a>
                                 </li>
                             }
@@ -136,7 +137,7 @@
                             <!-- Notifications Dropdown -->
                             <li class="nav-item dropdown me-2">
                                 <a class="nav-link position-relative py-1 px-2.5 rounded-circle hover-bg text-white" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    🔔
+                                    <i class="bi bi-bell fs-5"></i>
                                     <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
                                         0
                                     </span>
@@ -181,30 +182,30 @@
                                     {
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2 text-danger fw-semibold" asp-controller="Admin" asp-action="Dashboard">
-                                                🛡️ Admin Dashboard
+                                                <i class="bi bi-shield-lock me-1.5 text-danger"></i> Admin Dashboard
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2" asp-controller="Student" asp-action="Progress">
-                                                📊 Track Student Progress
+                                                <i class="bi bi-graph-up me-1.5 text-primary"></i> Track Student Progress
                                             </a>
                                         </li>
                                     }
                                     <li>
                                         <a class="dropdown-item rounded-3 py-2" asp-controller="Account" asp-action="Profile">
-                                            👤 View Profile
+                                            <i class="bi bi-person-circle me-1.5 text-secondary"></i> View Profile
                                         </a>
                                     </li>
                                     @if (userRole == "Educator" || User.IsInRole("Educator"))
                                     {
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2" asp-controller="Lecture" asp-action="Upload">
-                                                🎥 Upload Lecture
+                                                <i class="bi bi-camera-video me-1.5 text-primary"></i> Upload Lecture
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2" asp-controller="Material" asp-action="Upload">
-                                                📄 Upload Material
+                                                <i class="bi bi-file-earmark-text me-1.5 text-info"></i> Upload Material
                                             </a>
                                         </li>
                                     }
@@ -212,17 +213,17 @@
                                     {
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2 fw-semibold text-primary" asp-controller="Student" asp-action="Progress">
-                                                📊 Track Student Progress
+                                                <i class="bi bi-graph-up me-1.5 text-primary"></i> Track Student Progress
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2" asp-controller="Student" asp-action="Index">
-                                                🎓 My Enrolled Students
+                                                <i class="bi bi-mortarboard me-1.5 text-success"></i> My Enrolled Students
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item rounded-3 py-2" asp-controller="Student" asp-action="Enroll">
-                                                ➕ Enroll New Student
+                                                <i class="bi bi-person-plus me-1.5 text-primary"></i> Enroll New Student
                                             </a>
                                         </li>
                                     }
@@ -278,16 +279,16 @@
                     <li><a asp-controller="Material" asp-action="Index">Materials</a></li>
                     <li><a asp-controller="Home" asp-action="About">About Us</a></li>
                     <li><a asp-controller="Forum" asp-action="Index">Forum</a></li>
-                    <li><a asp-controller="Donation" asp-action="Index" class="text-warning fw-semibold">💖 Donate to Onudhabon</a></li>
+                    <li><a asp-controller="Donation" asp-action="Index" class="fw-semibold text-primary"><i class="bi bi-shield-heart me-1 text-primary"></i> Donate to Onudhabon</a></li>
                 </ul>
             </div>
 
             <div class="footer-column connect-column">
                 <h3>Connect</h3>
                 <ul>
-                    <li><a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a></li>
-                    <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a></li>
-                    <li><a href="mailto:support@onudhabon.com">Contact Us</a></li>
+                    <li><a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><i class="bi bi-facebook me-1"></i> Facebook</a></li>
+                    <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram me-1"></i> Instagram</a></li>
+                    <li><a href="mailto:support@onudhabon.com"><i class="bi bi-envelope me-1"></i> Contact Us</a></li>
                 </ul>
             </div>
         </div>
@@ -317,7 +318,7 @@
 
                         $.each(data, function (i, n) {
                             if (!n.isRead) unreadCount++;
-                            var icon = n.type === 'Like' ? '❤️' : '💬';
+                            var icon = n.type === 'Like' ? '<i class="bi bi-heart-fill text-danger me-1"></i>' : '<i class="bi bi-chat-dots-fill text-primary me-1"></i>';
                             var actionText = n.type === 'Like' ? 'liked your post' : 'commented on your post';
                             
                             // Unread notifications get a light blue highlight, read ones stay white
