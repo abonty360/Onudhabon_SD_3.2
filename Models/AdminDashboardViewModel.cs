@@ -8,6 +8,7 @@ namespace Onudhabon_ISD.Models
         public List<ForumPost> ForumPosts { get; set; } = new();
         public List<Student> Students { get; set; } = new();
         public List<Donation> Donations { get; set; } = new();
+        public VolunteerRankingViewModel Ranking { get; set; } = new();
 
         public int TotalUsers => Users.Count;
         public int PendingVolunteersCount => Users.Count(u => u.Role != "Admin" && (u.VerificationStatus == "Pending" || string.IsNullOrEmpty(u.VerificationStatus)));
