@@ -12,15 +12,18 @@ namespace Onudhabon_ISD.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly IVolunteerRankingService _rankingService;
         private readonly ILogger<AdminController> _logger;
 
         public AdminController(
             ApplicationDbContext context,
             ICloudinaryService cloudinaryService,
+            IVolunteerRankingService rankingService,
             ILogger<AdminController> logger)
         {
             _context = context;
             _cloudinaryService = cloudinaryService;
+            _rankingService = rankingService;
             _logger = logger;
         }
 
@@ -29,8 +32,11 @@ namespace Onudhabon_ISD.Controllers
         public async Task<IActionResult> Index() => await Dashboard();
 
         [HttpGet]
-        public async Task<IActionResult> Dashboard(string? tab = "volunteers")
+        public async Task<IActionResult> Dashboard(string? tab = "volunteers", int? month = null, int? year = null)
         {
+            var selectedMonth = month.HasValue && month.Value >= 1 && month.Value <= 12 ? month.Value : DateTime.UtcNow.Month;
+            var selectedYear = year.HasValue && year.Value >= 2020 && year.Value <= 2035 ? year.Value : DateTime.UtcNow.Year;
+
             var users = await _context.Users
                 .OrderByDescending(u => u.CreatedAt)
                 .ToListAsync();
@@ -55,6 +61,14 @@ namespace Onudhabon_ISD.Controllers
                 .OrderByDescending(d => d.CreatedAt)
                 .ToListAsync();
 
+            var rankingViewModel = _rankingService.GenerateMonthlyRankings(
+                users,
+                lectures,
+                materials,
+                students,
+                selectedMonth,
+                selectedYear);
+
             var viewModel = new AdminDashboardViewModel
             {
                 Users = users,
@@ -62,7 +76,8 @@ namespace Onudhabon_ISD.Controllers
                 Materials = materials,
                 ForumPosts = forumPosts,
                 Students = students,
-                Donations = donations
+                Donations = donations,
+                Ranking = rankingViewModel
             };
 
             ViewBag.ActiveTab = tab ?? "volunteers";
