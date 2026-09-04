@@ -357,11 +357,16 @@ namespace Onudhabon_ISD.Controllers
         public async Task<IActionResult> GetNotifications()
         {
             var userName = User.Identity?.Name;
-            if (string.IsNullOrEmpty(userName)) return Json(new List<object>());
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userName) && string.IsNullOrEmpty(userEmail) && string.IsNullOrEmpty(userId))
+                return Json(new List<object>());
 
             var userPosts = await _context.ForumPosts.ToListAsync();
             var notifications = await _context.Notifications
-                .Where(n => n.User == userName)
+                .Where(n => (userName != null && n.User == userName) ||
+                            (userEmail != null && n.User == userEmail) ||
+                            (userId != null && n.User == userId))
                 .OrderByDescending(n => n.CreatedAt)
                 .Take(20)
                 .ToListAsync();
@@ -387,9 +392,16 @@ namespace Onudhabon_ISD.Controllers
         public async Task<IActionResult> MarkSingleNotificationAsRead(int id)
         {
             var userName = User.Identity?.Name;
-            if (string.IsNullOrEmpty(userName)) return Json(new { success = false });
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userName) && string.IsNullOrEmpty(userEmail) && string.IsNullOrEmpty(userId))
+                return Json(new { success = false });
 
-            var notif = await _context.Notifications.FirstOrDefaultAsync(n => n.Id == id && n.User == userName);
+            var notif = await _context.Notifications.FirstOrDefaultAsync(n => n.Id == id && 
+                ((userName != null && n.User == userName) || 
+                 (userEmail != null && n.User == userEmail) || 
+                 (userId != null && n.User == userId)));
+
             if (notif != null)
             {
                 notif.IsRead = true;
@@ -404,10 +416,16 @@ namespace Onudhabon_ISD.Controllers
         public async Task<IActionResult> MarkNotificationsAsRead()
         {
             var userName = User.Identity?.Name;
-            if (string.IsNullOrEmpty(userName)) return Json(new { success = false });
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userName) && string.IsNullOrEmpty(userEmail) && string.IsNullOrEmpty(userId))
+                return Json(new { success = false });
 
             var unread = await _context.Notifications
-                .Where(n => n.User == userName && !n.IsRead)
+                .Where(n => !n.IsRead && 
+                    ((userName != null && n.User == userName) || 
+                     (userEmail != null && n.User == userEmail) || 
+                     (userId != null && n.User == userId)))
                 .ToListAsync();
 
             foreach (var n in unread)
