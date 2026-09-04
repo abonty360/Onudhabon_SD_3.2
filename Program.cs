@@ -17,6 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Cloudinary & Storage Services
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IVolunteerRankingService, VolunteerRankingService>();
 
 // HttpClient and Memory Cache
 builder.Services.AddHttpClient();
