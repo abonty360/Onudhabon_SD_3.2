@@ -316,15 +316,46 @@
 
                         $.each(data, function (i, n) {
                             if (!n.isRead) unreadCount++;
-                            var icon = n.type === 'Like' ? '<i class="bi bi-heart-fill text-danger me-1"></i>' : '<i class="bi bi-chat-dots-fill text-primary me-1"></i>';
-                            var actionText = n.type === 'Like' ? 'liked your post' : 'commented on your post';
+
+                            var icon = '<i class="bi bi-bell-fill text-primary me-1"></i>';
+                            var actionText = 'sent a notification regarding';
+                            var targetUrl = '/';
+
+                            if (n.type === 'Like') {
+                                icon = '<i class="bi bi-heart-fill text-danger me-1"></i>';
+                                actionText = 'liked your post';
+                                targetUrl = '/Forum#post-' + n.postId;
+                            } else if (n.type === 'Comment') {
+                                icon = '<i class="bi bi-chat-dots-fill text-primary me-1"></i>';
+                                actionText = 'commented on your post';
+                                targetUrl = '/Forum#post-' + n.postId;
+                            } else if (n.type === 'LectureApproved' || n.type === 'Lecture') {
+                                icon = '<i class="bi bi-play-circle-fill text-success me-1"></i>';
+                                actionText = 'approved your lecture';
+                                targetUrl = '/Lecture';
+                            } else if (n.type === 'MaterialApproved' || n.type === 'Material') {
+                                icon = '<i class="bi bi-file-earmark-check-fill text-success me-1"></i>';
+                                actionText = 'approved your study material';
+                                targetUrl = '/Material';
+                            } else if (n.type === 'StudentApproved' || n.type === 'Student') {
+                                icon = '<i class="bi bi-person-check-fill text-success me-1"></i>';
+                                actionText = 'approved student enrollment for';
+                                targetUrl = '/Student';
+                            } else if (n.type === 'PostApproved') {
+                                icon = '<i class="bi bi-check-circle-fill text-success me-1"></i>';
+                                actionText = 'approved your forum post';
+                                targetUrl = '/Forum#post-' + n.postId;
+                            } else if (n.type === 'UserApproved') {
+                                icon = '<i class="bi bi-patch-check-fill text-success me-1"></i>';
+                                actionText = 'approved your volunteer account';
+                                targetUrl = '/';
+                            }
                             
                             // Unread notifications get a light blue highlight, read ones stay white
                             var unreadBg = n.isRead ? 'bg-white' : 'bg-primary-subtle border-start border-primary border-3';
-                            var targetUrl = '/Forum#post-' + n.postId;
 
                             var item = '<li class="px-3 py-2 border-bottom small notification-item ' + unreadBg + '" style="cursor: pointer;" data-notif-id="' + n.id + '" data-url="' + targetUrl + '">' +
-                                '<div>' + icon + ' <strong>' + n.sender + '</strong> ' + actionText + ' <em>"' + n.post + '"</em></div>' +
+                                '<div>' + icon + ' <strong>' + (n.sender || 'Admin') + '</strong> ' + actionText + ' <em>"' + (n.post || '') + '"</em></div>' +
                                 '<div class="text-muted text-end mt-1" style="font-size: 0.75rem;">' + n.createdAt + '</div>' +
                                 '</li>';
                             container.append(item);
