@@ -1,0 +1,1050 @@
+@model Onudhabon.Models.RegisterViewModel
+@{
+    // Standalone markup matching exact layout & design structure
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Onudhabon</title>
+    <!-- Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Dedicated Auth Stylesheet -->
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+</head>
+<body class="register-page">
+
+    <div class="auth-wrapper register-wrapper">
+        <!-- Main Registration Card -->
+        <main class="auth-card" role="main">
+            <div class="auth-card-body">
+                
+                <!-- Brand Header with Logo Asset -->
+                <header class="auth-header">
+                    <div class="auth-logo-wrapper">
+                        <img src="~/images/login_logo.png" 
+                             alt="Onudhabon Logo" 
+                             class="auth-logo" 
+                             asp-append-version="true" />
+                    </div>
+                    <h1 class="auth-title">Onudhabon</h1>
+                    <h2 class="auth-subtitle">Exploring Education</h2>
+                    <p class="auth-tagline">Join our community as an Educator or Local Guardian</p>
+                </header>
+
+                <!-- Floating Segmented Tabs -->
+                <nav class="auth-tabs" role="tablist" aria-label="Authentication switch">
+                    <a asp-action="Login" asp-controller="Account" class="auth-tab" role="tab" aria-selected="false">Login</a>
+                    <a asp-action="Register" asp-controller="Account" class="auth-tab active" role="tab" aria-selected="true">Register</a>
+                </nav>
+
+                <!-- Inline Alerts: Model-Level Error Summary -->
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+                {
+                    <div class="auth-alert auth-alert-danger" role="alert">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <div asp-validation-summary="ModelOnly" class="d-inline"></div>
+                    </div>
+                }
+
+                <!-- Registration Form -->
+                <form asp-action="Register" 
+                      asp-controller="Account" 
+                      asp-route-returnUrl="@ViewData["ReturnUrl"]" 
+                      method="post" 
+                      enctype="multipart/form-data" 
+                      id="registerForm" 
+                      novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <!-- ================= 1. Account & Credentials ================= -->
+                    <div class="form-section-header first-section-header">
+                        <div class="section-title-wrap">
+                            <span class="section-badge">1</span>
+                            <h3 class="section-title">Account & Credentials</h3>
+                        </div>
+                        <span class="section-subtitle">Basic info</span>
+                    </div>
+
+                    <div class="form-grid-2col">
+                        <!-- Full Name (Full Width) -->
+                        <div class="auth-form-group col-span-2">
+                            <label asp-for="FullName" class="auth-label">Full Name <span class="required-star">*</span></label>
+                            <div class="input-icon-wrapper @(ViewData.ModelState["FullName"]?.Errors.Count > 0 ? "has-error" : "")">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </span>
+                                <input asp-for="FullName" 
+                                       class="auth-input" 
+                                       placeholder="e.g. Ayesha Rahman" 
+                                       autocomplete="name" 
+                                       required />
+                            </div>
+                            <span asp-validation-for="FullName" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Email Address -->
+                        <div class="auth-form-group">
+                            <label asp-for="Email" class="auth-label">Email Address <span class="required-star">*</span></label>
+                            <div class="input-icon-wrapper @(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "has-error" : "")">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                </span>
+                                <input asp-for="Email" 
+                                       type="email" 
+                                       class="auth-input" 
+                                       placeholder="name@example.com" 
+                                       autocomplete="email" 
+                                       required />
+                            </div>
+                            <span asp-validation-for="Email" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="auth-form-group">
+                            <label asp-for="PhoneNumber" class="auth-label">Phone Number <span class="required-star">*</span></label>
+                            <div class="input-icon-wrapper @(ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0 ? "has-error" : "")">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                    </svg>
+                                </span>
+                                <input asp-for="PhoneNumber" 
+                                       type="tel" 
+                                       class="auth-input" 
+                                       placeholder="e.g. +880 1712–345678" 
+                                       autocomplete="tel" 
+                                       required />
+                            </div>
+                            <span asp-validation-for="PhoneNumber" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Role -->
+                        <div class="auth-form-group">
+                            <label asp-for="Role" class="auth-label">Role <span class="required-star">*</span></label>
+                            <div class="input-icon-wrapper @(ViewData.ModelState["Role"]?.Errors.Count > 0 ? "has-error" : "")">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </span>
+                                <select asp-for="Role" class="auth-select" required>
+                                    <option value="" disabled selected>Choose your role</option>
+                                    <option value="Educator">Educator / Teacher</option>
+                                    <option value="LocalGuardian">Local Guardian</option>
+                                    <option value="Student">Student</option>
+                                    <option value="Researcher">Researcher</option>
+                                </select>
+                                <span class="select-arrow-icon" aria-hidden="true">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </span>
+                            </div>
+                            <span asp-validation-for="Role" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Profile Photo Dropzone -->
+                        <div class="auth-form-group">
+                            <label class="auth-label">Profile Photo</label>
+                            <label for="profilePhotoInput" class="photo-upload-zone" id="photoDropZone">
+                                <div class="upload-icon-badge">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="upload-text-wrap">
+                                    <span class="upload-main-text" id="uploadMainText">Upload Photo</span>
+                                    <span class="upload-sub-text" id="uploadSubText">JPG, PNG, WebP</span>
+                                </div>
+                                <input type="file" 
+                                       id="profilePhotoInput" 
+                                       name="ProfilePhoto" 
+                                       accept="image/png, image/jpeg, image/webp" 
+                                       style="display:none;" />
+                            </label>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="auth-form-group">
+                            <label asp-for="Password" class="auth-label">Password <span class="required-star">*</span></label>
+                            <div class="input-icon-wrapper @(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "has-error" : "")">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                </span>
+                                <input asp-for="Password" 
+                                       type="password" 
+                                       id="regPassword" 
+                                       class="auth-input" 
+                                       placeholder="Min. 6 chars" 
+                                       autocomplete="new-password" 
+                                       required />
+                                <button type="button" class="auth-toggle-pwd" id="toggleRegPwdBtn" title="Show/Hide Password" aria-label="Toggle password visibility">
+                                    <svg id="regEyeOpen" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                    <svg id="regEyeClosed" style="display: none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="auth-form-group">
+                            <label asp-for="ConfirmPassword" class="auth-label">Confirm Password <span class="required-star">*</span></label>
+                            <div class="input-icon-wrapper @(ViewData.ModelState["ConfirmPassword"]?.Errors.Count > 0 ? "has-error" : "")">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    </svg>
+                                </span>
+                                <input asp-for="ConfirmPassword" 
+                                       type="password" 
+                                       id="regConfirmPassword" 
+                                       class="auth-input" 
+                                       placeholder="Repeat password" 
+                                       autocomplete="new-password" 
+                                       required />
+                                <button type="button" class="auth-toggle-pwd" id="toggleRegConfirmPwdBtn" title="Show/Hide Password" aria-label="Toggle password visibility">
+                                    <svg id="regConfirmEyeOpen" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                    <svg id="regConfirmEyeClosed" style="display: none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
+                        </div>
+                    </div>
+
+                    <!-- ================= 2. Personal & Location Information ================= -->
+                    <div class="form-section-header">
+                        <div class="section-title-wrap">
+                            <span class="section-badge">2</span>
+                            <h3 class="section-title">Personal & Location Information</h3>
+                        </div>
+                        <span class="section-subtitle">Identity & Address</span>
+                    </div>
+
+                    <div class="form-grid-2col">
+                        <!-- Age -->
+                        <div class="auth-form-group">
+                            <label asp-for="Age" class="auth-label">Age</label>
+                            <div class="input-icon-wrapper">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                </span>
+                                <input asp-for="Age" 
+                                       type="number" 
+                                       min="10" 
+                                       max="120" 
+                                       class="auth-input" 
+                                       placeholder="e.g. 24" />
+                            </div>
+                        </div>
+
+                        <!-- NID / Birth Certificate No -->
+                        <div class="auth-form-group">
+                            <label asp-for="NidOrBirthCert" class="auth-label">NID / Birth Certificate No</label>
+                            <div class="input-icon-wrapper">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                                        <line x1="2" y1="10" x2="22" y2="10"></line>
+                                    </svg>
+                                </span>
+                                <input asp-for="NidOrBirthCert" 
+                                       class="auth-input" 
+                                       placeholder="e.g. 19981234567890" />
+                            </div>
+                        </div>
+
+                        <!-- City -->
+                        <div class="auth-form-group">
+                            <label asp-for="City" class="auth-label">City <span class="required-star">*</span></label>
+                            <div class="input-icon-wrapper @(ViewData.ModelState["City"]?.Errors.Count > 0 ? "has-error" : "")">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="22" x2="9" y2="12"></line>
+                                        <line x1="15" y1="22" x2="15" y2="12"></line>
+                                        <line x1="9" y1="6" x2="9.01" y2="6"></line>
+                                        <line x1="15" y1="6" x2="15.01" y2="6"></line>
+                                        <line x1="9" y1="10" x2="9.01" y2="10"></line>
+                                        <line x1="15" y1="10" x2="15.01" y2="10"></line>
+                                    </svg>
+                                </span>
+                                <select asp-for="City" id="citySelect" class="auth-select" required>
+                                    <option value="" disabled selected>Choose city</option>
+                                    <option value="Dhaka">Dhaka</option>
+                                    <option value="Chittagong">Chittagong</option>
+                                    <option value="Rajshahi">Rajshahi</option>
+                                    <option value="Khulna">Khulna</option>
+                                    <option value="Barisal">Barisal</option>
+                                    <option value="Sylhet">Sylhet</option>
+                                    <option value="Rangpur">Rangpur</option>
+                                    <option value="Mymensingh">Mymensingh</option>
+                                </select>
+                                <span class="select-arrow-icon" aria-hidden="true">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </span>
+                            </div>
+                            <span asp-validation-for="City" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Region / Area -->
+                        <div class="auth-form-group">
+                            <label asp-for="RegionOrArea" class="auth-label">Region / Area <span class="required-star">*</span></label>
+                            <div class="input-icon-wrapper @(ViewData.ModelState["RegionOrArea"]?.Errors.Count > 0 ? "has-error" : "")" id="regionWrapper">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </span>
+                                <select asp-for="RegionOrArea" id="regionSelect" class="auth-select" required disabled>
+                                    <option value="" disabled selected>Choose city first</option>
+                                </select>
+                                <span class="select-arrow-icon" aria-hidden="true">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </span>
+                            </div>
+                            <span asp-validation-for="RegionOrArea" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Detailed Address / Location (Full Width) -->
+                        <div class="auth-form-group col-span-2">
+                            <label asp-for="DetailedAddress" class="auth-label">Detailed Address / Location</label>
+                            <div class="input-icon-wrapper">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                    </svg>
+                                </span>
+                                <input asp-for="DetailedAddress" 
+                                       class="auth-input" 
+                                       placeholder="House #, Road #, Area details..." />
+                            </div>
+                        </div>
+
+                        <!-- Short Bio (Full Width) -->
+                        <div class="auth-form-group col-span-2">
+                            <label asp-for="ShortBio" class="auth-label">Short Bio</label>
+                            <div class="input-icon-wrapper auth-textarea-wrapper">
+                                <span class="input-icon textarea-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </span>
+                                <textarea asp-for="ShortBio" 
+                                          class="auth-input auth-textarea" 
+                                          rows="2" 
+                                          placeholder="Tell us about how you'd like to support our community and learners."></textarea>
+                            </div>
+                            <span asp-validation-for="ShortBio" class="field-validation-error"></span>
+                        </div>
+                    </div>
+
+                    <!-- ================= 3. Academic & Educational Background ================= -->
+                    <div class="form-section-header">
+                        <div class="section-title-wrap">
+                            <span class="section-badge">3</span>
+                            <h3 class="section-title">Academic & Educational Background</h3>
+                        </div>
+                        <span class="section-subtitle">Qualifications</span>
+                    </div>
+
+                    <div class="form-grid-2col">
+                        <!-- Highest Education Level -->
+                        <div class="auth-form-group">
+                            <label asp-for="HighestEducationLevel" class="auth-label">Highest Education Level</label>
+                            <div class="input-icon-wrapper">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                                    </svg>
+                                </span>
+                                <select asp-for="HighestEducationLevel" class="auth-select">
+                                    <option value="" disabled selected>Select Education Level</option>
+                                    <option value="Secondary">Secondary / SSC</option>
+                                    <option value="HigherSecondary">Higher Secondary / HSC</option>
+                                    <option value="Diploma">Diploma / Polytechnic</option>
+                                    <option value="Bachelors">Bachelor's / Undergraduate</option>
+                                    <option value="Masters">Master's / Postgraduate</option>
+                                    <option value="Doctorate">Doctorate / PhD</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <span class="select-arrow-icon" aria-hidden="true">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </span>
+                            </div>
+                            <span asp-validation-for="HighestEducationLevel" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Currently Enrolled / Studying? -->
+                        <div class="auth-form-group">
+                            <label asp-for="CurrentlyEnrolled" class="auth-label">Currently Enrolled / Studying?</label>
+                            <div class="input-icon-wrapper">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                                    </svg>
+                                </span>
+                                <select asp-for="CurrentlyEnrolled" class="auth-select">
+                                    <option value="" disabled selected>Select Status</option>
+                                    <option value="Yes">Currently Enrolled / Studying</option>
+                                    <option value="Graduated">Graduated / Completed</option>
+                                    <option value="NotEnrolled">Not Enrolled</option>
+                                    <option value="OnLeave">On Leave / Gap Year</option>
+                                </select>
+                                <span class="select-arrow-icon" aria-hidden="true">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </span>
+                            </div>
+                            <span asp-validation-for="CurrentlyEnrolled" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Major / Department / Field of Study (Full Width) -->
+                        <div class="auth-form-group col-span-2">
+                            <label asp-for="MajorOrFieldOfStudy" class="auth-label">Major / Department / Field of Study</label>
+                            <div class="input-icon-wrapper">
+                                <span class="input-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="2" x2="12" y2="3.5"></line>
+                                        <line x1="4.93" y1="4.93" x2="6" y2="6"></line>
+                                        <line x1="19.07" y1="4.93" x2="18" y2="6"></line>
+                                        <line x1="2" y1="12" x2="3.5" y2="12"></line>
+                                        <line x1="22" y1="12" x2="20.5" y2="12"></line>
+                                        <path d="M9 18h6"></path>
+                                        <path d="M10 21h4"></path>
+                                        <path d="M15 13a4.5 4.5 0 1 0-6 0c.5.5.8 1.1.9 1.8h4.2c.1-.7.4-1.3.9-1.8z"></path>
+                                    </svg>
+                                </span>
+                                <input asp-for="MajorOrFieldOfStudy" 
+                                       class="auth-input" 
+                                       placeholder="e.g. Computer Science, English, Business, Science..." />
+                            </div>
+                            <span asp-validation-for="MajorOrFieldOfStudy" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- University / College -->
+                        <div class="auth-form-group">
+                            <label asp-for="UniversityOrCollege" class="auth-label">University / College</label>
+                            <div class="input-icon-wrapper">
+                                <input asp-for="UniversityOrCollege" 
+                                       class="auth-input" 
+                                       placeholder="e.g. BUET, DU, NSU..." />
+                            </div>
+                            <span asp-validation-for="UniversityOrCollege" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- University Passing / Expected Year -->
+                        <div class="auth-form-group">
+                            <label asp-for="UniversityPassingYear" class="auth-label">University Passing / Expected Year</label>
+                            <div class="input-icon-wrapper">
+                                <input asp-for="UniversityPassingYear" 
+                                       class="auth-input" 
+                                       placeholder="e.g. 2024" />
+                            </div>
+                            <span asp-validation-for="UniversityPassingYear" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- HSC / College Institute -->
+                        <div class="auth-form-group">
+                            <label asp-for="HscInstitute" class="auth-label">HSC / College Institute</label>
+                            <div class="input-icon-wrapper">
+                                <input asp-for="HscInstitute" 
+                                       class="auth-input" 
+                                       placeholder="e.g. Notre Dame College" />
+                            </div>
+                            <span asp-validation-for="HscInstitute" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- HSC Passing Year -->
+                        <div class="auth-form-group">
+                            <label asp-for="HscPassingYear" class="auth-label">HSC Passing Year</label>
+                            <div class="input-icon-wrapper">
+                                <input asp-for="HscPassingYear" 
+                                       class="auth-input" 
+                                       placeholder="e.g. 2020" />
+                            </div>
+                            <span asp-validation-for="HscPassingYear" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- SSC / School Institute -->
+                        <div class="auth-form-group">
+                            <label asp-for="SscInstitute" class="auth-label">SSC / School Institute</label>
+                            <div class="input-icon-wrapper">
+                                <input asp-for="SscInstitute" 
+                                       class="auth-input" 
+                                       placeholder="e.g. Ideal School and College" />
+                            </div>
+                            <span asp-validation-for="SscInstitute" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- SSC Passing Year -->
+                        <div class="auth-form-group">
+                            <label asp-for="SscPassingYear" class="auth-label">SSC Passing Year</label>
+                            <div class="input-icon-wrapper">
+                                <input asp-for="SscPassingYear" 
+                                       class="auth-input" 
+                                       placeholder="e.g. 2018" />
+                            </div>
+                            <span asp-validation-for="SscPassingYear" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Certificate / Student ID / Document (Full Width) -->
+                        <div class="auth-form-group col-span-2">
+                            <label class="auth-label">Certificate / Student ID / Document</label>
+                            <label for="certificateDocInput" class="document-upload-zone" id="docDropZone">
+                                <div class="doc-upload-icon-badge">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="doc-upload-text-wrap">
+                                    <span class="doc-upload-main-text" id="docUploadMainText">Upload Certificate / Student ID / Degree Document</span>
+                                    <span class="doc-upload-sub-text" id="docUploadSubText">Optional verification document (PNG, JPG, PDF up to 10MB)</span>
+                                </div>
+                                <input type="file" 
+                                       id="certificateDocInput" 
+                                       name="EducationDocument" 
+                                       accept="image/png, image/jpeg, application/pdf" 
+                                       style="display:none;" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- ================= 4. Community & Agreement ================= -->
+                    <div class="form-section-header">
+                        <div class="section-title-wrap">
+                            <span class="section-badge">4</span>
+                            <h3 class="section-title">Community & Agreement</h3>
+                        </div>
+                        <span class="section-subtitle">Motivation</span>
+                    </div>
+
+                    <div class="form-grid-2col">
+                        <!-- Why do you want to join / volunteer? (Full Width) -->
+                        <div class="auth-form-group col-span-2">
+                            <label asp-for="VolunteerMotivation" class="auth-label">Why do you want to join / volunteer?</label>
+                            <div class="input-icon-wrapper auth-textarea-wrapper">
+                                <span class="input-icon textarea-icon" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                </span>
+                                <textarea asp-for="VolunteerMotivation" 
+                                          class="auth-input auth-textarea" 
+                                          rows="3" 
+                                          placeholder="Share your motivation, skills, or reasons for volunteering and mentoring learners..."></textarea>
+                            </div>
+                            <span asp-validation-for="VolunteerMotivation" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Agreement Checkbox -->
+                        <div class="reg-terms-group col-span-2">
+                            <label class="auth-terms-wrap" for="agreeTermsCheckbox">
+                                <input asp-for="AgreeToTerms" id="agreeTermsCheckbox" type="checkbox" class="auth-checkbox" required />
+                                <span class="terms-text">
+                                    I agree to the <button type="button" class="auth-legal-link" id="openTermsLink">Terms and Conditions</button> and acknowledge the <button type="button" class="auth-legal-link" id="openPrivacyLink">Privacy Policy</button> <span class="required-star">*</span>
+                                </span>
+                            </label>
+                            <span asp-validation-for="AgreeToTerms" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="auth-submit-btn col-span-2" id="regSubmitBtn">
+                            <span>Register</span>
+                            <span class="auth-btn-icon" aria-hidden="true">
+                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Card Bottom Action: Continue as Guest -->
+            <footer class="auth-card-footer">
+                <form asp-action="GuestLogin" asp-controller="Account" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="auth-guest-link">
+                        <span>Continue as Guest</span>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </form>
+            </footer>
+        </main>
+
+        <!-- Standalone Page Copyright -->
+        <footer class="auth-copyright">
+            &copy; 2026 Onudhabon. All rights reserved.
+        </footer>
+    </div>
+
+    <!-- Modal: Terms & Conditions -->
+    <div class="legal-modal-backdrop" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle" tabindex="-1">
+        <div class="legal-modal-card">
+            <div class="legal-modal-header">
+                <h3 class="legal-modal-title" id="termsModalTitle">Terms &amp; Conditions</h3>
+                <button type="button" class="legal-modal-close" id="closeTermsCrossBtn" aria-label="Close Terms &amp; Conditions">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="legal-modal-body">
+                <div class="legal-section">
+                    <h4 class="legal-section-title">1. Account &amp; Membership</h4>
+                    <p class="legal-section-text">
+                        By creating an account on Onudhabon, you agree to provide true, accurate, and current information. Registered users including Educators and Local Guardians must abide by community safety principles.
+                    </p>
+                </div>
+                <div class="legal-section">
+                    <h4 class="legal-section-title">2. Role Responsibilities</h4>
+                    <p class="legal-section-text">
+                        <strong>Educators:</strong> Agree to provide legitimate learning guidance, uphold quality teaching, and adhere to academic ethics.<br />
+                        <strong>Local Guardians:</strong> Oversee and support the educational activities of dependents under their supervision.
+                    </p>
+                </div>
+                <div class="legal-section">
+                    <h4 class="legal-section-title">3. Voluntary Contributions</h4>
+                    <p class="legal-section-text">
+                        Users who offer voluntary assistance agree to provide mentorship and support with integrity in a non-commercial manner.
+                    </p>
+                </div>
+                <div class="legal-section">
+                    <h4 class="legal-section-title">4. Privacy &amp; Safeguards</h4>
+                    <p class="legal-section-text">
+                        We respect your privacy and protect your personal information in accordance with our data safety standards.
+                    </p>
+                </div>
+            </div>
+            <div class="legal-modal-footer">
+                <button type="button" class="legal-modal-btn" id="understandTermsBtn">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Privacy Policy -->
+    <div class="legal-modal-backdrop" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyModalTitle" tabindex="-1">
+        <div class="legal-modal-card">
+            <div class="legal-modal-header">
+                <h3 class="legal-modal-title" id="privacyModalTitle">Privacy Policy</h3>
+                <button type="button" class="legal-modal-close" id="closePrivacyCrossBtn" aria-label="Close Privacy Policy">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="legal-modal-body">
+                <div class="legal-section">
+                    <h4 class="legal-section-title">1. Information We Collect</h4>
+                    <p class="legal-section-text">
+                        We collect personal information you provide when creating an account on Onudhabon, including your name, contact details (email, phone number), designated role, location (city, area), and profile photo.
+                    </p>
+                </div>
+                <div class="legal-section">
+                    <h4 class="legal-section-title">2. How We Use Information</h4>
+                    <p class="legal-section-text">
+                        Your data is utilized strictly to facilitate educational connections, verify member authenticity, deliver essential platform updates, and ensure safeguarding for all students and learners.
+                    </p>
+                </div>
+                <div class="legal-section">
+                    <h4 class="legal-section-title">3. Data Protection &amp; Security</h4>
+                    <p class="legal-section-text">
+                        We employ robust security measures and encryption standards to safeguard your personal credentials and identity records against unauthorized access, alteration, or disclosure.
+                    </p>
+                </div>
+                <div class="legal-section">
+                    <h4 class="legal-section-title">4. Your Rights &amp; Safeguards</h4>
+                    <p class="legal-section-text">
+                        We never sell or monetize your personal information. You retain the right to review, update, or request the deletion of your account and personal records at any time by contacting our support team.
+                    </p>
+                </div>
+            </div>
+            <div class="legal-modal-footer">
+                <button type="button" class="legal-modal-btn" id="understandPrivacyBtn">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client-Side Interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Helper function to setup password toggle
+            function setupPasswordToggle(toggleBtnId, inputId, eyeOpenId, eyeClosedId) {
+                const toggleBtn = document.getElementById(toggleBtnId);
+                const passwordInput = document.getElementById(inputId);
+                const eyeOpen = document.getElementById(eyeOpenId);
+                const eyeClosed = document.getElementById(eyeClosedId);
+
+                if (toggleBtn && passwordInput) {
+                    toggleBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const isPassword = passwordInput.getAttribute('type') === 'password';
+                        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+
+                        if (isPassword) {
+                            eyeOpen.style.display = 'none';
+                            eyeClosed.style.display = 'inline-block';
+                            toggleBtn.setAttribute('aria-label', 'Hide password');
+                        } else {
+                            eyeOpen.style.display = 'inline-block';
+                            eyeClosed.style.display = 'none';
+                            toggleBtn.setAttribute('aria-label', 'Show password');
+                        }
+                    });
+                }
+            }
+
+            setupPasswordToggle('toggleRegPwdBtn', 'regPassword', 'regEyeOpen', 'regEyeClosed');
+            setupPasswordToggle('toggleRegConfirmPwdBtn', 'regConfirmPassword', 'regConfirmEyeOpen', 'regConfirmEyeClosed');
+
+            // Profile photo input change handler
+            const photoInput = document.getElementById('profilePhotoInput');
+            const uploadMainText = document.getElementById('uploadMainText');
+            const uploadSubText = document.getElementById('uploadSubText');
+
+            if (photoInput && uploadMainText && uploadSubText) {
+                photoInput.addEventListener('change', function () {
+                    if (photoInput.files && photoInput.files.length > 0) {
+                        const file = photoInput.files[0];
+                        uploadMainText.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+                        uploadSubText.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+                    }
+                });
+            }
+
+            // Certificate/Document upload and drag-drop handler
+            const docInput = document.getElementById('certificateDocInput');
+            const docUploadMainText = document.getElementById('docUploadMainText');
+            const docUploadSubText = document.getElementById('docUploadSubText');
+            const docDropZone = document.getElementById('docDropZone');
+
+            if (docInput && docUploadMainText && docUploadSubText) {
+                docInput.addEventListener('change', function () {
+                    if (docInput.files && docInput.files.length > 0) {
+                        const file = docInput.files[0];
+                        docUploadMainText.textContent = file.name.length > 35 ? file.name.substring(0, 32) + '...' : file.name;
+                        docUploadSubText.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB (Selected - click to change)';
+                    }
+                });
+            }
+
+            if (docDropZone && docInput) {
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    docDropZone.addEventListener(eventName, function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        docDropZone.classList.add('dragover');
+                    });
+                });
+                ['dragleave', 'drop'].forEach(eventName => {
+                    docDropZone.addEventListener(eventName, function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        docDropZone.classList.remove('dragover');
+                    });
+                });
+                docDropZone.addEventListener('drop', function (e) {
+                    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        docInput.files = e.dataTransfer.files;
+                        const event = new Event('change');
+                        docInput.dispatchEvent(event);
+                    }
+                });
+            }
+
+            // ================= City to Region / Area Dynamic Cascade =================
+            const cityRegions = {
+                "Dhaka": [
+                    "Dhanmondi", "Gulshan", "Banani", "Uttara", "Mirpur",
+                    "Mohammadpur", "Bashundhara R/A", "Mohakhali", "Badda",
+                    "Motijheel", "Old Dhaka (Puran Dhaka)", "Farmgate", "Shahbagh",
+                    "Khilgaon", "Rampura", "Malibagh", "Lalmatia", "Shantinagar",
+                    "Tejgaon", "Jatrabari", "Savar", "Keraniganj", "Cantonment",
+                    "Uttarkhan / Dakshinkhan", "Other / Sub-area"
+                ],
+                "Sylhet": [
+                    "Zindabazar", "Amberkhana", "Shibganj", "Upashahar", "Subidbazar",
+                    "Lamabazar", "Kumarpara", "Mira Bazar", "Tilagarh", "Chowhatta",
+                    "Kazirbazar", "Pathantula", "Shahjalal Upashahar", "Akhalia",
+                    "Majortila", "Dargah Gate", "Kadamtoli", "South Surma",
+                    "Beanibazar", "Golapganj", "Sreemangal", "Other / Sub-area"
+                ],
+                "Chittagong": [
+                    "Agrabad", "Nasirabad", "GEC Circle", "Halishahar", "Panchlaish",
+                    "Khulshi", "Chandgaon", "Kotwali", "Chawkbazar", "Muradpur",
+                    "Bakalia", "Pahartali", "Patenga", "Bayezid Bostami",
+                    "Lalkhan Bazar", "Oxygen", "Other / Sub-area"
+                ],
+                "Rajshahi": [
+                    "Boalia", "Motihar", "Rajpara", "Shah Makhdum", "Kazihata",
+                    "Upashahar", "Talaimari", "Shaheb Bazar", "Padma Residential",
+                    "Binodpur", "Laxmipur", "Shihoroil", "Other / Sub-area"
+                ],
+                "Khulna": [
+                    "Boyra", "Sonadanga", "Khalishpur", "Daulatpur", "Khan Jahan Ali",
+                    "Shibbari", "Nirala", "Rupsha", "Tutpara", "Gollamari",
+                    "Mujgunni", "Khulna Sadar", "Other / Sub-area"
+                ],
+                "Barisal": [
+                    "Sadar Road", "Natullabad", "Rupatoli", "Brown Compound", "Alekanda",
+                    "Band Road", "C&B Road", "Kaunia", "Launch Ghat", "Amanatganj",
+                    "Chandmari", "Other / Sub-area"
+                ],
+                "Rangpur": [
+                    "Jahaj Company More", "Modern More", "RK Road", "Dhap", "Lalbagh",
+                    "Terminal", "Radhaballabh", "Senpara", "Kellaband",
+                    "Shapla Chattar", "Rangpur Sadar", "Other / Sub-area"
+                ],
+                "Mymensingh": [
+                    "Town Hall", "Ganginarpar", "Charpara", "Maskanda", "Notun Bazar",
+                    "Krishtopur", "Shehara", "Sankipara", "Boundary Road",
+                    "Kewatkhali", "Mymensingh Sadar", "Other / Sub-area"
+                ]
+            };
+
+            const citySelect = document.getElementById('citySelect');
+            const regionSelect = document.getElementById('regionSelect');
+            const regionWrapper = document.getElementById('regionWrapper');
+            const preselectedRegion = '@Html.Raw(Model?.RegionOrArea ?? "")';
+
+            function populateRegions(city, selectedRegion) {
+                if (!regionSelect) return;
+                regionSelect.innerHTML = '';
+
+                if (!city || !cityRegions[city]) {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.disabled = true;
+                    defaultOption.selected = true;
+                    defaultOption.textContent = 'Choose city first';
+                    regionSelect.appendChild(defaultOption);
+                    regionSelect.disabled = true;
+                    if (regionWrapper) {
+                        regionWrapper.classList.add('is-disabled');
+                    }
+                    return;
+                }
+
+                regionSelect.disabled = false;
+                if (regionWrapper) {
+                    regionWrapper.classList.remove('is-disabled');
+                }
+
+                const placeholderOption = document.createElement('option');
+                placeholderOption.value = '';
+                placeholderOption.disabled = true;
+                placeholderOption.selected = !selectedRegion;
+                placeholderOption.textContent = 'Choose region/area';
+                regionSelect.appendChild(placeholderOption);
+
+                const regions = cityRegions[city];
+                let hasMatch = false;
+                regions.forEach(function (r) {
+                    const opt = document.createElement('option');
+                    opt.value = r;
+                    opt.textContent = r;
+                    if (selectedRegion && selectedRegion === r) {
+                        opt.selected = true;
+                        hasMatch = true;
+                    }
+                    regionSelect.appendChild(opt);
+                });
+
+                if (selectedRegion && !hasMatch) {
+                    const customOpt = document.createElement('option');
+                    customOpt.value = selectedRegion;
+                    customOpt.textContent = selectedRegion;
+                    customOpt.selected = true;
+                    regionSelect.appendChild(customOpt);
+                }
+            }
+
+            if (citySelect && regionSelect) {
+                citySelect.addEventListener('change', function () {
+                    populateRegions(citySelect.value, null);
+                    if (regionWrapper && regionWrapper.classList.contains('has-error')) {
+                        regionWrapper.classList.remove('has-error');
+                        const err = regionWrapper.parentElement.querySelector('.field-validation-error');
+                        if (err) err.textContent = '';
+                    }
+                });
+
+                // Initialize on load
+                if (citySelect.value) {
+                    populateRegions(citySelect.value, preselectedRegion);
+                } else {
+                    populateRegions('', null);
+                }
+            }
+
+            // Dynamic error state clearing on input
+            const inputs = document.querySelectorAll('.auth-input, .auth-select');
+            inputs.forEach(function (input) {
+                input.addEventListener('input', function () {
+                    const wrapper = input.closest('.input-icon-wrapper');
+                    if (wrapper && wrapper.classList.contains('has-error')) {
+                        wrapper.classList.remove('has-error');
+                        const errorSpan = wrapper.parentElement.querySelector('.field-validation-error');
+                        if (errorSpan) {
+                            errorSpan.textContent = '';
+                        }
+                    }
+                });
+            });
+
+            // ================= Legal Modals Logic =================
+            const termsModal = document.getElementById('termsModal');
+            const privacyModal = document.getElementById('privacyModal');
+
+            const openTermsLink = document.getElementById('openTermsLink');
+            const openPrivacyLink = document.getElementById('openPrivacyLink');
+
+            const closeTermsCrossBtn = document.getElementById('closeTermsCrossBtn');
+            const understandTermsBtn = document.getElementById('understandTermsBtn');
+
+            const closePrivacyCrossBtn = document.getElementById('closePrivacyCrossBtn');
+            const understandPrivacyBtn = document.getElementById('understandPrivacyBtn');
+
+            function openModal(modal) {
+                if (!modal) return;
+                modal.classList.add('is-active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal(modal) {
+                if (!modal) return;
+                modal.classList.remove('is-active');
+                if (!termsModal.classList.contains('is-active') && !privacyModal.classList.contains('is-active')) {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            if (openTermsLink) {
+                openTermsLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openModal(termsModal);
+                });
+            }
+
+            if (openPrivacyLink) {
+                openPrivacyLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openModal(privacyModal);
+                });
+            }
+
+            if (closeTermsCrossBtn) {
+                closeTermsCrossBtn.addEventListener('click', function () {
+                    closeModal(termsModal);
+                });
+            }
+
+            if (understandTermsBtn) {
+                understandTermsBtn.addEventListener('click', function () {
+                    closeModal(termsModal);
+                });
+            }
+
+            if (closePrivacyCrossBtn) {
+                closePrivacyCrossBtn.addEventListener('click', function () {
+                    closeModal(privacyModal);
+                });
+            }
+
+            if (understandPrivacyBtn) {
+                understandPrivacyBtn.addEventListener('click', function () {
+                    closeModal(privacyModal);
+                });
+            }
+
+            // Close when clicking outside modal card
+            [termsModal, privacyModal].forEach(function (modal) {
+                if (!modal) return;
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) {
+                        closeModal(modal);
+                    }
+                });
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    closeModal(termsModal);
+                    closeModal(privacyModal);
+                }
+            });
+
+            // Auto-open if query param or hash matches
+            const urlParams = new URLSearchParams(window.location.search);
+            const modalParam = (urlParams.get('modal') || window.location.hash.replace('#', '')).toLowerCase();
+            if (modalParam === 'terms' || modalParam === 'termsmodal' || modalParam === 'terms-and-conditions') {
+                openModal(termsModal);
+            } else if (modalParam === 'privacy' || modalParam === 'privacymodal' || modalParam === 'privacy-policy') {
+                openModal(privacyModal);
+            }
+        });
+    </script>
+</body>
+</html>

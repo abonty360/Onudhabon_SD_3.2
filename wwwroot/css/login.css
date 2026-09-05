@@ -1,0 +1,1012 @@
+/* ==========================================================================
+   Onudhabon - login.css
+   Modern, spacious, and legible UI for Login & Registration
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #1d72f2;
+    --primary-hover: #1558c0;
+    --primary-active: #0f46a0;
+    --primary-light: #e0edff;
+    
+    --card-bg: #ffffff;
+    --card-border: #edf2f7;
+    --card-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.08), 0 6px 16px -4px rgba(15, 23, 42, 0.04);
+
+    --text-title: #1d72f2;
+    --text-heading: #1e293b;
+    --text-body: #334155;
+    --text-muted: #64748b;
+    --text-placeholder: #94a3b8;
+
+    --input-border: #e2e8f0;
+    --input-focus-border: #1d72f2;
+    --input-focus-ring: rgba(29, 114, 242, 0.16);
+
+    --tab-bg: #f1f5f9;
+    --footer-bg: #f8fafc;
+    --footer-border: #f1f5f9;
+
+    --danger: #ef4444;
+    --danger-bg: #fef2f2;
+    --danger-border: #fecaca;
+    --danger-text: #b91c1c;
+
+    --success: #10b981;
+    --success-bg: #ecfdf5;
+    --success-border: #bbf7d0;
+    --success-text: #047857;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.login-page,
+body.register-page {
+    min-height: 100vh;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-body);
+    background: radial-gradient(circle at 50% 30%, #ffffff 0%, #f4f6fa 55%, #edf1f7 100%);
+    background-attachment: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Page wrapper to hold the card and copyright */
+.auth-wrapper {
+    width: 100%;
+    max-width: 418px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth-wrapper.register-wrapper {
+    max-width: 720px;
+}
+
+/* ==========================================================================
+   Main Card Container
+   ========================================================================== */
+.auth-card {
+    width: 100%;
+    background-color: var(--card-bg);
+    border-radius: 22px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 10px 28px -6px rgba(15, 23, 42, 0.05), 0 4px 12px -4px rgba(15, 23, 42, 0.03);
+    overflow: hidden;
+}
+
+.auth-card-body {
+    padding: 38px 32px 28px 32px;
+}
+
+/* ==========================================================================
+   Brand Header
+   ========================================================================== */
+.auth-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.auth-logo-wrapper {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-logo {
+    height: 52px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    user-select: none;
+    display: block;
+}
+
+.auth-title {
+    font-size: 1.95rem;
+    font-weight: 700;
+    color: var(--text-title);
+    margin: 0 0 5px 0;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.auth-subtitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-heading);
+    margin: 0 0 5px 0;
+    line-height: 1.3;
+}
+
+.auth-tagline {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.45;
+}
+
+/* ==========================================================================
+   Segmented Floating Tab Switcher
+   ========================================================================== */
+.auth-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: var(--tab-bg);
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    gap: 4px;
+    user-select: none;
+}
+
+.auth-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border-radius: 9px;
+    font-size: 0.925rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    cursor: pointer;
+}
+
+.auth-tab:hover:not(.active) {
+    color: var(--text-heading);
+}
+
+.auth-tab.active {
+    background-color: #ffffff;
+    color: var(--primary);
+    border: 1px solid #dce4ed;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================================================
+   Section Headers (Registration Sections 1 & 2)
+   ========================================================================== */
+.form-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 28px;
+    margin-bottom: 16px;
+    padding-bottom: 4px;
+}
+
+.first-section-header {
+    margin-top: 0;
+}
+
+.section-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-badge {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-heading);
+    margin: 0;
+}
+
+.section-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   2-Column Grid Layout
+   ========================================================================== */
+.form-grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 20px;
+}
+
+.col-span-2 {
+    grid-column: 1 / -1;
+}
+
+/* ==========================================================================
+   Form Fields & Input Wrappers
+   ========================================================================== */
+.auth-form-group {
+    margin-bottom: 18px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-grid-2col .auth-form-group {
+    margin-bottom: 0;
+}
+
+.auth-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-body);
+    margin-bottom: 7px;
+}
+
+.auth-label .required-star {
+    color: var(--primary);
+}
+
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1.5px solid var(--input-border);
+    border-radius: 11px;
+    height: 48px;
+    padding: 0 15px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-icon-wrapper:focus-within {
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 3.5px var(--input-focus-ring);
+}
+
+.input-icon-wrapper.has-error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3.5px rgba(239, 68, 68, 0.14);
+}
+
+.input-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-placeholder);
+    margin-right: 12px;
+    flex-shrink: 0;
+    transition: color 0.15s ease;
+}
+
+.input-icon-wrapper:focus-within .input-icon {
+    color: var(--primary);
+}
+
+.input-icon-wrapper.has-error .input-icon {
+    color: var(--danger);
+}
+
+.auth-input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: var(--text-heading);
+    font-family: inherit;
+}
+
+.auth-input::placeholder {
+    color: var(--text-placeholder);
+    font-weight: 400;
+}
+
+/* Custom Textarea Styling */
+.auth-textarea-wrapper {
+    height: auto;
+    min-height: 82px;
+    align-items: flex-start;
+    padding: 11px 15px;
+}
+
+.auth-textarea-wrapper .textarea-icon {
+    margin-top: 2px;
+}
+
+.auth-textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: var(--text-heading);
+    font-family: inherit;
+    resize: vertical;
+    min-height: 60px;
+    line-height: 1.5;
+}
+
+.auth-textarea::placeholder {
+    color: var(--text-placeholder);
+    font-weight: 400;
+}
+
+/* Custom Select Styling */
+.auth-select {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: var(--text-heading);
+    font-family: inherit;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 24px;
+}
+
+.select-arrow-icon {
+    position: absolute;
+    right: 15px;
+    pointer-events: none;
+    color: var(--text-placeholder);
+    display: flex;
+    align-items: center;
+}
+
+.auth-select:disabled,
+.auth-input:disabled {
+    cursor: not-allowed;
+    color: var(--text-placeholder);
+    opacity: 0.75;
+}
+
+.input-icon-wrapper.is-disabled {
+    background-color: #f8fafc;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+/* ==========================================================================
+   Profile Photo Upload Dropzone
+   ========================================================================== */
+.photo-upload-zone {
+    height: 48px;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 11px;
+    background-color: #f8fafc;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    user-select: none;
+}
+
+.photo-upload-zone:hover {
+    border-color: var(--primary);
+    background-color: #f0f7ff;
+}
+
+.upload-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.upload-text-wrap {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    line-height: 1.25;
+}
+
+.upload-main-text {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-heading);
+}
+
+.upload-sub-text {
+    font-size: 0.75rem;
+    color: var(--text-placeholder);
+}
+
+/* ==========================================================================
+   Certificate / Document Upload Dropzone
+   ========================================================================== */
+.document-upload-zone {
+    min-height: 72px;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 12px;
+    background-color: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 20px;
+    gap: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    user-select: none;
+}
+
+.document-upload-zone:hover {
+    border-color: var(--primary);
+    background-color: #f0f7ff;
+}
+
+.document-upload-zone.dragover {
+    border-color: var(--primary);
+    background-color: #e8f2ff;
+    box-shadow: 0 0 0 3.5px rgba(29, 114, 242, 0.12);
+}
+
+.doc-upload-icon-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.doc-upload-text-wrap {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    line-height: 1.35;
+}
+
+.doc-upload-main-text {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-heading);
+}
+
+.doc-upload-sub-text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* Toggle Password Button */
+.auth-toggle-pwd {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 6px;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-placeholder);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: color 0.15s ease;
+}
+
+.auth-toggle-pwd:hover {
+    color: var(--text-body);
+}
+
+/* Field Validation Error */
+.field-validation-error,
+.text-validation-error {
+    color: var(--danger);
+    font-size: 0.8rem;
+    margin-top: 5px;
+    display: block;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   Options Row: Remember Me & Forgot Password
+   ========================================================================== */
+.auth-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    margin-bottom: 22px;
+    font-size: 0.88rem;
+}
+
+.auth-remember-wrap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-body);
+    font-weight: 500;
+}
+
+.auth-checkbox {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid #cbd5e1;
+    cursor: pointer;
+    accent-color: var(--primary);
+    margin: 0;
+}
+
+.auth-forgot-link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.auth-forgot-link:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* Registration Terms Agreement */
+.reg-terms-group {
+    margin-top: 20px;
+    margin-bottom: 24px;
+}
+
+/* ==========================================================================
+   Submit Button
+   ========================================================================== */
+.auth-submit-btn {
+    width: 100%;
+    height: 48px;
+    background-color: var(--primary);
+    border: none;
+    border-radius: 11px;
+    color: #ffffff;
+    font-size: 0.98rem;
+    font-weight: 600;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(29, 114, 242, 0.35);
+    transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.auth-submit-btn:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 6px 18px rgba(29, 114, 242, 0.42);
+    transform: translateY(-1px);
+}
+
+.auth-submit-btn:active {
+    background-color: var(--primary-active);
+    transform: translateY(0);
+}
+
+.auth-btn-icon {
+    display: flex;
+    align-items: center;
+    transition: transform 0.15s ease;
+}
+
+.auth-submit-btn:hover .auth-btn-icon {
+    transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Bottom Card Section ("Continue as Guest >")
+   ========================================================================== */
+.auth-card-footer {
+    border-top: 1px solid #f1f5f9;
+    background-color: var(--footer-bg);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-guest-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #475569;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.15s ease;
+}
+
+.auth-guest-link:hover {
+    color: var(--primary);
+}
+
+.auth-guest-link svg {
+    transition: transform 0.15s ease;
+}
+
+.auth-guest-link:hover svg {
+    transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Page Footer (Copyright)
+   ========================================================================== */
+.auth-copyright {
+    margin-top: 22px;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    text-align: center;
+    letter-spacing: 0.01em;
+}
+
+/* ==========================================================================
+   Alerts & Notifications
+   ========================================================================== */
+.auth-alert {
+    padding: 12px 16px;
+    border-radius: 11px;
+    font-size: 0.875rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-alert-danger {
+    background-color: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    color: var(--danger-text);
+}
+
+.auth-alert-success {
+    background-color: var(--success-bg);
+    border: 1px solid var(--success-border);
+    color: var(--success-text);
+}
+
+/* ==========================================================================
+   Conditional Modal Overlay (ViewBag.ModalMessage)
+   ========================================================================== */
+.modal-backdrop-custom {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.modal-card-custom {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.25);
+    max-width: 420px;
+    width: 100%;
+    padding: 30px 28px 24px 28px;
+    text-align: center;
+}
+
+.modal-icon-badge {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #fef2f2;
+    color: #ef4444;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.modal-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-heading);
+    margin-bottom: 8px;
+}
+
+.modal-card-message {
+    font-size: 0.925rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 22px;
+}
+
+.modal-btn-dismiss {
+    width: 100%;
+    height: 44px;
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.925rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.modal-btn-dismiss:hover {
+    background: var(--primary-hover);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 680px) {
+    .form-grid-2col {
+        grid-template-columns: 1fr;
+    }
+
+    .col-span-2 {
+        grid-column: 1;
+    }
+
+    .auth-card-body {
+        padding: 32px 24px 26px 24px;
+    }
+}
+
+@media (max-width: 520px) {
+    body.login-page,
+    body.register-page {
+        padding: 20px 12px;
+    }
+
+    .auth-card-body {
+        padding: 28px 18px 22px 18px;
+    }
+
+    .auth-title {
+        font-size: 1.65rem;
+    }
+
+    .auth-subtitle {
+        font-size: 1rem;
+    }
+
+    .auth-logo {
+        height: 42px;
+    }
+}
+
+/* ==========================================================================
+   Terms & Privacy Checkbox & Legal Modal Styling
+   ========================================================================== */
+.auth-terms-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    color: #475569;
+    font-size: 0.885rem;
+    line-height: 1.5;
+}
+
+.auth-terms-wrap .auth-checkbox {
+    width: 17px;
+    height: 17px;
+    border-radius: 4px;
+    border: 1.5px solid #cbd5e1;
+    cursor: pointer;
+    accent-color: var(--primary);
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.auth-legal-link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    display: inline;
+    transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+
+.auth-legal-link:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* Modal Backdrop */
+.legal-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 16px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.legal-modal-backdrop.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal Card */
+.legal-modal-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.25), 0 8px 16px -4px rgba(15, 23, 42, 0.1);
+    max-width: 530px;
+    width: 100%;
+    overflow: hidden;
+    transform: scale(0.96) translateY(8px);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 40px);
+}
+
+.legal-modal-backdrop.is-active .legal-modal-card {
+    transform: scale(1) translateY(0);
+}
+
+/* Modal Header */
+.legal-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #eef2f6;
+    background: #ffffff;
+}
+
+.legal-modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.25;
+}
+
+.legal-modal-close {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    border-radius: 8px;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.legal-modal-close:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+/* Modal Body */
+.legal-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    font-size: 0.925rem;
+    color: #475569;
+    line-height: 1.6;
+}
+
+.legal-section {
+    margin-bottom: 20px;
+}
+
+.legal-section:last-child {
+    margin-bottom: 0;
+}
+
+.legal-section-title {
+    font-size: 1.025rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 7px 0;
+    line-height: 1.35;
+}
+
+.legal-section-text {
+    font-size: 0.915rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.legal-section-text strong {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+/* Modal Footer */
+.legal-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 24px;
+    border-top: 1px solid #eef2f6;
+    background: #ffffff;
+}
+
+.legal-modal-btn {
+    background-color: var(--primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 0.925rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(29, 114, 242, 0.25);
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.legal-modal-btn:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 4px 12px rgba(29, 114, 242, 0.35);
+}
+
+@media (max-width: 540px) {
+    .legal-modal-header {
+        padding: 16px 18px;
+    }
+    .legal-modal-body {
+        padding: 18px;
+    }
+    .legal-modal-footer {
+        padding: 14px 18px;
+    }
+}
