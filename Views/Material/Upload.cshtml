@@ -1,0 +1,120 @@
+﻿@model Onudhabon_ISD.Models.MaterialUploadViewModel
+
+@{
+    ViewData["Title"] = "Upload Study Material - Onudhabon";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                    ← Back to Materials
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex p-3 mb-2">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="fw-bold text-dark">Upload Study Material</h3>
+                    <p class="text-muted">Files are stored in <code>onudhabon/materials</code> with automatic size calculation.</p>
+                </div>
+
+                <form asp-action="Upload" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-3"></div>
+
+                    <!-- Title -->
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label fw-semibold">Material / Document Title *</label>
+                        <input asp-for="Title" class="form-control form-control-lg rounded-3" placeholder="e.g. Physics Formula Sheet & Practice Set - Class 10" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Class & Subject & Topic -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label asp-for="ClassLevel" class="form-label fw-semibold">Class Level *</label>
+                            <select asp-for="ClassLevel" class="form-select rounded-3">
+                                <option value="">Select Class</option>
+                                @for (int i = 1; i <= 12; i++)
+                                {
+                                    <option value="@i">Class @i</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ClassLevel" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Subject" class="form-label fw-semibold">Subject *</label>
+                            <input asp-for="Subject" class="form-control rounded-3" placeholder="e.g. Physics, Bangla..." />
+                            <span asp-validation-for="Subject" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Topic" class="form-label fw-semibold">Topic *</label>
+                            <input asp-for="Topic" class="form-control rounded-3" placeholder="e.g. Optics and Waves" />
+                            <span asp-validation-for="Topic" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Medium & Instructor -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Version" class="form-label fw-semibold">Medium / Version</label>
+                            <select asp-for="Version" class="form-select rounded-3">
+                                <option value="Bangla">Bangla Medium</option>
+                                <option value="English">English Medium</option>
+                                <option value="English Version">English Version</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Instructor" class="form-label fw-semibold">Author / Educator</label>
+                            <input asp-for="Instructor" class="form-control rounded-3" placeholder="e.g. Ayesha Rahman" />
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-semibold">Description / Notes</label>
+                        <textarea asp-for="Description" rows="3" class="form-control rounded-3" placeholder="Summary of what topics or practice questions are included..."></textarea>
+                    </div>
+
+                    <!-- Document File Upload (Cloudinary) -->
+                    <div class="mb-4">
+                        <label asp-for="MaterialFile" class="form-label fw-semibold">Select Document File (PDF, DOCX, PPTX)</label>
+                        <input asp-for="MaterialFile" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx" class="form-control form-control-lg rounded-3" />
+                        <span class="text-muted small d-block mt-1">Uploaded directly to <code>onudhabon/materials</code>. File size in MB will be saved automatically.</span>
+                        <span asp-validation-for="MaterialFile" class="text-danger small"></span>
+                    </div>
+
+                    <div class="text-center my-3 text-muted position-relative">
+                        <hr />
+                        <span class="bg-white px-3 position-absolute top-50 start-50 translate-middle small fw-semibold text-secondary">OR USE EXISTING CLOUDINARY URL</span>
+                    </div>
+
+                    <!-- Optional Existing Cloudinary File URL (No Re-upload) -->
+                    <div class="mb-4">
+                        <label asp-for="ExistingFileUrl" class="form-label fw-semibold text-secondary">Existing File URL (If already on Cloudinary)</label>
+                        <input asp-for="ExistingFileUrl" class="form-control rounded-3" placeholder="https://res.cloudinary.com/.../onudhabon/materials/sample.pdf" />
+                        <span class="text-muted small">If provided, the existing Cloudinary document URL will be linked directly without re-uploading.</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">
+                        Upload & Submit Material (Status: Pending)
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

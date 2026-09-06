@@ -1,0 +1,130 @@
+﻿@model Onudhabon_ISD.Models.Material
+@inject Onudhabon_ISD.Services.ICloudinaryService CloudinaryService
+
+@{
+    ViewData["Title"] = $"{Model.Title} - Material Document";
+}
+
+<div class="container py-4">
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+            ← Back to Materials
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- PDF Viewer / Document Column -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-3 bg-light mb-4">
+                @if (!string.IsNullOrWhiteSpace(Model.FileUrl))
+                {
+                    <div class="ratio ratio-4x3 bg-white rounded-3 shadow-sm overflow-hidden mb-3 border">
+                        <iframe src="@Model.FileUrl" class="w-100 h-100" title="@Model.Title"></iframe>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <span class="badge bg-secondary rounded-pill me-2">Size: @(Model.Size ?? "N/A")</span>
+                            <span class="badge bg-info-subtle text-info rounded-pill">Downloads: @Model.Downloads</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="@Model.FileUrl" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                Open in New Tab
+                            </a>
+                            <a asp-action="Download" asp-route-id="@Model.Id" class="btn btn-primary btn-sm rounded-pill px-4">
+                                Download Material
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-5 text-center text-muted">
+                        <p class="mb-0">No document file URL available for this material.</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Material Details Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-pill">
+                        Class @Model.ClassLevel
+                    </span>
+                    <span class="badge bg-info-subtle text-info border border-info-subtle px-2.5 py-1 rounded-pill">
+                        @Model.Subject
+                    </span>
+                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2.5 py-1 rounded-pill">
+                        Topic: @Model.Topic
+                    </span>
+                    <span class="badge @(Model.Status?.ToLower() == "pending" ? "bg-warning-subtle text-warning border-warning-subtle" : "bg-success-subtle text-success border-success-subtle") border px-2.5 py-1 rounded-pill ms-auto">
+                        Status: @Model.Status
+                    </span>
+                </div>
+
+                <h3 class="fw-bold text-dark mt-2 mb-3">@Model.Title</h3>
+                <p class="text-muted leading-relaxed mb-4">
+                    @(string.IsNullOrWhiteSpace(Model.Description) ? "No detailed description provided." : Model.Description)
+                </p>
+
+                <div class="d-flex align-items-center justify-content-between border-top pt-3 text-muted small flex-wrap gap-2">
+                    <div>
+                        <strong>Instructor / Author:</strong> @(Model.Instructor ?? "Educator")
+                    </div>
+                    <div>
+                        <strong>Published:</strong> @Model.Date.ToString("MMMM dd, yyyy")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+            <!-- First Page Thumbnail Preview -->
+            @if (!string.IsNullOrWhiteSpace(Model.FileUrl))
+            {
+                <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 text-center">
+                    <h6 class="fw-bold mb-2 text-start">Document Preview</h6>
+                    <img src="@CloudinaryService.GetPdfThumbnailUrl(Model.FileUrl, 320, 1)"
+                         alt="Document Thumbnail"
+                         class="img-fluid rounded-3 border shadow-sm mx-auto"
+                         onerror="this.style.display='none';" />
+                </div>
+            }
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3">Document Summary</h5>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Class Level:</span>
+                        <span class="fw-semibold">Class @Model.ClassLevel</span>
+                    </li>
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Subject:</span>
+                        <span class="fw-semibold">@Model.Subject</span>
+                    </li>
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Topic:</span>
+                        <span class="fw-semibold">@Model.Topic</span>
+                    </li>
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">File Size:</span>
+                        <span class="fw-semibold">@(Model.Size ?? "N/A")</span>
+                    </li>
+                    <li class="d-flex justify-content-between py-2">
+                        <span class="text-muted">Total Downloads:</span>
+                        <span class="fw-semibold">@Model.Downloads</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-light">
+                <h6 class="fw-bold mb-2">Have study materials to share?</h6>
+                <p class="text-muted small mb-3">Upload PDF notes, formula sheets, and past question solutions.</p>
+                <a asp-action="Upload" class="btn btn-primary btn-sm rounded-pill px-4">
+                    Upload Material
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

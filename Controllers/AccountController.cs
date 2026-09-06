@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Onudhabon.Models;
 using Onudhabon_ISD.Data;
 using Onudhabon_ISD.Models;
+using Onudhabon_ISD.Services;
+using System.Security.Claims;
 
 namespace Onudhabon_ISD.Controllers
 {
@@ -14,13 +15,16 @@ namespace Onudhabon_ISD.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly ICloudinaryService _cloudinaryService;
 
         public AccountController(
             ApplicationDbContext context,
-            IPasswordHasher<User> passwordHasher)
+            IPasswordHasher<User> passwordHasher,
+            ICloudinaryService cloudinaryService)
         {
             _context = context;
             _passwordHasher = passwordHasher;
+            _cloudinaryService = cloudinaryService;
         }
 
         [HttpGet]
@@ -71,6 +75,11 @@ namespace Onudhabon_ISD.Controllers
                 new Claim("City", user.City),
                 new Claim("Area", user.Area)
             };
+
+            if (!string.IsNullOrEmpty(user.Picture))
+            {
+                claims.Add(new Claim("Picture", user.Picture));
+            }
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var authProperties = new AuthenticationProperties
@@ -134,7 +143,28 @@ namespace Onudhabon_ISD.Controllers
                 return View(model);
             }
 
-            // Create new User entity with exact informations from the register page
+            // Process uploaded files with Cloudinary
+            string? picturePath = null;
+            if (model.PictureFile != null && model.PictureFile.Length > 0)
+            {
+                var picResult = await _cloudinaryService.UploadProfilePictureAsync(model.PictureFile);
+                if (picResult.Success)
+                {
+                    picturePath = picResult.SecureUrl;
+                }
+            }
+
+            string? certificatePath = null;
+            if (model.CertificatePictureFile != null && model.CertificatePictureFile.Length > 0)
+            {
+                var certResult = await _cloudinaryService.UploadEducationDocAsync(model.CertificatePictureFile);
+                if (certResult.Success)
+                {
+                    certificatePath = certResult.SecureUrl;
+                }
+            }
+
+            // Create new User entity with all submitted registration information
             var user = new User
             {
                 FullName = model.FullName.Trim(),
@@ -143,9 +173,29 @@ namespace Onudhabon_ISD.Controllers
                 Role = model.Role.Trim(),
                 City = model.City.Trim(),
                 Area = model.Area.Trim(),
+                Location = string.IsNullOrWhiteSpace(model.Location) ? null : model.Location.Trim(),
+                Age = model.Age,
+                NidNumber = string.IsNullOrWhiteSpace(model.NidNumber) ? null : model.NidNumber.Trim(),
+                Bio = string.IsNullOrWhiteSpace(model.Bio) ? null : model.Bio.Trim(),
+                Picture = picturePath,
                 VolunteerReason = string.IsNullOrWhiteSpace(model.VolunteerReason) ? null : model.VolunteerReason.Trim(),
+                EducationLevel = string.IsNullOrWhiteSpace(model.EducationLevel) ? null : model.EducationLevel.Trim(),
+                Institution = !string.IsNullOrWhiteSpace(model.UniversityName) ? model.UniversityName.Trim() : (!string.IsNullOrWhiteSpace(model.HscInstitute) ? model.HscInstitute.Trim() : model.SscInstitute?.Trim()),
+                Major = string.IsNullOrWhiteSpace(model.Major) ? null : model.Major.Trim(),
+                CurrentlyStudying = string.IsNullOrWhiteSpace(model.CurrentlyStudying) ? null : model.CurrentlyStudying.Trim(),
+                SscPassingYear = string.IsNullOrWhiteSpace(model.SscPassingYear) ? null : model.SscPassingYear.Trim(),
+                SscInstitute = string.IsNullOrWhiteSpace(model.SscInstitute) ? null : model.SscInstitute.Trim(),
+                HscPassingYear = string.IsNullOrWhiteSpace(model.HscPassingYear) ? null : model.HscPassingYear.Trim(),
+                HscInstitute = string.IsNullOrWhiteSpace(model.HscInstitute) ? null : model.HscInstitute.Trim(),
+                UniversityName = string.IsNullOrWhiteSpace(model.UniversityName) ? null : model.UniversityName.Trim(),
+                UniversityPassingYear = string.IsNullOrWhiteSpace(model.UniversityPassingYear) ? null : model.UniversityPassingYear.Trim(),
+                CertificatePicture = certificatePath,
                 AgreeToTerms = model.AgreeToTerms,
-                CreatedAt = DateTime.UtcNow
+                IsRestricted = false,
+                IsVerified = false,
+                VerificationStatus = "Pending",
+                CreatedAt = DateTime.UtcNow,
+                __v = 0
             };
 
             // Securely hash password

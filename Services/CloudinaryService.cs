@@ -1,0 +1,375 @@
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+
+namespace Onudhabon_ISD.Services
+{
+    public class CloudinaryService : ICloudinaryService
+    {
+        private readonly Cloudinary _cloudinary;
+        private readonly ILogger<CloudinaryService> _logger;
+
+        public const string FOLDER_LECTURES = "onudhabon/lectures";
+        public const string FOLDER_MATERIALS = "onudhabon/materials";
+        public const string FOLDER_PROFILES = "onudhabon/profile_pictures";
+        public const string FOLDER_CONSENT = "onudhabon/consent_letters";
+        public const string FOLDER_EDUCATION = "onudhabon/education_doc";
+
+        public CloudinaryService(ILogger<CloudinaryService> logger)
+        {
+            _logger = logger;
+
+            var cloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME")
+                            ?? Environment.GetEnvironmentVariable("CloudName")
+                            ?? string.Empty;
+
+            var apiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY")
+                         ?? Environment.GetEnvironmentVariable("ApiKey")
+                         ?? string.Empty;
+
+            var apiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET")
+                            ?? Environment.GetEnvironmentVariable("ApiSecret")
+                            ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(cloudName) ||
+                string.IsNullOrWhiteSpace(apiKey) ||
+                string.IsNullOrWhiteSpace(apiSecret))
+            {
+                _logger.LogWarning("Cloudinary credentials missing in .env (CloudName, ApiKey, ApiSecret). Please configure them.");
+            }
+
+            var account = new Account(cloudName, apiKey, apiSecret);
+            _cloudinary = new Cloudinary(account);
+            _cloudinary.Api.Secure = true;
+        }
+
+        public async Task<CloudinaryUploadResult> UploadLectureVideoAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = "Video file is required." };
+            }
+
+            try
+            {
+                await using var stream = file.OpenReadStream();
+                var publicId = Path.GetFileNameWithoutExtension(file.FileName);
+
+                var uploadParams = new VideoUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = FOLDER_LECTURES,
+                    PublicId = publicId,
+                    UseFilename = true,
+                    UniqueFilename = false,
+                    Overwrite = true,
+                    EagerTransforms = new List<Transformation>
+                    {
+                        new Transformation().Width(300).Height(200).Crop("fill").FetchFormat("jpg")
+                    },
+                    EagerAsync = false
+                };
+
+                var result = await _cloudinary.UploadAsync(uploadParams);
+
+                if (result.Error != null)
+                {
+                    _logger.LogError("Cloudinary video upload error: {Message}", result.Error.Message);
+                    return new CloudinaryUploadResult { Success = false, ErrorMessage = result.Error.Message };
+                }
+
+                var secureUrl = result.SecureUrl?.ToString() ?? result.Url?.ToString() ?? string.Empty;
+                var eagerThumbnail = GetVideoThumbnailUrl(secureUrl, 300, 200);
+
+                return new CloudinaryUploadResult
+                {
+                    Success = true,
+                    SecureUrl = secureUrl,
+                    ThumbnailUrl = eagerThumbnail,
+                    PublicId = result.PublicId,
+                    Format = result.Format,
+                    Bytes = result.Bytes
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to upload video to Cloudinary ({FileName})", file.FileName);
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = ex.Message };
+            }
+        }
+
+        public async Task<CloudinaryUploadResult> UploadMaterialPdfAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = "Material file is required." };
+            }
+
+            try
+            {
+                await using var stream = file.OpenReadStream();
+                var publicId = Path.GetFileNameWithoutExtension(file.FileName);
+
+                var uploadParams = new AutoUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = FOLDER_MATERIALS,
+                    PublicId = publicId,
+                    UseFilename = true,
+                    UniqueFilename = false,
+                    Overwrite = true
+                };
+
+                var result = await _cloudinary.UploadAsync(uploadParams);
+
+                if (result.Error != null)
+                {
+                    _logger.LogError("Cloudinary material PDF upload error: {Message}", result.Error.Message);
+                    return new CloudinaryUploadResult { Success = false, ErrorMessage = result.Error.Message };
+                }
+
+                var secureUrl = result.SecureUrl?.ToString() ?? result.Url?.ToString() ?? string.Empty;
+
+                return new CloudinaryUploadResult
+                {
+                    Success = true,
+                    SecureUrl = secureUrl,
+                    ThumbnailUrl = GetPdfThumbnailUrl(secureUrl, 300, 1),
+                    PublicId = result.PublicId,
+                    Format = result.Format,
+                    Bytes = result.Bytes
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to upload material to Cloudinary ({FileName})", file.FileName);
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = ex.Message };
+            }
+        }
+
+        public async Task<CloudinaryUploadResult> UploadProfilePictureAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = "Profile image file is required." };
+            }
+
+            try
+            {
+                await using var stream = file.OpenReadStream();
+                var publicId = Path.GetFileNameWithoutExtension(file.FileName);
+
+                var uploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = FOLDER_PROFILES,
+                    PublicId = publicId,
+                    UseFilename = true,
+                    UniqueFilename = false,
+                    Overwrite = true
+                };
+
+                var result = await _cloudinary.UploadAsync(uploadParams);
+
+                if (result.Error != null)
+                {
+                    _logger.LogError("Cloudinary profile upload error: {Message}", result.Error.Message);
+                    return new CloudinaryUploadResult { Success = false, ErrorMessage = result.Error.Message };
+                }
+
+                var secureUrl = result.SecureUrl?.ToString() ?? result.Url?.ToString() ?? string.Empty;
+
+                return new CloudinaryUploadResult
+                {
+                    Success = true,
+                    SecureUrl = secureUrl,
+                    PublicId = result.PublicId,
+                    Format = result.Format,
+                    Bytes = result.Bytes
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to upload profile image to Cloudinary ({FileName})", file.FileName);
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = ex.Message };
+            }
+        }
+
+        public async Task<CloudinaryUploadResult> UploadConsentLetterAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = "Consent file is required." };
+            }
+
+            try
+            {
+                await using var stream = file.OpenReadStream();
+                var publicId = Path.GetFileNameWithoutExtension(file.FileName);
+
+                var uploadParams = new AutoUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = FOLDER_CONSENT,
+                    PublicId = publicId,
+                    UseFilename = true,
+                    UniqueFilename = false,
+                    Overwrite = true
+                };
+
+                var result = await _cloudinary.UploadAsync(uploadParams);
+
+                if (result.Error != null)
+                {
+                    _logger.LogError("Cloudinary consent letter upload error: {Message}", result.Error.Message);
+                    return new CloudinaryUploadResult { Success = false, ErrorMessage = result.Error.Message };
+                }
+
+                return new CloudinaryUploadResult
+                {
+                    Success = true,
+                    SecureUrl = result.SecureUrl?.ToString() ?? result.Url?.ToString(),
+                    PublicId = result.PublicId,
+                    Bytes = result.Bytes
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to upload consent letter to Cloudinary ({FileName})", file.FileName);
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = ex.Message };
+            }
+        }
+
+        public async Task<CloudinaryUploadResult> UploadEducationDocAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = "Education document file is required." };
+            }
+
+            try
+            {
+                await using var stream = file.OpenReadStream();
+                var publicId = Path.GetFileNameWithoutExtension(file.FileName);
+
+                var uploadParams = new AutoUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = FOLDER_EDUCATION,
+                    PublicId = publicId,
+                    UseFilename = true,
+                    UniqueFilename = false,
+                    Overwrite = true
+                };
+
+                var result = await _cloudinary.UploadAsync(uploadParams);
+
+                if (result.Error != null)
+                {
+                    _logger.LogError("Cloudinary education doc upload error: {Message}", result.Error.Message);
+                    return new CloudinaryUploadResult { Success = false, ErrorMessage = result.Error.Message };
+                }
+
+                var secureUrl = result.SecureUrl?.ToString() ?? result.Url?.ToString() ?? string.Empty;
+
+                return new CloudinaryUploadResult
+                {
+                    Success = true,
+                    SecureUrl = secureUrl,
+                    ThumbnailUrl = GetPdfThumbnailUrl(secureUrl, 300, 1),
+                    PublicId = result.PublicId,
+                    Bytes = result.Bytes
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to upload education document to Cloudinary ({FileName})", file.FileName);
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = ex.Message };
+            }
+        }
+
+        public async Task<bool> DeleteAsync(string publicId)
+        {
+            if (string.IsNullOrWhiteSpace(publicId)) return false;
+
+            try
+            {
+                var delParams = new DeletionParams(publicId);
+                var result = await _cloudinary.DestroyAsync(delParams);
+                return result.Result == "ok";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete Cloudinary asset {PublicId}", publicId);
+                return false;
+            }
+        }
+
+        public string GetOptimizedVideoUrl(string? originalUrl, int? maxWidth = null)
+        {
+            if (string.IsNullOrWhiteSpace(originalUrl)) return string.Empty;
+
+            if (!originalUrl.Contains("res.cloudinary.com") || !originalUrl.Contains("/video/upload/"))
+            {
+                return originalUrl;
+            }
+
+            var parts = new List<string> { "f_auto", "q_auto", "vc_auto" };
+            if (maxWidth.HasValue)
+            {
+                parts.Add($"w_{maxWidth.Value}");
+                parts.Add("c_limit");
+            }
+
+            var transformString = string.Join(",", parts);
+            return originalUrl.Replace("/video/upload/", $"/video/upload/{transformString}/");
+        }
+
+        public string GetVideoThumbnailUrl(string? videoUrl, int width = 300, int height = 200)
+        {
+            if (string.IsNullOrWhiteSpace(videoUrl)) return string.Empty;
+
+            if (!videoUrl.Contains("res.cloudinary.com") || !videoUrl.Contains("/video/upload/"))
+            {
+                return videoUrl;
+            }
+
+            var transform = $"so_0,w_{width},h_{height},c_fill,f_jpg";
+            var transformed = videoUrl.Replace("/video/upload/", $"/video/upload/{transform}/");
+            return Path.ChangeExtension(transformed, ".jpg");
+        }
+
+        public string GetPdfThumbnailUrl(string? originalUrl, int width = 300, int page = 1)
+        {
+            if (string.IsNullOrWhiteSpace(originalUrl)) return string.Empty;
+
+            if (!originalUrl.Contains("res.cloudinary.com"))
+            {
+                return originalUrl;
+            }
+
+            var transform = $"pg_{page},w_{width},c_limit,f_auto,q_auto";
+
+            if (originalUrl.Contains("/image/upload/"))
+            {
+                var replaced = originalUrl.Replace("/image/upload/", $"/image/upload/{transform}/");
+                return Path.ChangeExtension(replaced, ".jpg");
+            }
+
+            if (originalUrl.Contains("/raw/upload/"))
+            {
+                var replaced = originalUrl.Replace("/raw/upload/", $"/image/upload/{transform}/");
+                return Path.ChangeExtension(replaced, ".jpg");
+            }
+
+            if (originalUrl.Contains("/auto/upload/"))
+            {
+                var replaced = originalUrl.Replace("/auto/upload/", $"/image/upload/{transform}/");
+                return Path.ChangeExtension(replaced, ".jpg");
+            }
+
+            return originalUrl;
+        }
+    }
+}

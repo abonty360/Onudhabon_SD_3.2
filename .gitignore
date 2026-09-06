@@ -1,4 +1,14 @@
-﻿bin/
+﻿## Build and output directories
+bin/
 obj/
 .vs/
 *.user
+
+## Environment files & Secrets
+.env
+.env.*
+*.env
+*.env.local
+
+## Local uploads cache
+wwwroot/uploads/

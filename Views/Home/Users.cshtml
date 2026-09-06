@@ -48,71 +48,171 @@
                 <table class="table table-hover align-middle mb-0" style="font-size: 0.925rem;">
                     <thead style="background-color: #f1f5f9; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.05em;">
                         <tr>
-                            <th class="ps-4 py-3">ID</th>
-                            <th class="py-3">Full Name</th>
-                            <th class="py-3">Email Address</th>
-                            <th class="py-3">Phone Number</th>
+                            <th class="ps-4 py-3">User</th>
                             <th class="py-3">Role</th>
-                            <th class="py-3">City</th>
-                            <th class="py-3">Region / Area</th>
-                            <th class="py-3" style="max-width: 250px;">Volunteer Reason</th>
-                            <th class="py-3 text-center">Terms Agreed</th>
-                            <th class="pe-4 py-3 text-end">Registered Date</th>
+                            <th class="py-3">Contact</th>
+                            <th class="py-3">Location</th>
+                            <th class="py-3">Education / Academic</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3 text-center">Details</th>
+                            <th class="pe-4 py-3 text-end">Registered</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var user in Model)
                         {
                             <tr>
-                                <td class="ps-4 fw-semibold text-muted">#@user.Id</td>
-                                <td class="fw-bold text-dark">@user.FullName</td>
-                                <td>
-                                    <a href="mailto:@user.Email" class="text-decoration-none text-primary">@user.Email</a>
-                                </td>
-                                <td>
-                                    <span class="font-monospace text-secondary">@user.PhoneNumber</span>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-2.5">
+                                        @if (!string.IsNullOrEmpty(user.Picture))
+                                        {
+                                            <img src="@user.Picture" alt="@user.FullName" class="rounded-circle" style="width: 38px; height: 38px; object-fit: cover; border: 1.5px solid #e2e8f0;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-size: 0.9rem;">
+                                                @(string.IsNullOrEmpty(user.FullName) ? "U" : user.FullName.Substring(0, 1).ToUpper())
+                                            </div>
+                                        }
+                                        <div>
+                                            <div class="fw-bold text-dark">@user.FullName</div>
+                                            <div class="text-muted small">
+                                                ID: #@user.Id @(user.Age.HasValue ? $"• {user.Age} yrs" : "")
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     @if (user.Role == "Educator")
                                     {
-                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 rounded-pill">
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-pill">
                                             Educator
                                         </span>
                                     }
                                     else if (user.Role == "Local Guardian")
                                     {
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5 rounded-pill">
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill">
                                             Local Guardian
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2.5 py-1.5 rounded-pill">
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2.5 py-1 rounded-pill">
                                             @user.Role
                                         </span>
                                     }
                                 </td>
-                                <td>@user.City</td>
                                 <td>
-                                    <span class="badge bg-light text-dark border px-2 py-1">@user.Area</span>
+                                    <div><a href="mailto:@user.Email" class="text-decoration-none text-primary small">@user.Email</a></div>
+                                    <div class="font-monospace text-secondary small">@user.PhoneNumber</div>
                                 </td>
-                                <td style="max-width: 250px;" class="text-truncate" title="@(user.VolunteerReason ?? "N/A")">
-                                    @(string.IsNullOrWhiteSpace(user.VolunteerReason) ? "—" : user.VolunteerReason)
+                                <td>
+                                    <div class="fw-semibold text-dark">@user.City</div>
+                                    <div class="text-muted small">@user.Area @(!string.IsNullOrEmpty(user.Location) ? $"({user.Location})" : "")</div>
                                 </td>
-                                <td class="text-center">
-                                    @if (user.AgreeToTerms)
+                                <td>
+                                    @if (!string.IsNullOrEmpty(user.EducationLevel) || !string.IsNullOrEmpty(user.Institution))
                                     {
-                                        <span class="badge bg-success text-white px-2 py-1 rounded-pill" title="Agreed to Terms & Conditions">✓ Yes</span>
+                                        <div class="text-dark fw-medium small">@(user.EducationLevel ?? "Academic Record")</div>
+                                        <div class="text-muted small">@(user.Institution ?? user.UniversityName ?? "—") @(!string.IsNullOrEmpty(user.Major) ? $"({user.Major})" : "")</div>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-danger text-white px-2 py-1 rounded-pill">✕ No</span>
+                                        <span class="text-muted small">—</span>
                                     }
                                 </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border px-2 py-1">
+                                        @(user.VerificationStatus ?? "Pending")
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 py-1" data-bs-toggle="modal" data-bs-target="#userModal-@user.Id" style="font-size: 0.78rem;">
+                                        View Full
+                                    </button>
+                                </td>
                                 <td class="pe-4 text-end text-muted small">
-                                    @user.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+                                    @user.CreatedAt.ToString("MMM dd, yyyy")
                                 </td>
                             </tr>
+
+                            <!-- User Detail Modal -->
+                            <div class="modal fade" id="userModal-@user.Id" tabindex="-1" aria-labelledby="userModalLabel-@user.Id" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content rounded-4 border-0 shadow">
+                                        <div class="modal-header border-bottom py-3 px-4">
+                                            <h5 class="modal-title fw-bold" id="userModalLabel-@user.Id">
+                                                User Profile: @user.FullName
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="row g-3">
+                                                <div class="col-md-3 text-center border-end pe-3">
+                                                    @if (!string.IsNullOrEmpty(user.Picture))
+                                                    {
+                                                        <img src="@user.Picture" alt="@user.FullName" class="img-fluid rounded-4 shadow-sm mb-2" style="max-height: 140px; object-fit: cover;" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="rounded-4 bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 100px; height: 100px; font-size: 2rem;">
+                                                            @(string.IsNullOrEmpty(user.FullName) ? "U" : user.FullName.Substring(0, 1).ToUpper())
+                                                        </div>
+                                                    }
+                                                    <div class="fw-bold">@user.FullName</div>
+                                                    <div class="badge bg-primary-subtle text-primary rounded-pill mb-1">@user.Role</div>
+                                                    <div class="text-muted small">ID: #@user.Id</div>
+                                                </div>
+
+                                                <div class="col-md-9 ps-md-3">
+                                                    <h6 class="fw-bold text-primary border-bottom pb-1 mb-2">Personal & Contact Info</h6>
+                                                    <div class="row g-2 mb-3 small">
+                                                        <div class="col-6"><strong>Email:</strong> @user.Email</div>
+                                                        <div class="col-6"><strong>Phone:</strong> @user.PhoneNumber</div>
+                                                        <div class="col-6"><strong>City:</strong> @user.City</div>
+                                                        <div class="col-6"><strong>Area / Region:</strong> @user.Area</div>
+                                                        <div class="col-6"><strong>Specific Address:</strong> @(user.Location ?? "—")</div>
+                                                        <div class="col-6"><strong>Age:</strong> @(user.Age.HasValue ? user.Age.ToString() : "—")</div>
+                                                        <div class="col-6"><strong>NID / ID No:</strong> @(user.NidNumber ?? "—")</div>
+                                                        <div class="col-6"><strong>Verification:</strong> @(user.VerificationStatus ?? "Pending")</div>
+                                                    </div>
+
+                                                    <h6 class="fw-bold text-primary border-bottom pb-1 mb-2">Academic & Educational Background</h6>
+                                                    <div class="row g-2 mb-3 small">
+                                                        <div class="col-6"><strong>Highest Level:</strong> @(user.EducationLevel ?? "—")</div>
+                                                        <div class="col-6"><strong>Currently Enrolled:</strong> @(user.CurrentlyStudying ?? "—")</div>
+                                                        <div class="col-6"><strong>Major / Field:</strong> @(user.Major ?? "—")</div>
+                                                        <div class="col-6"><strong>University / College:</strong> @(user.UniversityName ?? "—") @(!string.IsNullOrEmpty(user.UniversityPassingYear) ? $"({user.UniversityPassingYear})" : "")</div>
+                                                        <div class="col-6"><strong>HSC Institute:</strong> @(user.HscInstitute ?? "—") @(!string.IsNullOrEmpty(user.HscPassingYear) ? $"({user.HscPassingYear})" : "")</div>
+                                                        <div class="col-6"><strong>SSC Institute:</strong> @(user.SscInstitute ?? "—") @(!string.IsNullOrEmpty(user.SscPassingYear) ? $"({user.SscPassingYear})" : "")</div>
+                                                        @if (!string.IsNullOrEmpty(user.CertificatePicture))
+                                                        {
+                                                            <div class="col-6">
+                                                                <strong>Certificate/Doc:</strong>
+                                                                <a href="@user.CertificatePicture" target="_blank" class="text-primary text-decoration-underline ms-1">View Attached Document</a>
+                                                            </div>
+                                                        }
+                                                    </div>
+
+                                                    @if (!string.IsNullOrEmpty(user.Bio) || !string.IsNullOrEmpty(user.VolunteerReason))
+                                                    {
+                                                        <h6 class="fw-bold text-primary border-bottom pb-1 mb-2">Bio & Motivation</h6>
+                                                        <div class="small mb-2">
+                                                            <strong>Bio:</strong> @(user.Bio ?? "—")
+                                                        </div>
+                                                        <div class="small">
+                                                            <strong>Volunteer Reason:</strong> @(user.VolunteerReason ?? "—")
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer py-2 px-4 border-top">
+                                            <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         }
                     </tbody>
                 </table>
