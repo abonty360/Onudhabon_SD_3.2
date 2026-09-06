@@ -65,6 +65,26 @@ namespace Onudhabon_ISD.Controllers
                 return View(model);
             }
 
+            // Check if user account has been restricted by Admin
+            if (user.IsRestricted)
+            {
+                ViewBag.RestrictedModal = true;
+                ViewBag.ModalTitle = "Account Restricted";
+                ViewBag.ModalMessage = "Your account has been restricted by the administrator. You are currently blocked from logging in. Please contact the administrator or support if you need assistance.";
+                ModelState.AddModelError(string.Empty, "Your account has been restricted. You are blocked from logging in.");
+                return View(model);
+            }
+
+            // Check if volunteer verification status was declined by Admin
+            if (string.Equals(user.VerificationStatus, "Declined", StringComparison.OrdinalIgnoreCase))
+            {
+                ViewBag.DeclinedModal = true;
+                ViewBag.ModalTitle = "Verification Status Declined";
+                ViewBag.ModalMessage = "Your volunteer verification status has been declined by the administrator. Please contact support or the administrator for further inquiries.";
+                ModelState.AddModelError(string.Empty, "Your verification status has been declined. You cannot log in.");
+                return View(model);
+            }
+
             // Create Claims for authenticated session
             var claims = new List<Claim>
             {
@@ -72,9 +92,9 @@ namespace Onudhabon_ISD.Controllers
                 new Claim(ClaimTypes.Name, user.FullName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
-                new Claim("PhoneNumber", user.PhoneNumber),
-                new Claim("City", user.City),
-                new Claim("Area", user.Area)
+                new Claim("PhoneNumber", user.PhoneNumber ?? ""),
+                new Claim("City", user.City ?? ""),
+                new Claim("Area", user.Area ?? "")
             };
 
             if (!string.IsNullOrEmpty(user.Picture))
@@ -100,6 +120,12 @@ namespace Onudhabon_ISD.Controllers
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
+            }
+
+            // If user is Admin, direct to the Admin Dashboard
+            if (user.Role == "Admin")
+            {
+                return RedirectToAction("Dashboard", "Admin");
             }
 
             return RedirectToAction("Index", "Home");

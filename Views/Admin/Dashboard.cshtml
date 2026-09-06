@@ -1,0 +1,788 @@
+﻿@model Onudhabon_ISD.Models.AdminDashboardViewModel
+@inject Onudhabon_ISD.Services.ICloudinaryService CloudinaryService
+
+@{
+    ViewData["Title"] = "Admin Dashboard - Onudhabon";
+    var activeTab = (string)(ViewBag.ActiveTab ?? "volunteers");
+}
+
+<div class="container-fluid px-lg-4 py-4">
+    <!-- Top Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-danger px-3 py-1.5 rounded-pill fs-6">Administrator Portal</span>
+                <span class="text-muted small">System Governance & Content Verification</span>
+            </div>
+            <h2 class="fw-bold mb-0 text-dark">Administrative Dashboard</h2>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Dashboard" asp-route-tab="@activeTab" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-2">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="me-1 align-text-bottom">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh Data
+            </a>
+        </div>
+    </div>
+
+    <!-- Feedback Alerts -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+            <strong>Success:</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+            <strong>Error:</strong> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Stat KPI Overview Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
+                <div class="text-muted small mb-1">Total Users</div>
+                <div class="h3 fw-bold text-dark mb-0">@Model.TotalUsers</div>
+                <div class="small text-muted mt-1">Registered accounts</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-warning-subtle border-warning-subtle">
+                <div class="text-warning-emphasis small mb-1 fw-semibold">Pending Volunteers</div>
+                <div class="h3 fw-bold text-warning-emphasis mb-0">@Model.PendingVolunteersCount</div>
+                <div class="small text-muted mt-1">Awaiting verification</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-success-subtle border-success-subtle">
+                <div class="text-success-emphasis small mb-1 fw-semibold">Active Volunteers</div>
+                <div class="h3 fw-bold text-success-emphasis mb-0">@Model.ActiveVolunteersCount</div>
+                <div class="small text-muted mt-1">Verified & active</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-primary-subtle border-primary-subtle">
+                <div class="text-primary-emphasis small mb-1 fw-semibold">Pending Lectures</div>
+                <div class="h3 fw-bold text-primary-emphasis mb-0">@Model.PendingLecturesCount</div>
+                <div class="small text-muted mt-1">Uploads to review</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-info-subtle border-info-subtle">
+                <div class="text-info-emphasis small mb-1 fw-semibold">Pending Materials</div>
+                <div class="h3 fw-bold text-info-emphasis mb-0">@Model.PendingMaterialsCount</div>
+                <div class="small text-muted mt-1">Documents to review</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-danger-subtle border-danger-subtle">
+                <div class="text-danger-emphasis small mb-1 fw-semibold">Restricted Users</div>
+                <div class="h3 fw-bold text-danger-emphasis mb-0">@Model.RestrictedUsersCount</div>
+                <div class="small text-muted mt-1">Blocked from login</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Tabs -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-white border-bottom p-3">
+            <ul class="nav nav-pills card-header-pills gap-2 flex-wrap" id="adminTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "volunteers" ? "active fw-semibold" : "text-dark")" 
+                            id="volunteers-tab" data-bs-toggle="tab" data-bs-target="#volunteers-tab-pane" type="button" role="tab">
+                        👥 Registered Users & Volunteers
+                        @if (Model.PendingVolunteersCount > 0)
+                        {
+                            <span class="badge bg-warning text-dark rounded-pill ms-1.5">@Model.PendingVolunteersCount</span>
+                        }
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "lectures" ? "active fw-semibold" : "text-dark")" 
+                            id="lectures-tab" data-bs-toggle="tab" data-bs-target="#lectures-tab-pane" type="button" role="tab">
+                        🎥 Lectures Moderation
+                        @if (Model.PendingLecturesCount > 0)
+                        {
+                            <span class="badge bg-primary text-white rounded-pill ms-1.5">@Model.PendingLecturesCount</span>
+                        }
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "materials" ? "active fw-semibold" : "text-dark")" 
+                            id="materials-tab" data-bs-toggle="tab" data-bs-target="#materials-tab-pane" type="button" role="tab">
+                        📄 Materials Moderation
+                        @if (Model.PendingMaterialsCount > 0)
+                        {
+                            <span class="badge bg-info text-dark rounded-pill ms-1.5">@Model.PendingMaterialsCount</span>
+                        }
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "students" ? "active fw-semibold" : "text-secondary")" 
+                            id="students-tab" data-bs-toggle="tab" data-bs-target="#students-tab-pane" type="button" role="tab">
+                        🎓 Student Enrollment Approvals <span class="badge bg-secondary-subtle text-secondary rounded-pill ms-1">Scope</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="tab-content" id="adminTabContent">
+
+                <!-- ================= TAB 1: VOLUNTEERS & USERS ================= -->
+                <div class="tab-pane fade @(activeTab == "volunteers" ? "show active" : "")" id="volunteers-tab-pane" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">Volunteer Registrations & Users</h5>
+                            <p class="text-muted small mb-0">Review volunteer applications, approve/decline status, and manage restrictions.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle border rounded-3 overflow-hidden">
+                            <thead class="table-light small text-muted text-uppercase">
+                                <tr>
+                                    <th>User Info</th>
+                                    <th>Role</th>
+                                    <th>Location</th>
+                                    <th>Verification</th>
+                                    <th>Restricted</th>
+                                    <th>Joined</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model.Users)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2.5">
+                                                @if (!string.IsNullOrWhiteSpace(user.Picture))
+                                                {
+                                                    <img src="@CloudinaryService.GetAvatarUrl(user.Picture, 60)" 
+                                                         alt="@user.FullName" 
+                                                         class="rounded-circle border" 
+                                                         style="width: 38px; height: 38px; object-fit: cover;" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" 
+                                                         style="width: 38px; height: 38px; font-size: 0.85rem;">
+                                                        @(string.IsNullOrEmpty(user.FullName) ? "U" : user.FullName.Substring(0, 1).ToUpper())
+                                                    </div>
+                                                }
+                                                <div>
+                                                    <button type="button" class="btn btn-link text-decoration-none p-0 fw-bold text-dark text-start" data-bs-toggle="modal" data-bs-target="#userModal-@user.Id">
+                                                        @user.FullName
+                                                    </button>
+                                                    <div class="text-muted small">@user.Email</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @if (user.Role == "Educator")
+                                            {
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Educator</span>
+                                            }
+                                            else if (user.Role == "Local Guardian")
+                                            {
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Local Guardian</span>
+                                            }
+                                            else if (user.Role == "Admin")
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Admin</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary rounded-pill">@user.Role</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="small fw-semibold text-dark">@user.City</div>
+                                            <div class="text-muted small">@user.Area</div>
+                                        </td>
+                                        <td>
+                                            @if (user.VerificationStatus == "Active" || user.VerificationStatus == "Approved")
+                                            {
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">
+                                                    Active
+                                                </span>
+                                            }
+                                            else if (user.VerificationStatus == "Declined")
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1">
+                                                    Declined
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1">
+                                                    Pending
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (user.IsRestricted)
+                                            {
+                                                <span class="badge bg-danger rounded-pill px-2.5">Restricted</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-light text-muted border rounded-pill">No</span>
+                                            }
+                                        </td>
+                                        <td class="small text-muted">@user.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex gap-1.5">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5" data-bs-toggle="modal" data-bs-target="#userModal-@user.Id" title="View Full Profile Preview">
+                                                    Preview
+                                                </button>
+
+                                                @if (user.Role != "Admin")
+                                                {
+                                                    @if (user.VerificationStatus != "Active" && user.VerificationStatus != "Approved")
+                                                    {
+                                                        <form asp-action="ApproveUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5" title="Approve Volunteer (Sets Active)">
+                                                                ✓ Approve
+                                                            </button>
+                                                        </form>
+                                                    }
+
+                                                    @if (user.VerificationStatus != "Declined")
+                                                    {
+                                                        <form asp-action="DeclineUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5" title="Decline Volunteer">
+                                                                ✕ Decline
+                                                            </button>
+                                                        </form>
+                                                    }
+
+                                                    <form asp-action="ToggleRestrictUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-sm @(user.IsRestricted ? "btn-warning" : "btn-outline-dark") rounded-pill px-2.5" title="@(user.IsRestricted ? "Unrestrict User" : "Restrict User (Blocks Login)")">
+                                                            @(user.IsRestricted ? "Unrestrict" : "Restrict")
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- User Detail Preview Modal -->
+                                    <div class="modal fade" id="userModal-@user.Id" tabindex="-1" aria-labelledby="userModalLabel-@user.Id" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content rounded-4 border-0 shadow">
+                                                <div class="modal-header border-bottom-0 pb-0">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        @if (!string.IsNullOrWhiteSpace(user.Picture))
+                                                        {
+                                                            <img src="@CloudinaryService.GetAvatarUrl(user.Picture, 100)" alt="@user.FullName" class="rounded-circle border" style="width: 54px; height: 54px; object-fit: cover;" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 54px; height: 54px; font-size: 1.3rem;">
+                                                                @(string.IsNullOrEmpty(user.FullName) ? "U" : user.FullName.Substring(0, 1).ToUpper())
+                                                            </div>
+                                                        }
+                                                        <div>
+                                                            <h5 class="modal-title fw-bold text-dark mb-0" id="userModalLabel-@user.Id">@user.FullName</h5>
+                                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill me-1">@user.Role</span>
+                                                            <span class="badge @(user.VerificationStatus == "Active" ? "bg-success-subtle text-success" : "bg-warning-subtle text-warning") rounded-pill">Status: @(user.VerificationStatus ?? "Pending")</span>
+                                                            @if (user.IsRestricted)
+                                                            {
+                                                                <span class="badge bg-danger rounded-pill">RESTRICTED</span>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body py-4">
+                                                    <div class="row g-3 small">
+                                                        <div class="col-sm-6">
+                                                            <div class="text-muted">Email:</div>
+                                                            <div class="fw-semibold text-dark">@user.Email</div>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="text-muted">Phone:</div>
+                                                            <div class="fw-semibold text-dark">@user.PhoneNumber</div>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="text-muted">City / Region:</div>
+                                                            <div class="fw-semibold text-dark">@user.City, @user.Area</div>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="text-muted">Detailed Address:</div>
+                                                            <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(user.Location) ? "—" : user.Location)</div>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="text-muted">Age / NID:</div>
+                                                            <div class="fw-semibold text-dark">Age: @(user.Age?.ToString() ?? "—"), NID: @(user.NidNumber ?? "—")</div>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="text-muted">Registration Date:</div>
+                                                            <div class="fw-semibold text-dark">@user.CreatedAt.ToString("f")</div>
+                                                        </div>
+
+                                                        <div class="col-12 border-top pt-2 mt-2">
+                                                            <h6 class="fw-bold text-dark mb-2">Educational Qualifications</h6>
+                                                            <div class="row g-2">
+                                                                <div class="col-sm-6"><strong>Highest Level:</strong> @(user.EducationLevel ?? "—")</div>
+                                                                <div class="col-sm-6"><strong>Major:</strong> @(user.Major ?? "—")</div>
+                                                                <div class="col-sm-6"><strong>University:</strong> @(user.UniversityName ?? "—") @(!string.IsNullOrWhiteSpace(user.UniversityPassingYear) ? $"({user.UniversityPassingYear})" : "")</div>
+                                                                <div class="col-sm-6"><strong>HSC:</strong> @(user.HscInstitute ?? "—") @(!string.IsNullOrWhiteSpace(user.HscPassingYear) ? $"({user.HscPassingYear})" : "")</div>
+                                                                <div class="col-sm-6"><strong>SSC:</strong> @(user.SscInstitute ?? "—") @(!string.IsNullOrWhiteSpace(user.SscPassingYear) ? $"({user.SscPassingYear})" : "")</div>
+                                                            </div>
+                                                        </div>
+
+                                                        @if (!string.IsNullOrWhiteSpace(user.CertificatePicture))
+                                                        {
+                                                            <div class="col-12 border-top pt-2">
+                                                                <div class="text-muted mb-1">Attached Certificate Document:</div>
+                                                                <a href="@user.CertificatePicture" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill">
+                                                                    📄 Open Uploaded Document on Cloudinary
+                                                                </a>
+                                                            </div>
+                                                        }
+
+                                                        @if (!string.IsNullOrWhiteSpace(user.Bio))
+                                                        {
+                                                            <div class="col-12 border-top pt-2">
+                                                                <div class="text-muted">Bio:</div>
+                                                                <p class="mb-0 text-dark">@user.Bio</p>
+                                                            </div>
+                                                        }
+                                                        @if (!string.IsNullOrWhiteSpace(user.VolunteerReason))
+                                                        {
+                                                            <div class="col-12 border-top pt-2">
+                                                                <div class="text-muted">Volunteer Motivation:</div>
+                                                                <p class="mb-0 text-dark">@user.VolunteerReason</p>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer border-top-0 pt-0 d-flex justify-content-between">
+                                                    <div>
+                                                        @if (user.Role != "Admin")
+                                                        {
+                                                            <form asp-action="ToggleRestrictUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="btn btn-sm @(user.IsRestricted ? "btn-warning" : "btn-danger") rounded-pill px-3">
+                                                                    @(user.IsRestricted ? "Unrestrict User" : "🚫 Restrict User")
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        @if (user.Role != "Admin" && user.VerificationStatus != "Active")
+                                                        {
+                                                            <form asp-action="ApproveUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                                                    ✓ Approve Volunteer
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        @if (user.Role != "Admin" && user.VerificationStatus != "Declined")
+                                                        {
+                                                            <form asp-action="DeclineUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                                                    ✕ Decline
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 2: LECTURES MODERATION ================= -->
+                <div class="tab-pane fade @(activeTab == "lectures" ? "show active" : "")" id="lectures-tab-pane" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">Lecture Moderation & Approvals</h5>
+                            <p class="text-muted small mb-0">Preview pending video lectures, verify educators, approve/decline uploads, and restrict educators if necessary.</p>
+                        </div>
+                    </div>
+
+                    @if (!Model.Lectures.Any())
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <p>No video lectures in catalog yet.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle border rounded-3 overflow-hidden">
+                                <thead class="table-light small text-muted text-uppercase">
+                                    <tr>
+                                        <th>Lecture</th>
+                                        <th>Class & Subject</th>
+                                        <th>Educator</th>
+                                        <th>Status</th>
+                                        <th>Uploaded</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var lecture in Model.Lectures)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2.5">
+                                                    <img src="@(lecture.Thumbnail ?? CloudinaryService.GetVideoThumbnailUrl(lecture.VideoUrl, 80, 50))" 
+                                                         alt="@lecture.Title" 
+                                                         class="rounded border bg-dark" 
+                                                         style="width: 60px; height: 38px; object-fit: cover;" 
+                                                         onerror="this.src='https://via.placeholder.com/60x38?text=Video';" />
+                                                    <div>
+                                                        <button type="button" class="btn btn-link text-decoration-none p-0 fw-bold text-dark text-start text-truncate d-inline-block" style="max-width: 280px;" data-bs-toggle="modal" data-bs-target="#lectureModal-@lecture.Id">
+                                                            @lecture.Title
+                                                        </button>
+                                                        <div class="text-muted small text-truncate" style="max-width: 280px;">Topic: @lecture.Topic</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary-subtle text-primary border rounded-pill">Class @lecture.ClassLevel</span>
+                                                <div class="small text-muted mt-0.5">@lecture.Subject</div>
+                                            </td>
+                                            <td>
+                                                <span class="fw-semibold text-dark">@(lecture.Instructor ?? "Educator")</span>
+                                            </td>
+                                            <td>
+                                                @if (lecture.Status == "Active" || lecture.Status == "Approved")
+                                                {
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">Active</span>
+                                                }
+                                                else if (lecture.Status == "Declined")
+                                                {
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1">Declined</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1">Pending</span>
+                                                }
+                                            </td>
+                                            <td class="small text-muted">@lecture.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-end">
+                                                <div class="d-inline-flex gap-1.5">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2.5" data-bs-toggle="modal" data-bs-target="#lectureModal-@lecture.Id">
+                                                        Preview & Verify
+                                                    </button>
+
+                                                    @if (lecture.Status != "Active" && lecture.Status != "Approved")
+                                                    {
+                                                        <form asp-action="ApproveLecture" asp-route-id="@lecture.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5">
+                                                                ✓ Approve
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    @if (lecture.Status != "Declined")
+                                                    {
+                                                        <form asp-action="DeclineLecture" asp-route-id="@lecture.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5">
+                                                                ✕ Decline
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Lecture Preview Modal with Educator Restriction Button -->
+                                        <div class="modal fade" id="lectureModal-@lecture.Id" tabindex="-1" aria-labelledby="lectureModalLabel-@lecture.Id" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                <div class="modal-content rounded-4 border-0 shadow">
+                                                    <div class="modal-header border-bottom-0 pb-0">
+                                                        <div>
+                                                            <h5 class="modal-title fw-bold text-dark mb-0" id="lectureModalLabel-@lecture.Id">@lecture.Title</h5>
+                                                            <div class="text-muted small">Instructor: <strong>@(lecture.Instructor ?? "Educator")</strong> | Class: @lecture.ClassLevel | Subject: @lecture.Subject</div>
+                                                        </div>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body py-3">
+                                                        @if (!string.IsNullOrWhiteSpace(lecture.VideoUrl))
+                                                        {
+                                                            <div class="ratio ratio-16x9 rounded-3 overflow-hidden bg-black mb-3 border">
+                                                                <video controls playsinline preload="metadata" poster="@lecture.Thumbnail" class="w-100 h-100" style="object-fit: contain;">
+                                                                    <source src="@lecture.VideoUrl" type="video/mp4" />
+                                                                    Your browser does not support HTML5 video playback.
+                                                                </video>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="p-4 bg-light rounded text-center text-muted mb-3">No video URL available.</div>
+                                                        }
+
+                                                        <div class="p-3 bg-light rounded-3 small">
+                                                            <div class="mb-1"><strong>Topic:</strong> @lecture.Topic</div>
+                                                            <div class="mb-1"><strong>Description:</strong> @(string.IsNullOrWhiteSpace(lecture.Description) ? "No description provided." : lecture.Description)</div>
+                                                            <div><strong>Status:</strong> <span class="badge @(lecture.Status == "Active" ? "bg-success" : "bg-warning text-dark")">@lecture.Status</span></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer border-top-0 pt-0 d-flex justify-content-between">
+                                                        <!-- Restrict Educator button within preview -->
+                                                        <div>
+                                                            @if (!string.IsNullOrWhiteSpace(lecture.Instructor))
+                                                            {
+                                                                <form asp-action="RestrictEducator" method="post" class="d-inline">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <input type="hidden" name="educatorName" value="@lecture.Instructor" />
+                                                                    <input type="hidden" name="returnTab" value="lectures" />
+                                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3" onclick="return confirm('Are you sure you want to restrict educator @lecture.Instructor? They will be blocked from logging in.');">
+                                                                        🚫 Restrict Educator (@lecture.Instructor)
+                                                                    </button>
+                                                                </form>
+                                                            }
+                                                        </div>
+                                                        <div class="d-flex gap-2">
+                                                            @if (lecture.Status != "Active" && lecture.Status != "Approved")
+                                                            {
+                                                                <form asp-action="ApproveLecture" asp-route-id="@lecture.Id" method="post" class="d-inline">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">✓ Approve Lecture</button>
+                                                                </form>
+                                                            }
+                                                            @if (lecture.Status != "Declined")
+                                                            {
+                                                                <form asp-action="DeclineLecture" asp-route-id="@lecture.Id" method="post" class="d-inline">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">✕ Decline Lecture</button>
+                                                                </form>
+                                                            }
+                                                            <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+                <!-- ================= TAB 3: MATERIALS MODERATION ================= -->
+                <div class="tab-pane fade @(activeTab == "materials" ? "show active" : "")" id="materials-tab-pane" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">Study Materials Moderation</h5>
+                            <p class="text-muted small mb-0">Preview documents, verify authors, approve/decline PDF resources, and restrict educators if necessary.</p>
+                        </div>
+                    </div>
+
+                    @if (!Model.Materials.Any())
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <p>No study materials in catalog yet.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle border rounded-3 overflow-hidden">
+                                <thead class="table-light small text-muted text-uppercase">
+                                    <tr>
+                                        <th>Material</th>
+                                        <th>Class & Subject</th>
+                                        <th>Author / Educator</th>
+                                        <th>Size</th>
+                                        <th>Status</th>
+                                        <th>Uploaded</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var material in Model.Materials)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2.5">
+                                                    <div class="rounded-3 bg-primary-subtle text-primary p-2">
+                                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <button type="button" class="btn btn-link text-decoration-none p-0 fw-bold text-dark text-start text-truncate d-inline-block" style="max-width: 280px;" data-bs-toggle="modal" data-bs-target="#materialModal-@material.Id">
+                                                            @material.Title
+                                                        </button>
+                                                        <div class="text-muted small text-truncate" style="max-width: 280px;">Topic: @material.Topic</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary-subtle text-primary border rounded-pill">Class @material.ClassLevel</span>
+                                                <div class="small text-muted mt-0.5">@material.Subject</div>
+                                            </td>
+                                            <td>
+                                                <span class="fw-semibold text-dark">@(material.Instructor ?? "Educator")</span>
+                                            </td>
+                                            <td class="small">@(material.Size ?? "N/A")</td>
+                                            <td>
+                                                @if (material.Status == "Active" || material.Status == "Approved")
+                                                {
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">Active</span>
+                                                }
+                                                else if (material.Status == "Declined")
+                                                {
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1">Declined</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1">Pending</span>
+                                                }
+                                            </td>
+                                            <td class="small text-muted">@material.Date.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-end">
+                                                <div class="d-inline-flex gap-1.5">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2.5" data-bs-toggle="modal" data-bs-target="#materialModal-@material.Id">
+                                                        Preview & Verify
+                                                    </button>
+
+                                                    @if (material.Status != "Active" && material.Status != "Approved")
+                                                    {
+                                                        <form asp-action="ApproveMaterial" asp-route-id="@material.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5">
+                                                                ✓ Approve
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    @if (material.Status != "Declined")
+                                                    {
+                                                        <form asp-action="DeclineMaterial" asp-route-id="@material.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5">
+                                                                ✕ Decline
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Material Preview Modal with Educator Restriction Button -->
+                                        <div class="modal fade" id="materialModal-@material.Id" tabindex="-1" aria-labelledby="materialModalLabel-@material.Id" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                <div class="modal-content rounded-4 border-0 shadow">
+                                                    <div class="modal-header border-bottom-0 pb-0">
+                                                        <div>
+                                                            <h5 class="modal-title fw-bold text-dark mb-0" id="materialModalLabel-@material.Id">@material.Title</h5>
+                                                            <div class="text-muted small">Author: <strong>@(material.Instructor ?? "Educator")</strong> | Class: @material.ClassLevel | Subject: @material.Subject</div>
+                                                        </div>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body py-3">
+                                                        @if (!string.IsNullOrWhiteSpace(material.FileUrl))
+                                                        {
+                                                            <div class="ratio ratio-4x3 rounded-3 overflow-hidden bg-white mb-3 border">
+                                                                <iframe src="@material.FileUrl" class="w-100 h-100" title="@material.Title"></iframe>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="p-4 bg-light rounded text-center text-muted mb-3">No document URL available.</div>
+                                                        }
+
+                                                        <div class="p-3 bg-light rounded-3 small">
+                                                            <div class="mb-1"><strong>Topic:</strong> @material.Topic</div>
+                                                            <div class="mb-1"><strong>File Size:</strong> @(material.Size ?? "N/A")</div>
+                                                            <div class="mb-1"><strong>Description:</strong> @(string.IsNullOrWhiteSpace(material.Description) ? "No description provided." : material.Description)</div>
+                                                            <div><strong>Status:</strong> <span class="badge @(material.Status == "Active" ? "bg-success" : "bg-warning text-dark")">@material.Status</span></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer border-top-0 pt-0 d-flex justify-content-between">
+                                                        <!-- Restrict Educator button within preview -->
+                                                        <div>
+                                                            @if (!string.IsNullOrWhiteSpace(material.Instructor))
+                                                            {
+                                                                <form asp-action="RestrictEducator" method="post" class="d-inline">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <input type="hidden" name="educatorName" value="@material.Instructor" />
+                                                                    <input type="hidden" name="returnTab" value="materials" />
+                                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3" onclick="return confirm('Are you sure you want to restrict educator @material.Instructor? They will be blocked from logging in.');">
+                                                                        🚫 Restrict Educator (@material.Instructor)
+                                                                    </button>
+                                                                </form>
+                                                            }
+                                                        </div>
+                                                        <div class="d-flex gap-2">
+                                                            @if (!string.IsNullOrWhiteSpace(material.FileUrl))
+                                                            {
+                                                                <a href="@material.FileUrl" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                                                    📄 Open in Tab
+                                                                </a>
+                                                            }
+                                                            @if (material.Status != "Active" && material.Status != "Approved")
+                                                            {
+                                                                <form asp-action="ApproveMaterial" asp-route-id="@material.Id" method="post" class="d-inline">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">✓ Approve Material</button>
+                                                                </form>
+                                                            }
+                                                            @if (material.Status != "Declined")
+                                                            {
+                                                                <form asp-action="DeclineMaterial" asp-route-id="@material.Id" method="post" class="d-inline">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">✕ Decline Material</button>
+                                                                </form>
+                                                            }
+                                                            <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+                <!-- ================= TAB 4: STUDENT ENROLLMENT SCOPE ================= -->
+                <div class="tab-pane fade @(activeTab == "students" ? "show active" : "")" id="students-tab-pane" role="tabpanel">
+                    <div class="text-center py-5">
+                        <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex p-4 mb-3">
+                            <svg width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                            </svg>
+                        </div>
+                        <h4 class="fw-bold text-dark">Student Enrollment Approvals</h4>
+                        <p class="text-muted mx-auto" style="max-width: 540px;">
+                            This section is reserved for the verification and approval of students enrolled by Local Guardians with consent letters. The backend scope and data models are ready.
+                        </p>
+                        <div class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill fs-6">
+                            Total Students in Database: @Model.TotalStudentsCount
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

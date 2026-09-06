@@ -1,10 +1,10 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Onudhabon.Models;
 using Onudhabon_ISD.Data;
 using Onudhabon_ISD.Models;
+using System.Diagnostics;
 
 namespace Onudhabon_ISD.Controllers
 {
@@ -24,14 +24,11 @@ namespace Onudhabon_ISD.Controllers
             return View();
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-        public async Task<IActionResult> Users()
+        public IActionResult Users()
         {
-            var users = await _context.Users
-                .OrderByDescending(u => u.CreatedAt)
-                .ToListAsync();
-            return View(users);
+            return RedirectToAction("Dashboard", "Admin", new { tab = "volunteers" });
         }
 
         public IActionResult Privacy()

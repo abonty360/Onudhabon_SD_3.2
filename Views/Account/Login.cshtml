@@ -1,4 +1,4 @@
-@model Onudhabon.Models.LoginViewModel
+@model Onudhabon_ISD.Models.LoginViewModel
 
 @{
     Layout = null;
@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
@@ -23,7 +23,7 @@
             <!-- Logo Section -->
             <div class="logo-section">
                 <a asp-controller="Home" asp-action="Index" class="logo-link">
-                    <img src="~/images/login_logo.png" asp-append-version="true" alt="Onudhabon Logo" class="logo-icon" />
+                    <img src="~/images/navbar_logo.png" asp-append-version="true" alt="Onudhabon Logo" class="logo-icon" />
                 </a>
                 <h1 class="app-title">Onudhabon</h1>
                 <div class="subtitle">Exploring Education</div>
@@ -43,7 +43,7 @@
             {
                 <div class="alert-custom alert-success" role="alert">
                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
                     </svg>
                     <span>@TempData["SuccessMessage"]</span>
                 </div>
@@ -53,8 +53,8 @@
             {
                 <div class="alert-custom alert-danger" role="alert">
                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z" />
                     </svg>
                     <div asp-validation-summary="ModelOnly" class="mb-0"></div>
                 </div>
@@ -62,7 +62,7 @@
 
             <!-- Login Form -->
             <div class="form-panel">
-                <form asp-controller="Account" asp-action="Login" asp-route-returnUrl='@ViewData["ReturnUrl"]' method="post">
+                <form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="ReturnUrl" />
 
@@ -131,25 +131,59 @@
         </div>
     </div>
 
+    <!-- Status Notification Modal (Pop-up for Declined / Restricted Volunteers) -->
+    @if (ViewBag.ModalMessage != null)
+    {
+        <div class="modal fade" id="statusNotificationModal" tabindex="-1" aria-labelledby="statusNotificationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 border-0 shadow-lg p-3">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <div class="rounded-circle p-2.5 @(ViewBag.RestrictedModal == true ? "bg-danger-subtle text-danger" : "bg-warning-subtle text-warning") me-2 d-inline-flex align-items-center justify-content-center">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <h5 class="modal-title fw-bold text-dark" id="statusNotificationModalLabel">@(ViewBag.ModalTitle ?? "Account Status Notice")</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body py-3">
+                        <p class="text-secondary mb-0" style="font-size: 0.98rem; line-height: 1.6;">@ViewBag.ModalMessage</p>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-primary rounded-pill px-4 py-2" data-bs-dismiss="modal">Acknowledge & Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        $(document).ready(function() {
+        var modalEl = document.getElementById('statusNotificationModal');
+        if (modalEl) {
+        var modal = new bootstrap.Modal(modalEl);
+        modal.show();
+        }
+        });
+
         function togglePasswordVisibility(inputId, btn) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                btn.innerHTML = `
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-                    </svg>`;
-            } else {
-                input.type = 'password';
-                btn.innerHTML = `
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>`;
-            }
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = `
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+        </svg>`;
+        } else {
+        input.type = 'password';
+        btn.innerHTML = `
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>`;
+        }
         }
     </script>
 </body>

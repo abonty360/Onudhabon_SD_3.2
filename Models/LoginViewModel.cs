@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Onudhabon.Models
+namespace Onudhabon_ISD.Models
 {
     public class LoginViewModel
     {

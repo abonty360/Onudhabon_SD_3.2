@@ -1,15 +1,50 @@
-﻿using Onudhabon_ISD.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using Onudhabon_ISD.Models;
 
 namespace Onudhabon_ISD.Data
 {
     public static class DbInitializer
     {
+        public static void SeedAdminUser(ApplicationDbContext context, IPasswordHasher<User> passwordHasher)
+        {
+            const string adminEmail = "admin@onudhabon.com";
+
+            var existingAdmin = context.Users.FirstOrDefault(u => u.Email.ToLower() == adminEmail.ToLower());
+            if (existingAdmin == null)
+            {
+                var admin = new User
+                {
+                    FullName = "System Administrator",
+                    Email = adminEmail,
+                    PhoneNumber = "01700000000",
+                    Role = "Admin",
+                    City = "Dhaka",
+                    Area = "Central",
+                    Location = "Onudhabon Administrative HQ, Dhaka",
+                    VolunteerReason = "Platform Administration and Volunteer Oversight",
+                    Bio = "Primary System Administrator overseeing volunteer verification, content moderation, and platform governance.",
+                    IsRestricted = false,
+                    IsVerified = true,
+                    VerificationStatus = "Active",
+                    AgreeToTerms = true,
+                    CreatedAt = DateTime.UtcNow,
+                    __v = 0
+                };
+
+                admin.PasswordHash = passwordHasher.HashPassword(admin, "Admin@12345");
+
+                context.Users.Add(admin);
+                context.SaveChanges();
+            }
+        }
+
         public static void SeedClassPlans(ApplicationDbContext context)
         {
             if (!context.ClassPlans.Any())
             {
                 var plans = new List<ClassPlan>();
 
+                // Classes 1–3: 3 subjects, 10 lectures each
                 for (int level = 1; level <= 3; level++)
                 {
                     plans.Add(new ClassPlan
@@ -23,6 +58,8 @@ namespace Onudhabon_ISD.Data
                         }
                     });
                 }
+
+                // Classes 4–8: 7 subjects, 12 lectures each
                 for (int level = 4; level <= 8; level++)
                 {
                     plans.Add(new ClassPlan
@@ -40,6 +77,8 @@ namespace Onudhabon_ISD.Data
                         }
                     });
                 }
+
+                // Classes 9–10: 11 subjects, 12 lectures each
                 for (int level = 9; level <= 10; level++)
                 {
                     plans.Add(new ClassPlan
