@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Onudhabon.Models;
@@ -23,6 +24,8 @@ namespace Onudhabon_ISD.Controllers
             return View();
         }
 
+        [Authorize]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> Users()
         {
             var users = await _context.Users

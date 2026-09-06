@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="card-body">
+                    <div class="mb-3 text-danger">
+                        <svg width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
+                    </div>
+                    <h2 class="fw-bold text-dark mb-2">Access Denied</h2>
+                    <p class="text-muted mb-4">You do not have permission to view this resource, or your session has expired.</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary px-4">Sign In</a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary px-4">Return Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
