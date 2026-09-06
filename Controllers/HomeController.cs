@@ -20,8 +20,22 @@ namespace Onudhabon_ISD.Controllers
         public async Task<IActionResult> Index()
         {
             var userCount = await _context.Users.CountAsync();
+
+            var materialCount = await _context.Materials.CountAsync();
+
+            var volunteerCount = await _context.Users
+                .CountAsync(u => u.Role == "Volunteer");
+
+            var latestPosts = await _context.ForumPosts
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(3)
+                .ToListAsync();
+
             ViewBag.UserCount = userCount;
-            return View();
+            ViewBag.MaterialCount = materialCount;
+            ViewBag.VolunteerCount = volunteerCount;
+
+            return View(latestPosts);
         }
 
         [Authorize(Roles = "Admin")]
@@ -39,7 +53,10 @@ namespace Onudhabon_ISD.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
     }
 }
