@@ -13,6 +13,26 @@ namespace Onudhabon.Models
         [Display(Name = "Email")]
         public string Email { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Phone number is required")]
+        [Phone(ErrorMessage = "Please enter a valid phone number")]
+        [Display(Name = "Phone Number")]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select a role")]
+        [Display(Name = "Role")]
+        public string Role { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select a city")]
+        [Display(Name = "City")]
+        public string City { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select a region/area")]
+        [Display(Name = "Region / Area")]
+        public string Area { get; set; } = string.Empty;
+
+        [Display(Name = "Why do you want to be a volunteer?")]
+        public string? VolunteerReason { get; set; }
+
         [Required(ErrorMessage = "Password is required")]
         [StringLength(100, ErrorMessage = "Password must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
@@ -24,5 +44,8 @@ namespace Onudhabon.Models
         [Display(Name = "Confirm Password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = string.Empty;
+
+        [Display(Name = "Terms & Conditions")]
+        public bool AgreeToTerms { get; set; }
     }
 }

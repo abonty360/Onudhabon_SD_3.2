@@ -51,6 +51,17 @@ namespace Onudhabon.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
 
+            // Restrict roles strictly to Educator or Local Guardian
+            if (!string.IsNullOrEmpty(model.Role) && model.Role != "Educator" && model.Role != "Local Guardian")
+            {
+                ModelState.AddModelError(nameof(model.Role), "Please select a valid role: Educator or Local Guardian.");
+            }
+
+            if (!model.AgreeToTerms)
+            {
+                ModelState.AddModelError(nameof(model.AgreeToTerms), "You must agree to the Terms and Conditions to register.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
