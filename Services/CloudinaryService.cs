@@ -289,6 +289,80 @@ namespace Onudhabon_ISD.Services
             }
         }
 
+        public async Task<List<CloudinaryResourceItem>> FetchCloudinaryLecturesAsync()
+        {
+            var list = new List<CloudinaryResourceItem>();
+            if (_cloudinary == null) return list;
+
+            try
+            {
+                var searchResult = await _cloudinary.Search()
+                    .Expression($"folder:{FOLDER_LECTURES}*")
+                    .MaxResults(500)
+                    .ExecuteAsync();
+
+                if (searchResult.Resources != null)
+                {
+                    foreach (var res in searchResult.Resources)
+                    {
+                        var secUrl = res.SecureUrl ?? res.Url ?? string.Empty;
+                        list.Add(new CloudinaryResourceItem
+                        {
+                            PublicId = res.PublicId,
+                            SecureUrl = secUrl,
+                            ThumbnailUrl = GetVideoThumbnailUrl(secUrl, 300, 200),
+                            Format = res.Format,
+                            Bytes = res.Bytes,
+                            CreatedAt = DateTime.TryParse(res.CreatedAt, out var dt) ? dt : DateTime.UtcNow
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching lectures from Cloudinary folder {Folder}", FOLDER_LECTURES);
+            }
+
+            return list;
+        }
+
+        public async Task<List<CloudinaryResourceItem>> FetchCloudinaryMaterialsAsync()
+        {
+            var list = new List<CloudinaryResourceItem>();
+            if (_cloudinary == null) return list;
+
+            try
+            {
+                var searchResult = await _cloudinary.Search()
+                    .Expression($"folder:{FOLDER_MATERIALS}*")
+                    .MaxResults(500)
+                    .ExecuteAsync();
+
+                if (searchResult.Resources != null)
+                {
+                    foreach (var res in searchResult.Resources)
+                    {
+                        var secUrl = res.SecureUrl ?? res.Url ?? string.Empty;
+                        list.Add(new CloudinaryResourceItem
+                        {
+                            PublicId = res.PublicId,
+                            SecureUrl = secUrl,
+                            ThumbnailUrl = GetPdfThumbnailUrl(secUrl, 300, 1),
+                            Format = res.Format,
+                            Bytes = res.Bytes,
+                            CreatedAt = DateTime.TryParse(res.CreatedAt, out var dt) ? dt : DateTime.UtcNow
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching materials from Cloudinary folder {Folder}", FOLDER_MATERIALS);
+            }
+
+            return list;
+        }
+
         public async Task<bool> DeleteAsync(string publicId)
         {
             if (string.IsNullOrWhiteSpace(publicId)) return false;
@@ -304,6 +378,53 @@ namespace Onudhabon_ISD.Services
                 _logger.LogError(ex, "Failed to delete Cloudinary asset {PublicId}", publicId);
                 return false;
             }
+        }
+
+        public string GetTransformedImageUrl(
+            string? originalUrl,
+            int? width = null,
+            int? height = null,
+            string crop = "fill",
+            bool gravityFace = false,
+            string? customTransformation = null)
+        {
+            if (string.IsNullOrWhiteSpace(originalUrl)) return string.Empty;
+
+            if (!originalUrl.Contains("res.cloudinary.com") || !originalUrl.Contains("/image/upload/"))
+            {
+                return originalUrl;
+            }
+
+            var parts = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(customTransformation))
+            {
+                parts.Add(customTransformation);
+            }
+            else
+            {
+                if (width.HasValue) parts.Add($"w_{width.Value}");
+                if (height.HasValue) parts.Add($"h_{height.Value}");
+                if (!string.IsNullOrWhiteSpace(crop) && (width.HasValue || height.HasValue)) parts.Add($"c_{crop}");
+                if (gravityFace) parts.Add("g_face");
+                parts.Add("f_auto");
+                parts.Add("q_auto");
+            }
+
+            var transformString = string.Join(",", parts);
+            if (string.IsNullOrWhiteSpace(transformString)) return originalUrl;
+
+            return originalUrl.Replace("/image/upload/", $"/image/upload/{transformString}/");
+        }
+
+        public string GetAvatarUrl(string? originalUrl, int size = 150)
+        {
+            return GetTransformedImageUrl(
+                originalUrl,
+                width: size,
+                height: size,
+                crop: "thumb",
+                gravityFace: true);
         }
 
         public string GetOptimizedVideoUrl(string? originalUrl, int? maxWidth = null)

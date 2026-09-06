@@ -25,8 +25,52 @@ namespace Onudhabon_ISD.Controllers
 
         // GET: /Lecture
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Index(string? classLevel, string? subject, string? topic)
         {
+            // Automatically discover and sync any existing Cloudinary assets if present
+            try
+            {
+                var cloudinaryVideos = await _cloudinaryService.FetchCloudinaryLecturesAsync();
+                if (cloudinaryVideos.Any())
+                {
+                    var existingUrls = await _context.Lectures.Select(l => l.VideoUrl).ToListAsync();
+                    var newLectures = new List<Lecture>();
+
+                    foreach (var cVid in cloudinaryVideos)
+                    {
+                        if (!string.IsNullOrEmpty(cVid.SecureUrl) && !existingUrls.Contains(cVid.SecureUrl))
+                        {
+                            newLectures.Add(new Lecture
+                            {
+                                Title = cVid.DisplayTitle,
+                                Description = $"Recorded lecture video for {cVid.DisplayTitle}",
+                                Instructor = "Educator",
+                                Version = "Bangla",
+                                ClassLevel = "General",
+                                Subject = "General",
+                                Topic = cVid.DisplayTitle,
+                                VideoUrl = cVid.SecureUrl,
+                                Thumbnail = cVid.ThumbnailUrl ?? _cloudinaryService.GetVideoThumbnailUrl(cVid.SecureUrl, 300, 200),
+                                Status = "Active",
+                                CreatedAt = cVid.CreatedAt,
+                                __v = 0
+                            });
+                        }
+                    }
+
+                    if (newLectures.Any())
+                    {
+                        _context.Lectures.AddRange(newLectures);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Cloudinary video discovery skipped: {Message}", ex.Message);
+            }
+
             var query = _context.Lectures.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(classLevel))
@@ -57,6 +101,7 @@ namespace Onudhabon_ISD.Controllers
 
         // GET: /Lecture/Details/5
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
             var lecture = await _context.Lectures.FirstOrDefaultAsync(l => l.Id == id);
@@ -68,13 +113,20 @@ namespace Onudhabon_ISD.Controllers
             return View(lecture);
         }
 
+        // GET: /Lecture/Upload
         [HttpGet]
+        [Authorize(Roles = "Educator")]
         public IActionResult Upload()
         {
-            return View(new LectureUploadViewModel());
+            return View(new LectureUploadViewModel
+            {
+                Instructor = User.Identity?.Name
+            });
         }
 
+        // POST: /Lecture/Upload
         [HttpPost]
+        [Authorize(Roles = "Educator")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upload(LectureUploadViewModel model)
         {
@@ -100,6 +152,7 @@ namespace Onudhabon_ISD.Controllers
                 videoUrl = uploadResult.SecureUrl;
                 thumbnailUrl = uploadResult.ThumbnailUrl;
             }
+            // 2. Otherwise if an existing Cloudinary URL is provided: reuse directly without re-uploading
             else if (!string.IsNullOrWhiteSpace(model.ExistingVideoUrl))
             {
                 videoUrl = model.ExistingVideoUrl.Trim();
@@ -138,6 +191,7 @@ namespace Onudhabon_ISD.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: /Lecture/GetApproved
         [HttpGet]
         public async Task<IActionResult> GetApproved(string? classLevel, string? subject)
         {
@@ -176,6 +230,7 @@ namespace Onudhabon_ISD.Controllers
             return Json(approvedLectures);
         }
 
+        // GET: /Lecture/GetTopicsBySubject
         [HttpGet]
         public async Task<IActionResult> GetTopicsBySubject(string? classLevel, string? subject)
         {

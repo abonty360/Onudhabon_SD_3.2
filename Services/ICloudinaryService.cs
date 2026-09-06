@@ -15,6 +15,19 @@ namespace Onudhabon_ISD.Services
         public string FormattedSize => $"{SizeInMb:F2} MB";
     }
 
+    public class CloudinaryResourceItem
+    {
+        public string PublicId { get; set; } = string.Empty;
+        public string SecureUrl { get; set; } = string.Empty;
+        public string? ThumbnailUrl { get; set; }
+        public string? Format { get; set; }
+        public long Bytes { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public double SizeInMb => Bytes > 0 ? Math.Round((double)Bytes / (1024.0 * 1024.0), 2) : 0;
+        public string FormattedSize => $"{SizeInMb:F2} MB";
+        public string DisplayTitle => Path.GetFileNameWithoutExtension(PublicId).Replace("_", " ").Replace("-", " ");
+    }
+
     public interface ICloudinaryService
     {
         /// <summary>
@@ -43,9 +56,29 @@ namespace Onudhabon_ISD.Services
         Task<CloudinaryUploadResult> UploadEducationDocAsync(IFormFile file);
 
         /// <summary>
+        /// Fetches all existing video assets from 'onudhabon/lectures' folder in Cloudinary.
+        /// </summary>
+        Task<List<CloudinaryResourceItem>> FetchCloudinaryLecturesAsync();
+
+        /// <summary>
+        /// Fetches all existing material/document assets from 'onudhabon/materials' folder in Cloudinary.
+        /// </summary>
+        Task<List<CloudinaryResourceItem>> FetchCloudinaryMaterialsAsync();
+
+        /// <summary>
         /// Deletes an asset by public ID from Cloudinary.
         /// </summary>
         Task<bool> DeleteAsync(string publicId);
+
+        /// <summary>
+        /// Generates a transformed Cloudinary Image URL (resize, crop, optimize).
+        /// </summary>
+        string GetTransformedImageUrl(string? originalUrl, int? width = null, int? height = null, string crop = "fill", bool gravityFace = false, string? customTransformation = null);
+
+        /// <summary>
+        /// Generates a perfectly cropped face avatar thumbnail (e.g. 150x150 face-centered).
+        /// </summary>
+        string GetAvatarUrl(string? originalUrl, int size = 150);
 
         /// <summary>
         /// Generates an optimized video streaming URL.

@@ -23,9 +23,54 @@ namespace Onudhabon_ISD.Controllers
             _logger = logger;
         }
 
+        // GET: /Material
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Index(string? classLevel, string? subject, string? topic)
         {
+            try
+            {
+                var cloudinaryDocs = await _cloudinaryService.FetchCloudinaryMaterialsAsync();
+                if (cloudinaryDocs.Any())
+                {
+                    var existingUrls = await _context.Materials.Select(m => m.FileUrl).ToListAsync();
+                    var newMaterials = new List<Material>();
+
+                    foreach (var cDoc in cloudinaryDocs)
+                    {
+                        if (!string.IsNullOrEmpty(cDoc.SecureUrl) && !existingUrls.Contains(cDoc.SecureUrl))
+                        {
+                            newMaterials.Add(new Material
+                            {
+                                Title = cDoc.DisplayTitle,
+                                Description = $"Educational study material for {cDoc.DisplayTitle}",
+                                Instructor = "Educator",
+                                Version = "Bangla",
+                                ClassLevel = "General",
+                                Subject = "General",
+                                Topic = cDoc.DisplayTitle,
+                                FileUrl = cDoc.SecureUrl,
+                                Size = cDoc.FormattedSize,
+                                Status = "Active",
+                                Downloads = 0,
+                                Date = cDoc.CreatedAt,
+                                __v = 0
+                            });
+                        }
+                    }
+
+                    if (newMaterials.Any())
+                    {
+                        _context.Materials.AddRange(newMaterials);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Cloudinary material discovery skipped: {Message}", ex.Message);
+            }
+
             var query = _context.Materials.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(classLevel))
@@ -54,7 +99,9 @@ namespace Onudhabon_ISD.Controllers
             return View(materials);
         }
 
+        // GET: /Material/Details/5
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
             var material = await _context.Materials.FirstOrDefaultAsync(m => m.Id == id);
@@ -66,13 +113,20 @@ namespace Onudhabon_ISD.Controllers
             return View(material);
         }
 
+        // GET: /Material/Upload
         [HttpGet]
+        [Authorize(Roles = "Educator")]
         public IActionResult Upload()
         {
-            return View(new MaterialUploadViewModel());
+            return View(new MaterialUploadViewModel
+            {
+                Instructor = User.Identity?.Name
+            });
         }
 
+        // POST: /Material/Upload
         [HttpPost]
+        [Authorize(Roles = "Educator")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upload(MaterialUploadViewModel model)
         {
@@ -84,6 +138,7 @@ namespace Onudhabon_ISD.Controllers
             string? fileUrl = null;
             string? size = null;
 
+            // 1. If a new material file is uploaded: upload to Cloudinary (ONLY ONCE)
             if (model.MaterialFile != null && model.MaterialFile.Length > 0)
             {
                 var uploadResult = await _cloudinaryService.UploadMaterialPdfAsync(model.MaterialFile);
@@ -95,9 +150,9 @@ namespace Onudhabon_ISD.Controllers
                 }
 
                 fileUrl = uploadResult.SecureUrl;
-                size = uploadResult.FormattedSize; 
+                size = uploadResult.FormattedSize; // Size formatted in MB (2 decimal places)
             }
-
+            // 2. Otherwise if an existing Cloudinary URL is provided: reuse directly without re-uploading
             else if (!string.IsNullOrWhiteSpace(model.ExistingFileUrl))
             {
                 fileUrl = model.ExistingFileUrl.Trim();
@@ -137,6 +192,7 @@ namespace Onudhabon_ISD.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: /Material/Download/5
         [HttpGet]
         public async Task<IActionResult> Download(int id)
         {
@@ -146,12 +202,14 @@ namespace Onudhabon_ISD.Controllers
                 return NotFound();
             }
 
+            // Increment download count
             material.Downloads++;
             await _context.SaveChangesAsync();
 
             return Redirect(material.FileUrl);
         }
 
+        // GET: /Material/GetApproved
         [HttpGet]
         public async Task<IActionResult> GetApproved(string? classLevel, string? subject)
         {
@@ -191,7 +249,7 @@ namespace Onudhabon_ISD.Controllers
             return Json(approvedMaterials);
         }
 
-
+        // GET: /Material/GetTopicsBySubject
         [HttpGet]
         public async Task<IActionResult> GetTopicsBySubject(string? classLevel, string? subject)
         {

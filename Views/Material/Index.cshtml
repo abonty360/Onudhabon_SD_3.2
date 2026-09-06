@@ -11,14 +11,17 @@
             <h2 class="fw-bold mb-1" style="color: #1e293b;">Study Materials & Documents</h2>
             <p class="text-muted mb-0">Browse lecture sheets, guides, and PDF resources securely hosted on Cloudinary.</p>
         </div>
-        <div class="d-flex gap-2">
-            <a asp-action="Upload" class="btn btn-primary px-3 py-2 rounded-pill">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="me-1 align-text-bottom">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-                Upload Material Document
-            </a>
-        </div>
+        @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator"))
+        {
+            <div class="d-flex gap-2">
+                <a asp-action="Upload" class="btn btn-primary px-3 py-2 rounded-pill">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="me-1 align-text-bottom">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Upload Material Document
+                </a>
+            </div>
+        }
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -39,8 +42,11 @@
                     </svg>
                 </div>
                 <h5 class="fw-bold text-dark">No study materials uploaded yet</h5>
-                <p class="text-muted">Upload course materials, slide decks, and past question sheets.</p>
-                <a asp-action="Upload" class="btn btn-outline-primary px-4 rounded-pill">Upload First Document</a>
+                <p class="text-muted">Educational documents and study guides will appear here for learners.</p>
+                @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator"))
+                {
+                    <a asp-action="Upload" class="btn btn-outline-primary px-4 rounded-pill">Upload First Document</a>
+                }
             </div>
         </div>
     }

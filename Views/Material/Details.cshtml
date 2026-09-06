@@ -118,13 +118,16 @@
                 </ul>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-light">
-                <h6 class="fw-bold mb-2">Have study materials to share?</h6>
-                <p class="text-muted small mb-3">Upload PDF notes, formula sheets, and past question solutions.</p>
-                <a asp-action="Upload" class="btn btn-primary btn-sm rounded-pill px-4">
-                    Upload Material
-                </a>
-            </div>
+            @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator"))
+            {
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-light">
+                    <h6 class="fw-bold mb-2">Have study materials to share?</h6>
+                    <p class="text-muted small mb-3">Upload PDF notes, formula sheets, and past question solutions.</p>
+                    <a asp-action="Upload" class="btn btn-primary btn-sm rounded-pill px-4">
+                        Upload Material
+                    </a>
+                </div>
+            }
         </div>
     </div>
 </div>

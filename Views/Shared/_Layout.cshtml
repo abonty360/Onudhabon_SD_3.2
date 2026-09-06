@@ -1,3 +1,31 @@
+@using System.Security.Claims
+@inject Onudhabon_ISD.Services.ICloudinaryService CloudinaryService
+@inject Onudhabon_ISD.Data.ApplicationDbContext DbContext
+
+@{
+    string? userPicture = null;
+    string? userRole = null;
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        userPicture = User.FindFirst("Picture")?.Value;
+        userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+        if (string.IsNullOrEmpty(userPicture))
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdStr, out int uid))
+            {
+                var dbUser = DbContext.Users.Find(uid);
+                userPicture = dbUser?.Picture;
+                if (string.IsNullOrEmpty(userRole))
+                {
+                    userRole = dbUser?.Role;
+                }
+            }
+        }
+    }
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,57 +34,122 @@
     <title>@ViewData["Title"] - Onudhabon</title>
     <script type="importmap"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Onudhabon.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Onudhabon_ISD.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3 py-2.5">
+            <div class="container-fluid px-lg-4">
+                <a class="navbar-brand d-flex align-items-center me-4" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/images/navbar_logo.png" asp-append-version="true" alt="Onudhabon" style="height: 38px; width: auto;" />
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 align-items-center">
                         <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="Home" asp-action="Users">Users Table</a>
+                            <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Lecture" asp-action="Index">Recorded Lectures</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Material" asp-action="Index">Study Materials</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Home" asp-action="Users">Users Table</a>
                         </li>
                     </ul>
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav align-items-center mt-2 mt-lg-0">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item d-flex align-items-center me-3">
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6 rounded-pill">
-                                    👤 @(User.Identity.Name)
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3">Sign Out</button>
-                                </form>
+                            @if (userRole == "Educator" || User.IsInRole("Educator"))
+                            {
+                                <li class="nav-item dropdown me-3">
+                                    <a class="btn btn-outline-primary btn-sm dropdown-toggle rounded-pill px-3 py-1.5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        + Upload
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2">
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Lecture" asp-action="Upload">
+                                                🎥 Upload Lecture Video
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Material" asp-action="Upload">
+                                                📄 Upload Study Material
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link d-flex align-items-center gap-2 text-dark dropdown-toggle py-1 px-2 rounded-pill hover-bg" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    @if (!string.IsNullOrWhiteSpace(userPicture))
+                                    {
+                                        <img src="@CloudinaryService.GetAvatarUrl(userPicture, 70)"
+                                             alt="@User.Identity.Name"
+                                             class="rounded-circle border"
+                                             style="width: 34px; height: 34px; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center border"
+                                             style="width: 34px; height: 34px; font-size: 0.85rem;">
+                                            @(string.IsNullOrEmpty(User.Identity.Name) ? "U" : User.Identity.Name.Substring(0, 1).ToUpper())
+                                        </div>
+                                    }
+                                    <span class="fw-semibold">@(User.Identity.Name)</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2" style="min-width: 210px;">
+                                    <li class="px-3 py-2 border-bottom mb-1">
+                                        <div class="fw-bold text-dark">@(User.Identity.Name)</div>
+                                        <div class="text-muted small">Role: @(userRole ?? "User")</div>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item rounded-3 py-2" asp-controller="Account" asp-action="Profile">
+                                            👤 View Profile
+                                        </a>
+                                    </li>
+                                    @if (userRole == "Educator" || User.IsInRole("Educator"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Lecture" asp-action="Upload">
+                                                🎥 Upload Lecture
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Material" asp-action="Upload">
+                                                📄 Upload Material
+                                            </a>
+                                        </li>
+                                    }
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="px-1 py-1">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="dropdown-item rounded-3 text-danger py-2 w-100 text-start">
+                                                🚪 Sign Out
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link btn btn-outline-primary px-3 py-1 text-primary ms-2" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                                <a class="nav-link btn btn-outline-primary px-3.5 py-1.5 text-primary ms-2 rounded-pill" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn btn-primary px-3 py-1 text-white ms-2" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                                <a class="nav-link btn btn-primary px-3.5 py-1.5 text-white ms-2 rounded-pill" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
                             </li>
                         }
                     </ul>
@@ -72,7 +165,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - Onudhabon - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; @DateTime.Now.Year - Onudhabon - Exploring Education
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

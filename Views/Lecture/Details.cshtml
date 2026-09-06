@@ -13,6 +13,7 @@
     </div>
 
     <div class="row g-4">
+        <!-- Video Player Column -->
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-black mb-4">
                 @if (!string.IsNullOrWhiteSpace(Model.VideoUrl))
@@ -24,9 +25,9 @@
                                poster="@(Model.Thumbnail ?? CloudinaryService.GetVideoThumbnailUrl(Model.VideoUrl, 640, 360))"
                                class="w-100 h-100"
                                style="object-fit: contain; background: #000;">
-                            
+                            <!-- Auto-optimized adaptive streaming source -->
                             <source src="@CloudinaryService.GetOptimizedVideoUrl(Model.VideoUrl)" type="video/mp4" />
-                            
+                            <!-- Direct fallback source -->
                             <source src="@Model.VideoUrl" type="video/mp4" />
                             Your browser does not support HTML5 video playback.
                         </video>
@@ -40,6 +41,7 @@
                 }
             </div>
 
+            <!-- Lecture Info Card -->
             <div class="card border-0 shadow-sm rounded-4 p-4">
                 <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-pill">
@@ -72,7 +74,7 @@
             </div>
         </div>
 
-
+        <!-- Sidebar Column -->
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
                 <h5 class="fw-bold mb-3">Lecture Summary</h5>
@@ -100,13 +102,16 @@
                 </ul>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-light">
-                <h6 class="fw-bold mb-2">Want to contribute lectures?</h6>
-                <p class="text-muted small mb-3">Upload lecture videos and supplementary notes for learners.</p>
-                <a asp-action="Upload" class="btn btn-primary btn-sm rounded-pill px-4">
-                    Upload Lecture
-                </a>
-            </div>
+            @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator"))
+            {
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-light">
+                    <h6 class="fw-bold mb-2">Want to contribute lectures?</h6>
+                    <p class="text-muted small mb-3">Upload lecture videos and supplementary notes for learners.</p>
+                    <a asp-action="Upload" class="btn btn-primary btn-sm rounded-pill px-4">
+                        Upload Lecture
+                    </a>
+                </div>
+            }
         </div>
     </div>
 </div>
