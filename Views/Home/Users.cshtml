@@ -1,0 +1,122 @@
+﻿@model IEnumerable<Onudhabon_ISD.Models.User>
+
+@{
+    ViewData["Title"] = "Registered Users Table";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: #1e293b;">Registered Users</h2>
+            <p class="text-muted mb-0">Complete records of all registered accounts and submitted registration information.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Account" asp-action="Register" class="btn btn-primary px-3 py-2">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="me-1 align-text-bottom">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Register New User
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 text-center p-5" style="background-color: #f8fafc;">
+            <div class="card-body">
+                <div class="mb-3 text-muted">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+                <h5 class="fw-bold text-dark">No users registered yet</h5>
+                <p class="text-muted">Register a new user from the registration page to see the record populated in this table.</p>
+                <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary px-4">Go to Register Page</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+                <span class="fw-semibold text-dark">
+                    Total Records: <span class="badge bg-primary rounded-pill ms-1">@Model.Count()</span>
+                </span>
+                <span class="text-muted small">Database Table: <code>[OnudhabonDB].[dbo].[Users]</code></span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size: 0.925rem;">
+                    <thead style="background-color: #f1f5f9; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.05em;">
+                        <tr>
+                            <th class="ps-4 py-3">ID</th>
+                            <th class="py-3">Full Name</th>
+                            <th class="py-3">Email Address</th>
+                            <th class="py-3">Phone Number</th>
+                            <th class="py-3">Role</th>
+                            <th class="py-3">City</th>
+                            <th class="py-3">Region / Area</th>
+                            <th class="py-3" style="max-width: 250px;">Volunteer Reason</th>
+                            <th class="py-3 text-center">Terms Agreed</th>
+                            <th class="pe-4 py-3 text-end">Registered Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold text-muted">#@user.Id</td>
+                                <td class="fw-bold text-dark">@user.FullName</td>
+                                <td>
+                                    <a href="mailto:@user.Email" class="text-decoration-none text-primary">@user.Email</a>
+                                </td>
+                                <td>
+                                    <span class="font-monospace text-secondary">@user.PhoneNumber</span>
+                                </td>
+                                <td>
+                                    @if (user.Role == "Educator")
+                                    {
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 rounded-pill">
+                                            Educator
+                                        </span>
+                                    }
+                                    else if (user.Role == "Local Guardian")
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5 rounded-pill">
+                                            Local Guardian
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2.5 py-1.5 rounded-pill">
+                                            @user.Role
+                                        </span>
+                                    }
+                                </td>
+                                <td>@user.City</td>
+                                <td>
+                                    <span class="badge bg-light text-dark border px-2 py-1">@user.Area</span>
+                                </td>
+                                <td style="max-width: 250px;" class="text-truncate" title="@(user.VolunteerReason ?? "N/A")">
+                                    @(string.IsNullOrWhiteSpace(user.VolunteerReason) ? "—" : user.VolunteerReason)
+                                </td>
+                                <td class="text-center">
+                                    @if (user.AgreeToTerms)
+                                    {
+                                        <span class="badge bg-success text-white px-2 py-1 rounded-pill" title="Agreed to Terms & Conditions">✓ Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger text-white px-2 py-1 rounded-pill">✕ No</span>
+                                    }
+                                </td>
+                                <td class="pe-4 text-end text-muted small">
+                                    @user.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

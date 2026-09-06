@@ -5,5 +5,56 @@
 <div class="text-center py-5">
     <h1 class="display-5 fw-bold text-primary mb-3">Welcome to Onudhabon</h1>
     <p class="lead text-muted mb-4">Join our mission to explore education.</p>
-    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg px-4 gap-3">Go to Login Page</a>
+
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <div class="card mx-auto shadow-sm p-4 border-0 rounded-4 text-start" style="max-width: 540px; background-color: #f8fafc;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 fs-6 rounded-pill">
+                        ✓ Authenticated
+                    </span>
+                    @if (User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role) != null)
+                    {
+                        <span class="badge bg-primary text-white px-3 py-1.5 rounded-pill">
+                            @(User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value)
+                        </span>
+                    }
+                </div>
+                <h4 class="card-title fw-bold text-dark mb-1">Hello, @(User.Identity.Name)!</h4>
+                <p class="card-text text-muted mb-3">
+                    Email: @(User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value)
+                </p>
+
+                <div class="p-3 bg-white rounded-3 border mb-3">
+                    <div class="row g-2 small">
+                        <div class="col-6">
+                            <span class="text-muted d-block">City:</span>
+                            <span class="fw-semibold text-dark">@(User.Claims.FirstOrDefault(c => c.Type == "City")?.Value ?? "N/A")</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block">Region / Area:</span>
+                            <span class="fw-semibold text-dark">@(User.Claims.FirstOrDefault(c => c.Type == "Area")?.Value ?? "N/A")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a asp-controller="Home" asp-action="Users" class="btn btn-outline-primary flex-fill">View Registered Users Table</a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-center gap-3">
+            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg px-4">Sign In</a>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-lg px-4">Register</a>
+            <a asp-controller="Home" asp-action="Users" class="btn btn-outline-secondary btn-lg px-4">Users Table</a>
+        </div>
+    }
 </div>

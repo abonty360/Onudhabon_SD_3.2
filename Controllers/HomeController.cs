@@ -1,14 +1,34 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Onudhabon.Models;
+using Onudhabon_ISD.Data;
+using Onudhabon_ISD.Models;
 
-namespace Onudhabon.Controllers
+namespace Onudhabon_ISD.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ApplicationDbContext _context;
+
+        public HomeController(ApplicationDbContext context)
         {
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var userCount = await _context.Users.CountAsync();
+            ViewBag.UserCount = userCount;
             return View();
+        }
+
+        public async Task<IActionResult> Users()
+        {
+            var users = await _context.Users
+                .OrderByDescending(u => u.CreatedAt)
+                .ToListAsync();
+            return View(users);
         }
 
         public IActionResult Privacy()
