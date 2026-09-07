@@ -1,0 +1,166 @@
+@model Onudhabon_ISD.Models.CreateForumPostViewModel
+
+@{
+    ViewData["Title"] = "Create New Forum Post - Onudhabon";
+}
+
+<style>
+    .create-post-page {
+        background: #f8fafc;
+        min-height: 100vh;
+        font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .form-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    }
+
+    .sidebar-widget {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+</style>
+
+<div class="create-post-page py-5">
+    <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Forum" asp-action="Index" class="text-decoration-none text-muted">Forum</a></li>
+                <li class="breadcrumb-item active text-primary fw-semibold" aria-current="page">Create Discussion</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <!-- MAIN FORM (8 COLS) -->
+            <div class="col-lg-8">
+                <div class="form-card overflow-hidden">
+                    <!-- Header -->
+                    <div class="bg-primary text-white p-4 p-md-5" style="background: radial-gradient(134.4% 100% at 50% 0%, #1e3a8a 0%, #0f172a 100%) !important;">
+                        <span class="badge bg-white text-primary rounded-pill px-3 py-1 mb-2 fw-semibold">New Discussion</span>
+                        <h2 class="display-6 fw-bold text-white mb-1">✍️ Start a Discussion</h2>
+                        <p class="mb-0 text-white-50">Share a topic, ask for academic help, or start an engaging discussion with teachers and peers.</p>
+                    </div>
+
+                    <div class="p-4 p-md-5">
+                        <!-- Info Alert -->
+                        <div class="alert alert-info border-0 rounded-3 d-flex align-items-center gap-3 mb-4 bg-primary-subtle text-primary-emphasis" role="alert">
+                            <div class="fs-4">ℹ️</div>
+                            <div class="small">
+                                <strong>Note:</strong> All new discussions are submitted with <em>Pending Review</em> status. Once verified by an administrator, your post will be visible across the community.
+                            </div>
+                        </div>
+
+                        <form asp-action="Create" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4" role="alert"></div>
+
+                            <!-- Post Title -->
+                            <div class="mb-4">
+                                <label asp-for="Title" class="form-label fw-bold text-dark">
+                                    Discussion Title <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Title"
+                                       class="form-control form-control-lg rounded-3 border ps-3"
+                                       placeholder="e.g., Understanding Newton's Laws with Practical Examples"
+                                       maxlength="255"
+                                       required />
+                                <span asp-validation-for="Title" class="text-danger small"></span>
+                                <div class="form-text text-muted">Write a concise, descriptive title to attract helpful answers.</div>
+                            </div>
+
+                            <!-- Post Content -->
+                            <div class="mb-4">
+                                <label asp-for="Content" class="form-label fw-bold text-dark">
+                                    Discussion Content <span class="text-danger">*</span>
+                                </label>
+                                <textarea asp-for="Content"
+                                          class="form-control rounded-3 border p-3"
+                                          rows="8"
+                                          placeholder="Explain your question, concept, or insight in detail..."
+                                          maxlength="4000"
+                                          required></textarea>
+                                <span asp-validation-for="Content" class="text-danger small"></span>
+                                <div class="d-flex justify-content-between text-muted small mt-1">
+                                    <span>Supports multi-line explanations and structured questions.</span>
+                                    <span>Max 4,000 characters</span>
+                                </div>
+                            </div>
+
+                            <!-- Tags -->
+                            <div class="mb-4">
+                                <label asp-for="Tags" class="form-label fw-bold text-dark">
+                                    Topic Tags (Optional)
+                                </label>
+                                <input asp-for="Tags"
+                                       class="form-control rounded-3 border ps-3"
+                                       placeholder="e.g., Physics, Class9, Mechanics, ExamPrep"
+                                       maxlength="255" />
+                                <span asp-validation-for="Tags" class="text-danger small"></span>
+                                <div class="form-text text-muted">Comma-separated tags (e.g. <code>Math, Geometry, Class10</code>)</div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex align-items-center justify-content-end gap-3 pt-3 border-top">
+                                <a asp-action="Index" class="btn btn-light rounded-pill px-4">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2.5 fw-bold shadow-sm">
+                                    🚀 Submit Discussion
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIDEBAR TIPS (4 COLS) -->
+            <div class="col-lg-4 d-flex flex-column gap-4">
+                <!-- Posting Guidelines -->
+                <div class="sidebar-widget">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="fs-5">📋</span>
+                        <h6 class="fw-bold text-dark mb-0 fs-6">Posting Guidelines</h6>
+                    </div>
+                    <ul class="list-unstyled small text-muted d-flex flex-column gap-2.5 mb-0">
+                        <li class="d-flex align-items-start gap-2">
+                            <span class="text-success fw-bold">✓</span>
+                            <span><strong>Be Clear & Specific:</strong> State your question or topic clearly so others understand quickly.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <span class="text-success fw-bold">✓</span>
+                            <span><strong>Tag Accurately:</strong> Add relevant subjects (e.g. <em>Biology</em>, <em>Math</em>) to help students find it.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <span class="text-success fw-bold">✓</span>
+                            <span><strong>Stay Respectful:</strong> Keep conversations constructive and focused on learning.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Admin Moderation Info -->
+                <div class="sidebar-widget bg-light border-0">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="fs-5">🛡️</span>
+                        <h6 class="fw-bold text-dark mb-0 fs-6">Moderation Review</h6>
+                    </div>
+                    <p class="text-muted small mb-0" style="line-height: 1.5;">
+                        To protect learners from spam and ensure quality academic discourse, all submissions are reviewed by Onudhabon administrators before going live.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,811 @@
+@model Onudhabon_ISD.Models.ForumIndexViewModel
+@inject Onudhabon_ISD.Services.ICloudinaryService CloudinaryService
+
+@{
+    ViewData["Title"] = "Community Forum - Onudhabon";
+}
+
+<style>
+    /* =========================================
+       CUSTOM FORUM UI STYLING
+    ========================================= */
+    .forum-page {
+        background: #f8fafc;
+        min-height: 100vh;
+        font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .forum-hero-banner {
+        background: radial-gradient(134.4% 100% at 50% 0%, #1e3a8a 0%, #0f172a 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .forum-hero-banner::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -20%;
+        width: 140%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+        pointer-events: none;
+    }
+
+    .forum-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .forum-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+        transform: translateY(-2px);
+    }
+
+    .author-avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+        flex-shrink: 0;
+    }
+
+    .badge-status-active {
+        background-color: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
+        font-weight: 600;
+    }
+
+    .badge-status-pending {
+        background-color: #fffbeb;
+        color: #b45309;
+        border: 1px solid #fde68a;
+        font-weight: 600;
+    }
+
+    .tag-pill {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        font-size: 0.78rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px;
+        font-weight: 500;
+        transition: all 0.15s ease;
+        text-decoration: none;
+    }
+
+    .tag-pill:hover {
+        background-color: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .action-pill-btn {
+        padding: 0.45rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 9999px;
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #475569;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+    }
+
+    .action-pill-btn:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #0f172a;
+    }
+
+    .action-pill-btn.liked {
+        background: #eff6ff;
+        border-color: #3b82f6;
+        color: #1d4ed8;
+        box-shadow: 0 0 0 1px #3b82f6;
+    }
+
+    .action-pill-btn.disliked {
+        background: #fef2f2;
+        border-color: #ef4444;
+        color: #b91c1c;
+        box-shadow: 0 0 0 1px #ef4444;
+    }
+
+    .comments-wrapper {
+        background-color: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+        border-bottom-left-radius: 1.25rem;
+        border-bottom-right-radius: 1.25rem;
+    }
+
+    .comment-bubble {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 0.85rem 1.15rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .comment-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e0e7ff;
+        color: #4338ca;
+        font-size: 0.85rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .filter-tab-pill {
+        border-radius: 9999px;
+        padding: 0.45rem 1.1rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .filter-tab-pill.active {
+        background-color: #2563eb;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .filter-tab-pill:not(.active) {
+        color: #64748b;
+        background-color: transparent;
+    }
+
+    .filter-tab-pill:not(.active):hover {
+        color: #0f172a;
+        background-color: #e2e8f0;
+    }
+
+    .sidebar-widget {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+</style>
+
+<div class="forum-page">
+    <!-- HERO HEADER -->
+    <header class="forum-hero-banner text-white py-5">
+        <div class="container py-2 position-relative" style="z-index: 1;">
+            <div class="row align-items-center justify-content-between g-4">
+                <div class="col-lg-8">
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15 mb-3">
+                        <span class="badge bg-primary rounded-pill px-2 py-0.5" style="font-size: 0.72rem;">NEW</span>
+                        <span class="small fw-semibold text-white">Interactive Community Discussions</span>
+                    </div>
+                    <h1 class="display-5 fw-extrabold text-white mb-2 tracking-tight">Onudhabon Community Forum</h1>
+                    <p class="lead text-white-50 mb-0" style="max-width: 650px; font-size: 1.05rem;">
+                        Connect with fellow students, educators, and mentors. Ask questions, explore academic concepts, and exchange helpful study materials.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    @if (Model.IsAuthenticated)
+                    {
+                        <a asp-action="Create" class="btn btn-light btn-lg rounded-pill px-4 py-2.5 fw-bold shadow-lg text-primary d-inline-flex align-items-center gap-2">
+                            <span style="font-size: 1.2rem;">✍️</span> Start Discussion
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="btn btn-light btn-lg rounded-pill px-4 py-2.5 fw-bold shadow-lg text-primary d-inline-flex align-items-center gap-2">
+                            <span>🔐</span> Sign In to Post
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="container py-5">
+        <!-- ALERTS -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4 d-flex align-items-center gap-3 p-3.5" role="alert">
+                <div class="fs-4">🎉</div>
+                <div class="flex-grow-1">
+                    <strong>Success:</strong> @TempData["SuccessMessage"]
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4 d-flex align-items-center gap-3 p-3.5" role="alert">
+                <div class="fs-4">⚠️</div>
+                <div class="flex-grow-1">
+                    <strong>Notice:</strong> @TempData["ErrorMessage"]
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="row g-4">
+            <!-- MAIN FORUM FEED (LEFT 8 COLS) -->
+            <div class="col-lg-8">
+                <!-- SEARCH & FILTER TOOLBAR -->
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+                    <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-md-center">
+                        <!-- Navigation Tabs -->
+                        <div class="d-flex flex-wrap gap-1 p-1 bg-light rounded-pill border">
+                            <a asp-action="Index" asp-route-filter="all" asp-route-search="@Model.SearchQuery"
+                               class="filter-tab-pill @(Model.ActiveTab == "all" ? "active" : "")">
+                                🔥 All Posts
+                            </a>
+
+                            @if (Model.IsAdmin)
+                            {
+                                <a asp-action="Index" asp-route-filter="active" asp-route-search="@Model.SearchQuery"
+                                   class="filter-tab-pill @(Model.ActiveTab == "active" ? "active" : "")">
+                                    ✅ Active
+                                </a>
+                                <a asp-action="Index" asp-route-filter="pending" asp-route-search="@Model.SearchQuery"
+                                   class="filter-tab-pill @(Model.ActiveTab == "pending" ? "active bg-warning text-dark border-0 shadow-sm" : "")">
+                                    ⏳ Pending Review
+                                </a>
+                            }
+                            else if (Model.IsAuthenticated)
+                            {
+                                <a asp-action="Index" asp-route-filter="myposts" asp-route-search="@Model.SearchQuery"
+                                   class="filter-tab-pill @(Model.ActiveTab == "myposts" ? "active" : "")">
+                                    👤 My Posts
+                                </a>
+                            }
+                        </div>
+
+                        <!-- Search Box -->
+                        <form method="get" asp-action="Index" class="d-flex" style="min-width: 250px;">
+                            <input type="hidden" name="filter" value="@Model.ActiveTab" />
+                            <div class="input-group">
+                                <input type="text"
+                                       name="search"
+                                       class="form-control rounded-start-pill border-end-0 ps-3 bg-light border"
+                                       placeholder="Search discussions..."
+                                       value="@Model.SearchQuery" />
+                                <button type="submit" class="btn btn-outline-secondary border-start-0 rounded-end-pill px-3 bg-light">
+                                    🔍
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- POSTS LIST -->
+                @if (!Model.Posts.Any())
+                {
+                    <div class="forum-card text-center py-5 px-4">
+                        <div class="py-5">
+                            <div class="mb-3" style="font-size: 3.8rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08));">💬</div>
+                            <h3 class="fw-bold text-dark mb-2">No discussions found</h3>
+                            <p class="text-muted mx-auto mb-4" style="max-width: 480px; font-size: 0.95rem;">
+                                @if (!string.IsNullOrEmpty(Model.SearchQuery))
+                                {
+                                    <span>No results matching "<strong>@Model.SearchQuery</strong>". Try searching for different keywords or clear your filter.</span>
+                                }
+                                else
+                                {
+                                    <span>There are no active discussions in this view yet. Start a discussion to inspire others!</span>
+                                }
+                            </p>
+                            @if (Model.IsAuthenticated)
+                            {
+                                <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                                    ✍️ Create First Post
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-column gap-4">
+                        @foreach (var post in Model.Posts)
+                        {
+                            <article class="forum-card overflow-hidden" id="post-card-@post.Id">
+                                <!-- Card Header -->
+                                <div class="p-4 pb-2 d-flex justify-content-between align-items-start flex-wrap gap-2">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="author-avatar">
+                                            @(string.IsNullOrEmpty(post.Author) ? "U" : post.Author.Substring(0, 1).ToUpper())
+                                        </div>
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="fw-bold text-dark mb-0 fs-6">@(post.Author ?? "Community Member")</h6>
+                                                @if (post.IsAuthor)
+                                                {
+                                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size: 0.7rem;">Author</span>
+                                                }
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.8rem;">
+                                                🕒 @post.CreatedAt.ToString("MMM dd, yyyy • h:mm tt")
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status Badge & Admin Actions -->
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if (post.Status == "Active")
+                                        {
+                                            <span class="badge badge-status-active rounded-pill px-3 py-1.5" id="status-badge-@post.Id">
+                                                ● Active
+                                            </span>
+                                        }
+                                        else if (post.Status == "Declined")
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1.5 fw-semibold" id="status-badge-@post.Id">
+                                                ✕ Declined
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-status-pending rounded-pill px-3 py-1.5" id="status-badge-@post.Id">
+                                                ⏳ Pending Review
+                                            </span>
+                                        }
+
+                                        @if (Model.IsAdmin)
+                                        {
+                                            <div class="d-flex align-items-center gap-1 admin-actions-@post.Id">
+                                                @if (post.Status != "Active")
+                                                {
+                                                    <form asp-action="ApprovePost" asp-route-id="@post.Id" method="post" class="d-inline approve-post-form" data-post-id="@post.Id">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5 py-1 fw-bold shadow-xs" title="Approve this post">
+                                                            ✓ Approve
+                                                        </button>
+                                                    </form>
+                                                }
+                                                @if (post.Status != "Declined")
+                                                {
+                                                    <form asp-action="DisapprovePost" asp-route-id="@post.Id" method="post" class="d-inline disapprove-post-form" data-post-id="@post.Id">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1 fw-semibold shadow-xs" title="Disapprove this post">
+                                                            ✕ Disapprove
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Card Content -->
+                                <div class="px-4 py-2">
+                                    <h4 class="fw-bold text-dark mb-2 fs-5" style="letter-spacing: -0.01em;">@post.Title</h4>
+                                    <p class="text-secondary mb-3" style="white-space: pre-line; line-height: 1.65; font-size: 0.95rem;">@post.Content</p>
+
+                                    @if (!string.IsNullOrWhiteSpace(post.Tags))
+                                    {
+                                        <div class="d-flex flex-wrap gap-1.5 mb-2">
+                                            @foreach (var tag in post.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                            {
+                                                <a asp-action="Index" asp-route-search="@tag.Trim()" class="tag-pill">#@tag.Trim()</a>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Card Engagement Footer -->
+                                <div class="px-4 py-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2" style="background-color: #fafbfc;">
+                                    @if (post.Status == "Active")
+                                    {
+                                        <div class="d-flex align-items-center gap-2">
+                                            @if (Model.IsAuthenticated)
+                                            {
+                                                <!-- Like Button -->
+                                                <button type="button"
+                                                        class="action-pill-btn like-btn @(post.UserReaction == "Like" ? "liked" : "")"
+                                                        data-post-id="@post.Id"
+                                                        data-reaction="Like"
+                                                        id="like-btn-@post.Id"
+                                                        title="Helpful / Like">
+                                                    <span>👍</span>
+                                                    <span class="like-count" id="like-count-@post.Id">@post.LikeCount</span>
+                                                </button>
+
+                                                <!-- Dislike Button -->
+                                                <button type="button"
+                                                        class="action-pill-btn dislike-btn @(post.UserReaction == "Dislike" ? "disliked" : "")"
+                                                        data-post-id="@post.Id"
+                                                        data-reaction="Dislike"
+                                                        id="dislike-btn-@post.Id"
+                                                        title="Not helpful / Dislike">
+                                                    <span>👎</span>
+                                                    <span class="dislike-count" id="dislike-count-@post.Id">@post.DislikeCount</span>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="action-pill-btn" title="Sign in to like">
+                                                    <span>👍</span> <span>@post.LikeCount</span>
+                                                </a>
+                                                <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="action-pill-btn" title="Sign in to dislike">
+                                                    <span>👎</span> <span>@post.DislikeCount</span>
+                                                </a>
+                                            }
+
+                                            <!-- Comments Toggle Button -->
+                                            <button type="button"
+                                                    class="action-pill-btn"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#comments-section-@post.Id"
+                                                    aria-expanded="false"
+                                                    aria-controls="comments-section-@post.Id">
+                                                <span>💬</span>
+                                                <span>Comments (<span id="comment-count-@post.Id">@post.CommentCount</span>)</span>
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex align-items-center gap-2 text-muted small py-1">
+                                            <span>🔒 <em>Reactions and comments will become available once this post is approved by an administrator.</em></span>
+                                        </div>
+                                    }
+                                </div>
+
+                                @if (post.Status == "Active")
+                                {
+                                    <!-- COLLAPSIBLE THREADED COMMENTS -->
+                                    <div class="collapse comments-wrapper" id="comments-section-@post.Id">
+                                        <div class="p-4">
+                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                <h6 class="fw-bold text-dark mb-0 fs-6">Discussion Thread</h6>
+                                                <span class="text-muted small"><span id="thread-count-@post.Id">@post.Comments.Count</span> replies</span>
+                                            </div>
+
+                                            <!-- Comments Stream -->
+                                            <div class="d-flex flex-column gap-3 mb-3" id="comments-list-@post.Id">
+                                                @if (!post.Comments.Any())
+                                                {
+                                                    <div class="text-muted small py-3 text-center bg-white rounded-3 border" id="no-comments-@post.Id">
+                                                        👋 No comments yet. Be the first to share your thoughts!
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    @foreach (var comment in post.Comments)
+                                                    {
+                                                        <div class="d-flex gap-2.5 align-items-start comment-item">
+                                                            <div class="comment-avatar">
+                                                                @(string.IsNullOrEmpty(comment.Author) ? "U" : comment.Author.Substring(0, 1).ToUpper())
+                                                            </div>
+                                                            <div class="comment-bubble flex-grow-1">
+                                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                    <span class="fw-bold text-dark small">@(comment.Author ?? "Community Member")</span>
+                                                                    <span class="text-muted small" style="font-size: 0.72rem;">@comment.CreatedAt.ToString("MMM dd, yyyy • h:mm tt")</span>
+                                                                </div>
+                                                                <p class="mb-0 text-secondary small" style="white-space: pre-line; line-height: 1.5;">@comment.Content</p>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+
+                                            <!-- Add Comment Form -->
+                                            @if (Model.IsAuthenticated)
+                                            {
+                                                <form asp-action="AddComment" method="post" class="add-comment-form mt-3" data-post-id="@post.Id">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="PostId" value="@post.Id" />
+                                                    <div class="d-flex gap-2">
+                                                        <input type="text"
+                                                               name="Content"
+                                                               id="comment-input-@post.Id"
+                                                               class="form-control rounded-pill ps-3.5 border bg-white shadow-2xs"
+                                                               placeholder="Write a constructive reply..."
+                                                               required
+                                                               maxlength="4000" />
+                                                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-xs flex-shrink-0">
+                                                            Reply
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <div class="text-center py-2.5 bg-white rounded-3 border">
+                                                    <span class="text-muted small">
+                                                        Join the conversation:
+                                                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="fw-bold text-primary text-decoration-none">Sign in to comment</a>
+                                                    </span>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </article>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- RIGHT SIDEBAR (4 COLS) -->
+            <aside class="col-lg-4 d-flex flex-column gap-4">
+                <!-- Community Overview Card -->
+                <div class="sidebar-widget">
+                    <div class="d-flex align-items-center gap-2.5 mb-3">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                            💡
+                        </div>
+                        <h6 class="fw-bold text-dark mb-0 fs-6">About Community Forum</h6>
+                    </div>
+                    <p class="text-muted small mb-3" style="line-height: 1.6;">
+                        A friendly, peer-to-peer discussion space where educators and students come together to learn, share insights, and discuss academic topics.
+                    </p>
+                    <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-3">
+                        <li class="d-flex align-items-center gap-2">
+                            <span class="text-success">✓</span> Respectful academic discussions
+                        </li>
+                        <li class="d-flex align-items-center gap-2">
+                            <span class="text-success">✓</span> Constructive feedback & assistance
+                        </li>
+                        <li class="d-flex align-items-center gap-2">
+                            <span class="text-success">✓</span> Verified educator moderation
+                        </li>
+                    </ul>
+                    @if (Model.IsAuthenticated)
+                    {
+                        <a asp-action="Create" class="btn btn-primary btn-sm w-100 rounded-pill py-2 fw-semibold shadow-xs">
+                            ✍️ Ask a Question / Post
+                        </a>
+                    }
+                </div>
+
+                <!-- Popular Academic Subjects Widget -->
+                <div class="sidebar-widget">
+                    <h6 class="fw-bold text-dark mb-3 fs-6">Popular Topic Tags</h6>
+                    <div class="d-flex flex-wrap gap-1.5">
+                        <a asp-action="Index" asp-route-search="Mathematics" class="tag-pill">#Mathematics</a>
+                        <a asp-action="Index" asp-route-search="Physics" class="tag-pill">#Physics</a>
+                        <a asp-action="Index" asp-route-search="Chemistry" class="tag-pill">#Chemistry</a>
+                        <a asp-action="Index" asp-route-search="Bangla" class="tag-pill">#Bangla</a>
+                        <a asp-action="Index" asp-route-search="English" class="tag-pill">#English</a>
+                        <a asp-action="Index" asp-route-search="HigherMath" class="tag-pill">#HigherMath</a>
+                        <a asp-action="Index" asp-route-search="Biology" class="tag-pill">#Biology</a>
+                        <a asp-action="Index" asp-route-search="ExamPrep" class="tag-pill">#ExamPrep</a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+            const antiForgeryToken = tokenElement ? tokenElement.value : '';
+
+            // Handle Like Reaction
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', async function (e) {
+                    e.preventDefault();
+                    const postId = this.getAttribute('data-post-id');
+                    await toggleReaction(postId, 'Like');
+                });
+            });
+
+            // Handle Dislike Reaction
+            document.querySelectorAll('.dislike-btn').forEach(btn => {
+                btn.addEventListener('click', async function (e) {
+                    e.preventDefault();
+                    const postId = this.getAttribute('data-post-id');
+                    await toggleReaction(postId, 'Dislike');
+                });
+            });
+
+            async function toggleReaction(postId, type) {
+                const url = type === 'Like' ? `/Forum/ToggleLike/${postId}` : `/Forum/ToggleDislike/${postId}`;
+                const likeBtn = document.getElementById(`like-btn-${postId}`);
+                const dislikeBtn = document.getElementById(`dislike-btn-${postId}`);
+                const likeCountEl = document.getElementById(`like-count-${postId}`);
+                const dislikeCountEl = document.getElementById(`dislike-count-${postId}`);
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': antiForgeryToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            if (likeCountEl) likeCountEl.textContent = data.likeCount;
+                            if (dislikeCountEl) dislikeCountEl.textContent = data.dislikeCount;
+
+                            // Update Like button styling
+                            if (data.userReaction === 'Like') {
+                                likeBtn.classList.add('liked');
+                            } else {
+                                likeBtn.classList.remove('liked');
+                            }
+
+                            // Update Dislike button styling
+                            if (data.userReaction === 'Dislike') {
+                                dislikeBtn.classList.add('disliked');
+                            } else {
+                                dislikeBtn.classList.remove('disliked');
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error toggling reaction:', err);
+                }
+            }
+
+            // Handle Comment Form Submission via AJAX
+            document.querySelectorAll('.add-comment-form').forEach(form => {
+                form.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const postId = this.getAttribute('data-post-id');
+                    const inputEl = document.getElementById(`comment-input-${postId}`);
+                    const content = inputEl.value.trim();
+                    if (!content) return;
+
+                    const formData = new FormData(this);
+
+                    try {
+                        const response = await fetch('/Forum/AddComment', {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                // Clear input
+                                inputEl.value = '';
+
+                                // Update comment count
+                                const countEl = document.getElementById(`comment-count-${postId}`);
+                                if (countEl) countEl.textContent = data.commentCount;
+                                const threadCountEl = document.getElementById(`thread-count-${postId}`);
+                                if (threadCountEl) threadCountEl.textContent = data.commentCount;
+
+                                // Hide "no comments" message if present
+                                const noCommentsEl = document.getElementById(`no-comments-${postId}`);
+                                if (noCommentsEl) noCommentsEl.style.display = 'none';
+
+                                // Append new comment
+                                const listEl = document.getElementById(`comments-list-${postId}`);
+                                const initial = (data.comment.author || 'U').substring(0, 1).toUpperCase();
+                                const commentDiv = document.createElement('div');
+                                commentDiv.className = 'd-flex gap-2.5 align-items-start comment-item';
+                                commentDiv.innerHTML = `
+                                    <div class="comment-avatar">
+                                        ${escapeHtml(initial)}
+                                    </div>
+                                    <div class="comment-bubble flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="fw-bold text-dark small">${escapeHtml(data.comment.author)}</span>
+                                            <span class="text-muted small" style="font-size: 0.72rem;">${escapeHtml(data.comment.createdAt)}</span>
+                                        </div>
+                                        <p class="mb-0 text-secondary small" style="white-space: pre-line; line-height: 1.5;">${escapeHtml(data.comment.content)}</p>
+                                    </div>
+                                `;
+                                listEl.appendChild(commentDiv);
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Error posting comment:', err);
+                    }
+                });
+            });
+
+            // Handle Admin Approve Post via AJAX
+            document.querySelectorAll('.approve-post-form').forEach(form => {
+                form.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const postId = this.getAttribute('data-post-id');
+                    const formData = new FormData(this);
+
+                    try {
+                        const response = await fetch(`/Forum/ApprovePost/${postId}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                const badge = document.getElementById(`status-badge-${postId}`);
+                                if (badge) {
+                                    badge.className = 'badge badge-status-active rounded-pill px-3 py-1.5';
+                                    badge.textContent = '● Active';
+                                }
+                                location.reload();
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Error approving post:', err);
+                    }
+                });
+            });
+
+            // Handle Admin Disapprove Post via AJAX
+            document.querySelectorAll('.disapprove-post-form').forEach(form => {
+                form.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const postId = this.getAttribute('data-post-id');
+                    const formData = new FormData(this);
+
+                    try {
+                        const response = await fetch(`/Forum/DisapprovePost/${postId}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                const badge = document.getElementById(`status-badge-${postId}`);
+                                if (badge) {
+                                    badge.className = 'badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1.5 fw-semibold';
+                                    badge.textContent = '✕ Declined';
+                                }
+                                location.reload();
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Error disapproving post:', err);
+                    }
+                });
+            });
+
+            function escapeHtml(text) {
+                if (!text) return '';
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, m => map[m]);
+            }
+        });
+    </script>
+}
