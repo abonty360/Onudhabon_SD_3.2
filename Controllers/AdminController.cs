@@ -71,10 +71,29 @@ namespace Onudhabon_ISD.Controllers
             var user = await _context.Users.FindAsync(id);
             if (user == null) return NotFound();
 
+            var wasNotActive = user.VerificationStatus != "Active";
+
             user.VerificationStatus = "Active";
             user.IsVerified = true;
             user.IsRestricted = false;
             await _context.SaveChangesAsync();
+
+            // Send notification to user if status changed to Active
+            if (wasNotActive)
+            {
+                var notification = new Notification
+                {
+                    User = user.Email,
+                    Sender = "System Admin",
+                    Post = $"Your {user.Role} volunteer account has been approved and activated.",
+                    Type = "VolunteerApproval",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    __v = 0
+                };
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+            }
 
             TempData["SuccessMessage"] = $"Volunteer '{user.FullName}' ({user.Role}) has been approved. Status is now Active.";
             return RedirectToAction(nameof(Dashboard), new { tab = "volunteers" });
@@ -119,8 +138,27 @@ namespace Onudhabon_ISD.Controllers
             var lecture = await _context.Lectures.FindAsync(id);
             if (lecture == null) return NotFound();
 
+            var wasNotActive = lecture.Status != "Active";
+
             lecture.Status = "Active";
             await _context.SaveChangesAsync();
+
+            // Send notification to instructor if status changed to Active
+            if (wasNotActive && !string.IsNullOrWhiteSpace(lecture.Instructor))
+            {
+                var notification = new Notification
+                {
+                    User = lecture.Instructor,
+                    Sender = "System Admin",
+                    Post = $"Your recorded lecture \"{lecture.Title}\" has been approved and published.",
+                    Type = "LectureApproval",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    __v = 0
+                };
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+            }
 
             TempData["SuccessMessage"] = $"Lecture '{lecture.Title}' has been approved and is now live for all learners.";
             return RedirectToAction(nameof(Dashboard), new { tab = "lectures" });
@@ -149,8 +187,27 @@ namespace Onudhabon_ISD.Controllers
             var material = await _context.Materials.FindAsync(id);
             if (material == null) return NotFound();
 
+            var wasNotActive = material.Status != "Active";
+
             material.Status = "Active";
             await _context.SaveChangesAsync();
+
+            // Send notification to instructor if status changed to Active
+            if (wasNotActive && !string.IsNullOrWhiteSpace(material.Instructor))
+            {
+                var notification = new Notification
+                {
+                    User = material.Instructor,
+                    Sender = "System Admin",
+                    Post = $"Your study material \"{material.Title}\" has been approved and is now available for download.",
+                    Type = "MaterialApproval",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    __v = 0
+                };
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+            }
 
             TempData["SuccessMessage"] = $"Material '{material.Title}' has been approved and is available for download.";
             return RedirectToAction(nameof(Dashboard), new { tab = "materials" });
@@ -207,12 +264,66 @@ namespace Onudhabon_ISD.Controllers
             var post = await _context.ForumPosts.FindAsync(id);
             if (post == null) return NotFound();
 
+            var wasNotActive = post.Status != "Active";
+
             post.Status = "Active";
             post.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
+            // Send notification to author if status changed to Active
+            if (wasNotActive && !string.IsNullOrWhiteSpace(post.Author))
+            {
+                var notification = new Notification
+                {
+                    User = post.Author,
+                    Sender = "System Admin",
+                    Post = $"Your forum post \"{post.Title}\" has been approved and is now active.",
+                    Type = "ForumApproval",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    __v = 0
+                };
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+            }
+
             TempData["SuccessMessage"] = $"Forum post '{post.Title}' has been approved and is now active.";
             return RedirectToAction(nameof(Dashboard), new { tab = "forum" });
+        }
+
+        // POST: /Admin/ApproveStudent/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) return NotFound();
+
+            var wasNotActive = student.Status != "Active";
+
+            student.Status = "Active";
+            await _context.SaveChangesAsync();
+
+            // Send notification to guardian/submitter if status changed to Active
+            var recipient = student.GuardianName ?? student.GuardianId;
+            if (wasNotActive && !string.IsNullOrWhiteSpace(recipient))
+            {
+                var notification = new Notification
+                {
+                    User = recipient,
+                    Sender = "System Admin",
+                    Post = $"Your student enrollment submission for '{student.FullName}' (Class {student.ClassLevel}) has been approved.",
+                    Type = "StudentApproval",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    __v = 0
+                };
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["SuccessMessage"] = $"Student '{student.FullName}' has been approved.";
+            return RedirectToAction(nameof(Dashboard), new { tab = "students" });
         }
 
         // POST: /Admin/DisapproveForumPost/5
