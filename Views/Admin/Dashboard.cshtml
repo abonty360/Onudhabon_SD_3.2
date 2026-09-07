@@ -1,4 +1,4 @@
-﻿@model Onudhabon_ISD.Models.AdminDashboardViewModel
+@model Onudhabon_ISD.Models.AdminDashboardViewModel
 @inject Onudhabon_ISD.Services.ICloudinaryService CloudinaryService
 
 @{
@@ -119,6 +119,16 @@
                         @if (Model.PendingMaterialsCount > 0)
                         {
                             <span class="badge bg-info text-dark rounded-pill ms-1.5">@Model.PendingMaterialsCount</span>
+                        }
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 py-2 @(activeTab == "forum" ? "active fw-semibold" : "text-dark")" 
+                            id="forum-tab" data-bs-toggle="tab" data-bs-target="#forum-tab-pane" type="button" role="tab">
+                        💬 Forum Discussions
+                        @if (Model.PendingForumPostsCount > 0)
+                        {
+                            <span class="badge bg-warning text-dark rounded-pill ms-1.5">@Model.PendingForumPostsCount</span>
                         }
                     </button>
                 </li>
@@ -756,6 +766,121 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+                <!-- ================= TAB: FORUM MODERATION ================= -->
+                <div class="tab-pane fade @(activeTab == "forum" ? "show active" : "")" id="forum-tab-pane" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">Forum Posts Moderation</h5>
+                            <span class="text-muted small">Review user-submitted discussions, approve quality topics, or decline spam/inappropriate content.</span>
+                        </div>
+                        <a asp-controller="Forum" asp-action="Index" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                            🌐 View Live Forum Feed
+                        </a>
+                    </div>
+
+                    @if (!Model.ForumPosts.Any())
+                    {
+                        <div class="text-center py-5 border rounded-4 bg-light">
+                            <div class="fs-1 text-muted mb-2">💬</div>
+                            <h5 class="text-dark fw-bold">No forum posts found</h5>
+                            <p class="text-muted small">When users create forum posts, they will appear here for administrative moderation.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive border rounded-4 bg-white shadow-2xs">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Post Title & Content</th>
+                                        <th>Author</th>
+                                        <th>Date Submitted</th>
+                                        <th>Engagement</th>
+                                        <th>Status</th>
+                                        <th class="text-end pe-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var post in Model.ForumPosts)
+                                    {
+                                        <tr>
+                                            <td class="ps-3" style="max-width: 320px;">
+                                                <div class="fw-bold text-dark text-truncate" title="@post.Title">@post.Title</div>
+                                                <div class="text-muted small text-truncate" style="font-size: 0.8rem;" title="@post.Content">
+                                                    @(string.IsNullOrWhiteSpace(post.Content) ? "No description" : post.Content)
+                                                </div>
+                                                @if (!string.IsNullOrWhiteSpace(post.Tags))
+                                                {
+                                                    <div class="mt-1">
+                                                        @foreach (var tag in post.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                                        {
+                                                            <span class="badge bg-light text-secondary border rounded-pill" style="font-size: 0.68rem;">#@tag.Trim()</span>
+                                                        }
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="fw-semibold text-dark small">@(post.Author ?? "Community Member")</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted small">@post.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                                <div class="text-muted" style="font-size: 0.72rem;">@post.CreatedAt.ToString("h:mm tt")</div>
+                                            </td>
+                                            <td>
+                                                <span class="small text-muted me-2" title="Likes">👍 @post.LikeCount</span>
+                                                <span class="small text-muted me-2" title="Dislikes">👎 @post.DislikeCount</span>
+                                                <span class="small text-muted" title="Comments">💬 @post.Comments.Count</span>
+                                            </td>
+                                            <td>
+                                                @if (post.Status == "Active")
+                                                {
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">Active</span>
+                                                }
+                                                else if (post.Status == "Declined")
+                                                {
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1">Declined</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2.5 py-1">Pending</span>
+                                                }
+                                            </td>
+                                            <td class="text-end pe-3">
+                                                <div class="d-inline-flex gap-1">
+                                                    @if (post.Status != "Active")
+                                                    {
+                                                        <form asp-action="ApproveForumPost" asp-route-id="@post.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-success btn-sm rounded-pill px-2.5 py-1 fw-bold" title="Approve Post">
+                                                                ✓ Approve
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    @if (post.Status != "Declined")
+                                                    {
+                                                        <form asp-action="DisapproveForumPost" asp-route-id="@post.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-2.5 py-1 fw-semibold" title="Disapprove Post">
+                                                                ✕ Decline
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    <form asp-action="DeleteForumPost" asp-route-id="@post.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to permanently delete this forum post?');">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill px-2 py-1" title="Delete Post">
+                                                            🗑️
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>

@@ -43,6 +43,11 @@ namespace Onudhabon_ISD.Controllers
                 .OrderByDescending(m => m.Date)
                 .ToListAsync();
 
+            var forumPosts = await _context.ForumPosts
+                .Include(p => p.Comments)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
             var studentCount = await _context.Students.CountAsync();
 
             var viewModel = new AdminDashboardViewModel
@@ -50,6 +55,7 @@ namespace Onudhabon_ISD.Controllers
                 Users = users,
                 Lectures = lectures,
                 Materials = materials,
+                ForumPosts = forumPosts,
                 TotalStudentsCount = studentCount
             };
 
@@ -191,6 +197,53 @@ namespace Onudhabon_ISD.Controllers
 
             TempData["SuccessMessage"] = $"Educator '{educator.FullName}' ({educator.Email}) has been restricted and blocked from logging in.";
             return RedirectToAction(nameof(Dashboard), new { tab = returnTab });
+        }
+
+        // POST: /Admin/ApproveForumPost/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveForumPost(int id)
+        {
+            var post = await _context.ForumPosts.FindAsync(id);
+            if (post == null) return NotFound();
+
+            post.Status = "Active";
+            post.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Forum post '{post.Title}' has been approved and is now active.";
+            return RedirectToAction(nameof(Dashboard), new { tab = "forum" });
+        }
+
+        // POST: /Admin/DisapproveForumPost/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DisapproveForumPost(int id)
+        {
+            var post = await _context.ForumPosts.FindAsync(id);
+            if (post == null) return NotFound();
+
+            post.Status = "Declined";
+            post.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Forum post '{post.Title}' has been declined/disapproved.";
+            return RedirectToAction(nameof(Dashboard), new { tab = "forum" });
+        }
+
+        // POST: /Admin/DeleteForumPost/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteForumPost(int id)
+        {
+            var post = await _context.ForumPosts.FindAsync(id);
+            if (post == null) return NotFound();
+
+            _context.ForumPosts.Remove(post);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Forum post '{post.Title}' has been deleted.";
+            return RedirectToAction(nameof(Dashboard), new { tab = "forum" });
         }
     }
 }

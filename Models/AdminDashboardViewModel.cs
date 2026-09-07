@@ -1,10 +1,11 @@
-﻿namespace Onudhabon_ISD.Models
+namespace Onudhabon_ISD.Models
 {
     public class AdminDashboardViewModel
     {
         public List<User> Users { get; set; } = new();
         public List<Lecture> Lectures { get; set; } = new();
         public List<Material> Materials { get; set; } = new();
+        public List<ForumPost> ForumPosts { get; set; } = new();
 
         public int TotalUsers => Users.Count;
         public int PendingVolunteersCount => Users.Count(u => u.Role != "Admin" && (u.VerificationStatus == "Pending" || string.IsNullOrEmpty(u.VerificationStatus)));
@@ -17,6 +18,9 @@
 
         public int PendingMaterialsCount => Materials.Count(m => m.Status == "pending" || m.Status == "Pending");
         public int ApprovedMaterialsCount => Materials.Count(m => m.Status == "Active" || m.Status == "Approved");
+
+        public int PendingForumPostsCount => ForumPosts.Count(f => f.Status == "Pending");
+        public int ActiveForumPostsCount => ForumPosts.Count(f => f.Status == "Active");
 
         public int TotalStudentsCount { get; set; } = 0;
     }
