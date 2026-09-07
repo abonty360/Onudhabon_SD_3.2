@@ -197,9 +197,28 @@ namespace Onudhabon_ISD.Controllers
                 return NotFound();
             }
 
+            var wasNotActive = post.Status != "Active";
+
             post.Status = "Active";
             post.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
+
+            // Send notification to author if status changed to Active
+            if (wasNotActive && !string.IsNullOrWhiteSpace(post.Author))
+            {
+                var notification = new Notification
+                {
+                    User = post.Author,
+                    Sender = "System Admin",
+                    Post = $"Your forum post \"{post.Title}\" has been approved and is now active.",
+                    Type = "ForumApproval",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    __v = 0
+                };
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+            }
 
             if (IsAjaxRequest())
             {
