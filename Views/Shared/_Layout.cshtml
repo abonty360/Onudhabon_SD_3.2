@@ -257,6 +257,52 @@
                             }
 
 
+                            <!-- NOTIFICATIONS BELL DROPDOWN -->
+                            <li class="nav-item dropdown me-2 position-relative">
+                                <a class="nav-link text-dark position-relative p-2 rounded-circle hover-bg d-flex align-items-center justify-content-center"
+                                   href="#"
+                                   id="notificationDropdown"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false"
+                                   title="Notifications"
+                                   style="width: 38px; height: 38px; font-size: 1.15rem;">
+                                    🔔
+                                    <span id="notificationBadge"
+                                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                          style="display: none; font-size: 0.65rem; padding: 0.25em 0.5em;">
+                                        0
+                                    </span>
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-0 mt-2"
+                                     aria-labelledby="notificationDropdown"
+                                     style="width: 360px; max-width: 92vw; overflow: hidden; z-index: 1060;">
+                                    <div class="d-flex align-items-center justify-content-between p-3 border-bottom bg-light">
+                                        <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                                            <span>🔔</span> Notifications
+                                            <span id="notificationHeaderBadge" class="badge bg-secondary-subtle text-secondary rounded-pill small">0 unread</span>
+                                        </h6>
+                                        <button type="button" id="markAllReadBtn" class="btn btn-sm btn-link text-decoration-none p-0 text-primary small fw-semibold" style="display: none;">
+                                            Mark all read
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="notificationItemsList" class="list-group list-group-flush" style="max-height: 380px; overflow-y: auto;">
+                                        <div class="text-center py-4 text-muted small" id="notificationLoadingState">
+                                            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                                            <div>Loading notifications...</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-2 border-top text-center bg-light">
+                                        <a asp-controller="Notification" asp-action="Index" class="btn btn-link btn-sm text-decoration-none text-muted fw-semibold small w-100">
+                                            View all notifications →
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+
                             <!-- PROFILE DROPDOWN -->
                             <li class="nav-item dropdown">
 
@@ -504,6 +550,175 @@
 
     <script src="~/js/site.js"
             asp-append-version="true"></script>
+
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <form id="globalAntiforgeryForm" style="display:none;">
+            @Html.AntiForgeryToken()
+        </form>
+
+        <script>
+            (function () {
+                const badge = document.getElementById('notificationBadge');
+                const headerBadge = document.getElementById('notificationHeaderBadge');
+                const list = document.getElementById('notificationItemsList');
+                const markAllBtn = document.getElementById('markAllReadBtn');
+
+                function getAntiForgeryToken() {
+                    const tokenInput = document.querySelector('#globalAntiforgeryForm input[name="__RequestVerificationToken"]') ||
+                                       document.querySelector('input[name="__RequestVerificationToken"]');
+                    return tokenInput ? tokenInput.value : '';
+                }
+
+                async function fetchNotifications() {
+                    try {
+                        const response = await fetch('/Notification/GetNotifications', {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        if (!response.ok) return;
+                        const data = await response.json();
+                        if (!data || !data.success) return;
+
+                        const unreadCount = data.unreadCount || 0;
+                        if (unreadCount > 0) {
+                            if (badge) {
+                                badge.style.display = 'inline-block';
+                                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                            }
+                            if (headerBadge) {
+                                headerBadge.textContent = `${unreadCount} unread`;
+                                headerBadge.className = 'badge bg-danger text-white rounded-pill small';
+                            }
+                            if (markAllBtn) markAllBtn.style.display = 'inline-block';
+                        } else {
+                            if (badge) {
+                                badge.style.display = 'none';
+                                badge.textContent = '0';
+                            }
+                            if (headerBadge) {
+                                headerBadge.textContent = '0 unread';
+                                headerBadge.className = 'badge bg-secondary-subtle text-secondary rounded-pill small';
+                            }
+                            if (markAllBtn) markAllBtn.style.display = 'none';
+                        }
+
+                        if (!list) return;
+
+                        if (!data.notifications || data.notifications.length === 0) {
+                            list.innerHTML = `
+                                <div class="text-center py-4 text-muted">
+                                    <div class="fs-4 mb-1">🎉</div>
+                                    <div class="fw-semibold small">All caught up!</div>
+                                    <div class="small text-muted">No notifications yet.</div>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        list.innerHTML = data.notifications.map(item => `
+                            <a href="${escapeHtml(item.link || '#')}" 
+                               class="list-group-item list-group-item-action p-3 border-bottom d-flex gap-2 align-items-start ${item.isRead ? '' : 'bg-primary-subtle bg-opacity-25'}"
+                               onclick="handleNotificationClick(event, ${item.id}, '${escapeHtml(item.link || '#')}')">
+                                <div class="fs-5 lh-1 mt-1">${item.icon || '🔔'}</div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="d-flex align-items-center justify-content-between gap-1 mb-1">
+                                        <span class="badge ${getBadgeClass(item.type)} rounded-pill" style="font-size: 0.65rem;">${escapeHtml(item.type)}</span>
+                                        <span class="text-muted" style="font-size: 0.72rem;">${escapeHtml(item.timeAgo)}</span>
+                                    </div>
+                                    <p class="mb-0 small text-dark ${item.isRead ? '' : 'fw-bold'}" style="line-height: 1.35;">
+                                        ${escapeHtml(item.message)}
+                                    </p>
+                                </div>
+                                ${!item.isRead ? '<span class="p-1 bg-primary rounded-circle mt-2 flex-shrink-0" style="width: 8px; height: 8px;" title="Unread"></span>' : ''}
+                            </a>
+                        `).join('');
+
+                    } catch (err) {
+                        console.error('Error fetching notifications:', err);
+                    }
+                }
+
+                function getBadgeClass(type) {
+                    switch(type) {
+                        case 'LectureApproval': return 'bg-success text-white';
+                        case 'MaterialApproval': return 'bg-info text-white';
+                        case 'StudentApproval': return 'bg-warning text-dark';
+                        case 'ForumApproval': return 'bg-primary text-white';
+                        case 'VolunteerApproval': return 'bg-dark text-white';
+                        case 'Like': return 'bg-danger-subtle text-danger';
+                        case 'Dislike': return 'bg-secondary-subtle text-secondary';
+                        case 'Comment': return 'bg-primary-subtle text-primary';
+                        default: return 'bg-secondary text-white';
+                    }
+                }
+
+                function escapeHtml(text) {
+                    if (!text) return '';
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                }
+
+                window.handleNotificationClick = async function (e, id, link) {
+                    e.preventDefault();
+                    try {
+                        const token = getAntiForgeryToken();
+                        const formData = new FormData();
+                        formData.append('id', id);
+                        if (token) formData.append('__RequestVerificationToken', token);
+
+                        await fetch(`/Notification/MarkSingleNotificationAsRead/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                'RequestVerificationToken': token,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        });
+                    } catch (err) {
+                        console.error('Error marking as read:', err);
+                    } finally {
+                        if (link && link !== '#' && link !== '') {
+                            window.location.href = link;
+                        } else {
+                            fetchNotifications();
+                        }
+                    }
+                };
+
+                if (markAllBtn) {
+                    markAllBtn.addEventListener('click', async function (e) {
+                        e.preventDefault();
+                        try {
+                            const token = getAntiForgeryToken();
+                            const formData = new FormData();
+                            if (token) formData.append('__RequestVerificationToken', token);
+
+                            const res = await fetch('/Notification/MarkNotificationsAsRead', {
+                                method: 'POST',
+                                headers: {
+                                    'RequestVerificationToken': token,
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: formData
+                            });
+                            if (res.ok) {
+                                fetchNotifications();
+                            }
+                        } catch (err) {
+                            console.error('Error marking all as read:', err);
+                        }
+                    });
+                }
+
+                // Initial fetch
+                fetchNotifications();
+
+                // Periodic polling every 10 seconds
+                setInterval(fetchNotifications, 10000);
+            })();
+        </script>
+    }
 
     @await RenderSectionAsync("Scripts", required: false)
 
