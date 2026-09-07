@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Onudhabon_ISD.Models;
 
 namespace Onudhabon_ISD.Data
@@ -17,6 +17,8 @@ namespace Onudhabon_ISD.Data
         public DbSet<Lecture> Lectures { get; set; }
         public DbSet<Forum> Forums { get; set; }
         public DbSet<ForumPost> ForumPosts { get; set; }
+        public DbSet<ForumComment> ForumComments { get; set; }
+        public DbSet<ForumPostReaction> ForumPostReactions { get; set; }
         public DbSet<ClassPlan> ClassPlans { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -159,9 +161,46 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Content).HasMaxLength(4000);
                 entity.Property(e => e.Author).HasMaxLength(150);
                 entity.Property(e => e.Tags).HasMaxLength(255);
+                entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Pending");
+                entity.Property(e => e.LikeCount).HasDefaultValue(0);
+                entity.Property(e => e.DislikeCount).HasDefaultValue(0);
                 entity.Property(e => e.Replies).HasDefaultValue(0);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
                 entity.Property(e => e.__v).HasDefaultValue(0);
+
+                entity.HasMany(e => e.Comments)
+                    .WithOne(c => c.Post)
+                    .HasForeignKey(c => c.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(e => e.Reactions)
+                    .WithOne(r => r.Post)
+                    .HasForeignKey(r => r.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ForumComment Entity Configuration
+            modelBuilder.Entity<ForumComment>(entity =>
+            {
+                entity.ToTable("ForumComments");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Author).HasMaxLength(150);
+                entity.Property(e => e.Content).IsRequired().HasMaxLength(4000);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.__v).HasDefaultValue(0);
+            });
+
+            // ForumPostReaction Entity Configuration
+            modelBuilder.Entity<ForumPostReaction>(entity =>
+            {
+                entity.ToTable("ForumPostReactions");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.ReactionType).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.__v).HasDefaultValue(0);
+
+                entity.HasIndex(e => new { e.PostId, e.UserId }).IsUnique();
             });
 
             modelBuilder.Entity<ClassPlan>(entity =>
