@@ -237,7 +237,48 @@ namespace Onudhabon_ISD.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Profile()
+        public async Task<IActionResult> Profile(int? id = null)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+
+            int currentUserId = 0;
+            int.TryParse(userIdStr, out currentUserId);
+
+            User? user = null;
+            if (id.HasValue && id.Value > 0)
+            {
+                user = await _context.Users.FindAsync(id.Value);
+            }
+            else if (currentUserId > 0)
+            {
+                user = await _context.Users.FindAsync(currentUserId);
+            }
+
+            if (user == null && !string.IsNullOrEmpty(email))
+            {
+                user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            }
+
+            if (user == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            ViewBag.IsOwnProfile = (currentUserId > 0 && user.Id == currentUserId);
+
+            // User contribution stats
+            ViewBag.LectureCount = await _context.Lectures.CountAsync(l => l.Instructor == user.FullName || l.Instructor == user.Email);
+            ViewBag.MaterialCount = await _context.Materials.CountAsync(m => m.Instructor == user.FullName || m.Instructor == user.Email);
+            ViewBag.ForumPostCount = await _context.ForumPosts.CountAsync(p => p.Author == user.FullName || p.Author == user.Email);
+
+            return View(user);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(EditProfileViewModel model)
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var email = User.FindFirstValue(ClaimTypes.Email);
@@ -258,7 +299,93 @@ namespace Onudhabon_ISD.Controllers
                 return RedirectToAction(nameof(Login));
             }
 
-            return View(user);
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Please fill in all required fields properly.";
+                return RedirectToAction(nameof(Profile));
+            }
+
+            // Upload profile picture if provided
+            if (model.PictureFile != null && model.PictureFile.Length > 0)
+            {
+                var picResult = await _cloudinaryService.UploadProfilePictureAsync(model.PictureFile);
+                if (picResult.Success && !string.IsNullOrEmpty(picResult.SecureUrl))
+                {
+                    user.Picture = picResult.SecureUrl;
+                }
+                else if (!string.IsNullOrEmpty(picResult.ErrorMessage))
+                {
+                    TempData["ErrorMessage"] = $"Profile photo upload error: {picResult.ErrorMessage}";
+                    return RedirectToAction(nameof(Profile));
+                }
+            }
+
+            // Upload certificate / educational document if provided
+            if (model.CertificatePictureFile != null && model.CertificatePictureFile.Length > 0)
+            {
+                var certResult = await _cloudinaryService.UploadEducationDocAsync(model.CertificatePictureFile);
+                if (certResult.Success && !string.IsNullOrEmpty(certResult.SecureUrl))
+                {
+                    user.CertificatePicture = certResult.SecureUrl;
+                }
+                else if (!string.IsNullOrEmpty(certResult.ErrorMessage))
+                {
+                    TempData["ErrorMessage"] = $"Document upload error: {certResult.ErrorMessage}";
+                    return RedirectToAction(nameof(Profile));
+                }
+            }
+
+            // Update user details
+            user.FullName = model.FullName.Trim();
+            user.PhoneNumber = model.PhoneNumber.Trim();
+            user.City = model.City.Trim();
+            user.Area = model.Area.Trim();
+            user.Location = string.IsNullOrWhiteSpace(model.Location) ? null : model.Location.Trim();
+            user.Age = model.Age;
+            user.NidNumber = string.IsNullOrWhiteSpace(model.NidNumber) ? null : model.NidNumber.Trim();
+            user.Bio = string.IsNullOrWhiteSpace(model.Bio) ? null : model.Bio.Trim();
+            user.VolunteerReason = string.IsNullOrWhiteSpace(model.VolunteerReason) ? null : model.VolunteerReason.Trim();
+
+            user.EducationLevel = string.IsNullOrWhiteSpace(model.EducationLevel) ? null : model.EducationLevel.Trim();
+            user.CurrentlyStudying = string.IsNullOrWhiteSpace(model.CurrentlyStudying) ? null : model.CurrentlyStudying.Trim();
+            user.Major = string.IsNullOrWhiteSpace(model.Major) ? null : model.Major.Trim();
+            user.UniversityName = string.IsNullOrWhiteSpace(model.UniversityName) ? null : model.UniversityName.Trim();
+            user.UniversityPassingYear = string.IsNullOrWhiteSpace(model.UniversityPassingYear) ? null : model.UniversityPassingYear.Trim();
+            user.HscInstitute = string.IsNullOrWhiteSpace(model.HscInstitute) ? null : model.HscInstitute.Trim();
+            user.HscPassingYear = string.IsNullOrWhiteSpace(model.HscPassingYear) ? null : model.HscPassingYear.Trim();
+            user.SscInstitute = string.IsNullOrWhiteSpace(model.SscInstitute) ? null : model.SscInstitute.Trim();
+            user.SscPassingYear = string.IsNullOrWhiteSpace(model.SscPassingYear) ? null : model.SscPassingYear.Trim();
+            user.Institution = !string.IsNullOrWhiteSpace(model.Institution)
+                ? model.Institution.Trim()
+                : (!string.IsNullOrWhiteSpace(model.UniversityName) ? model.UniversityName.Trim() : user.Institution);
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            // Refresh cookie claims so navbar and UI immediately show updated name & photo
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("PhoneNumber", user.PhoneNumber ?? ""),
+                new Claim("City", user.City ?? ""),
+                new Claim("Area", user.Area ?? "")
+            };
+
+            if (!string.IsNullOrEmpty(user.Picture))
+            {
+                claims.Add(new Claim("Picture", user.Picture));
+            }
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
+
+            TempData["SuccessMessage"] = "Profile details updated successfully!";
+            return RedirectToAction(nameof(Profile));
         }
 
         [HttpPost]

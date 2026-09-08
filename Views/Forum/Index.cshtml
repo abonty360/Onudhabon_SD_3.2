@@ -209,13 +209,13 @@
                     @if (Model.IsAuthenticated)
                     {
                         <a asp-action="Create" class="btn btn-light btn-lg rounded-pill px-4 py-2.5 fw-bold shadow-lg text-primary d-inline-flex align-items-center gap-2">
-                            <span style="font-size: 1.2rem;">✍️</span> Start Discussion
+                            <i class="bi bi-pencil-square fs-5"></i> Start Discussion
                         </a>
                     }
                     else
                     {
                         <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="btn btn-light btn-lg rounded-pill px-4 py-2.5 fw-bold shadow-lg text-primary d-inline-flex align-items-center gap-2">
-                            <span>🔐</span> Sign In to Post
+                            <i class="bi bi-box-arrow-in-right fs-5"></i> Sign In to Post
                         </a>
                     }
                 </div>
@@ -229,7 +229,7 @@
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4 d-flex align-items-center gap-3 p-3.5" role="alert">
-                <div class="fs-4">🎉</div>
+                <div class="fs-4"><i class="bi bi-check-circle-fill text-success"></i></div>
                 <div class="flex-grow-1">
                     <strong>Success:</strong> @TempData["SuccessMessage"]
                 </div>
@@ -239,7 +239,7 @@
         @if (TempData["ErrorMessage"] != null)
         {
             <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4 d-flex align-items-center gap-3 p-3.5" role="alert">
-                <div class="fs-4">⚠️</div>
+                <div class="fs-4"><i class="bi bi-exclamation-triangle-fill text-danger"></i></div>
                 <div class="flex-grow-1">
                     <strong>Notice:</strong> @TempData["ErrorMessage"]
                 </div>
@@ -257,25 +257,25 @@
                         <div class="d-flex flex-wrap gap-1 p-1 bg-light rounded-pill border">
                             <a asp-action="Index" asp-route-filter="all" asp-route-search="@Model.SearchQuery"
                                class="filter-tab-pill @(Model.ActiveTab == "all" ? "active" : "")">
-                                🔥 All Posts
+                                <i class="bi bi-grid me-1"></i> All Posts
                             </a>
 
                             @if (Model.IsAdmin)
                             {
                                 <a asp-action="Index" asp-route-filter="active" asp-route-search="@Model.SearchQuery"
                                    class="filter-tab-pill @(Model.ActiveTab == "active" ? "active" : "")">
-                                    ✅ Active
+                                    <i class="bi bi-check-circle me-1"></i> Active
                                 </a>
                                 <a asp-action="Index" asp-route-filter="pending" asp-route-search="@Model.SearchQuery"
                                    class="filter-tab-pill @(Model.ActiveTab == "pending" ? "active bg-warning text-dark border-0 shadow-sm" : "")">
-                                    ⏳ Pending Review
+                                    <i class="bi bi-clock me-1"></i> Pending Review
                                 </a>
                             }
                             else if (Model.IsAuthenticated)
                             {
                                 <a asp-action="Index" asp-route-filter="myposts" asp-route-search="@Model.SearchQuery"
                                    class="filter-tab-pill @(Model.ActiveTab == "myposts" ? "active" : "")">
-                                    👤 My Posts
+                                    <i class="bi bi-person me-1"></i> My Posts
                                 </a>
                             }
                         </div>
@@ -290,7 +290,7 @@
                                        placeholder="Search discussions..."
                                        value="@Model.SearchQuery" />
                                 <button type="submit" class="btn btn-outline-secondary border-start-0 rounded-end-pill px-3 bg-light">
-                                    🔍
+                                    <i class="bi bi-search"></i>
                                 </button>
                             </div>
                         </form>
@@ -302,7 +302,9 @@
                 {
                     <div class="forum-card text-center py-5 px-4">
                         <div class="py-5">
-                            <div class="mb-3" style="font-size: 3.8rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08));">💬</div>
+                            <div class="mb-3">
+                                <i class="bi bi-chat-square-text text-muted" style="font-size: 3.5rem;"></i>
+                            </div>
                             <h3 class="fw-bold text-dark mb-2">No discussions found</h3>
                             <p class="text-muted mx-auto mb-4" style="max-width: 480px; font-size: 0.95rem;">
                                 @if (!string.IsNullOrEmpty(Model.SearchQuery))
@@ -317,7 +319,7 @@
                             @if (Model.IsAuthenticated)
                             {
                                 <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
-                                    ✍️ Create First Post
+                                    <i class="bi bi-pencil-square me-1"></i> Create First Post
                                 </a>
                             }
                         </div>
@@ -344,12 +346,12 @@
                                                 }
                                             </div>
                                             <small class="text-muted" style="font-size: 0.8rem;">
-                                                🕒 @post.CreatedAt.ToString("MMM dd, yyyy • h:mm tt")
+                                                <i class="bi bi-clock me-1"></i>@post.CreatedAt.ToString("MMM dd, yyyy • h:mm tt")
                                             </small>
                                         </div>
                                     </div>
 
-                                    <!-- Status Badge & Admin Actions -->
+                                    <!-- Status Badge & Post Actions -->
                                     <div class="d-flex align-items-center gap-2">
                                         @if (post.Status == "Active")
                                         {
@@ -370,15 +372,15 @@
                                             </span>
                                         }
 
-                                        @if (Model.IsAdmin)
-                                        {
-                                            <div class="d-flex align-items-center gap-1 admin-actions-@post.Id">
+                                        <div class="d-flex align-items-center gap-1">
+                                            @if (Model.IsAdmin)
+                                            {
                                                 @if (post.Status != "Active")
                                                 {
                                                     <form asp-action="ApprovePost" asp-route-id="@post.Id" method="post" class="d-inline approve-post-form" data-post-id="@post.Id">
                                                         @Html.AntiForgeryToken()
                                                         <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5 py-1 fw-bold shadow-xs" title="Approve this post">
-                                                            ✓ Approve
+                                                            <i class="bi bi-check2"></i> Approve
                                                         </button>
                                                     </form>
                                                 }
@@ -386,13 +388,22 @@
                                                 {
                                                     <form asp-action="DisapprovePost" asp-route-id="@post.Id" method="post" class="d-inline disapprove-post-form" data-post-id="@post.Id">
                                                         @Html.AntiForgeryToken()
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1 fw-semibold shadow-xs" title="Disapprove this post">
-                                                            ✕ Disapprove
+                                                        <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill px-2.5 py-1 fw-semibold shadow-xs" title="Decline this post">
+                                                            <i class="bi bi-x-circle"></i> Decline
                                                         </button>
                                                     </form>
                                                 }
-                                            </div>
-                                        }
+                                            }
+                                            @if (Model.IsAdmin || post.IsAuthor)
+                                            {
+                                                <form asp-action="DeletePost" asp-route-id="@post.Id" method="post" class="d-inline delete-post-form" data-post-id="@post.Id">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1 fw-semibold shadow-xs" title="Delete this post">
+                                                        <i class="bi bi-trash3"></i> Delete
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
 
@@ -426,7 +437,7 @@
                                                         data-reaction="Like"
                                                         id="like-btn-@post.Id"
                                                         title="Helpful / Like">
-                                                    <span>👍</span>
+                                                    <i class="bi @(post.UserReaction == "Like" ? "bi-hand-thumbs-up-fill" : "bi-hand-thumbs-up")" id="like-icon-@post.Id"></i>
                                                     <span class="like-count" id="like-count-@post.Id">@post.LikeCount</span>
                                                 </button>
 
@@ -437,17 +448,17 @@
                                                         data-reaction="Dislike"
                                                         id="dislike-btn-@post.Id"
                                                         title="Not helpful / Dislike">
-                                                    <span>👎</span>
+                                                    <i class="bi @(post.UserReaction == "Dislike" ? "bi-hand-thumbs-down-fill" : "bi-hand-thumbs-down")" id="dislike-icon-@post.Id"></i>
                                                     <span class="dislike-count" id="dislike-count-@post.Id">@post.DislikeCount</span>
                                                 </button>
                                             }
                                             else
                                             {
                                                 <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="action-pill-btn" title="Sign in to like">
-                                                    <span>👍</span> <span>@post.LikeCount</span>
+                                                    <i class="bi bi-hand-thumbs-up"></i> <span>@post.LikeCount</span>
                                                 </a>
                                                 <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="action-pill-btn" title="Sign in to dislike">
-                                                    <span>👎</span> <span>@post.DislikeCount</span>
+                                                    <i class="bi bi-hand-thumbs-down"></i> <span>@post.DislikeCount</span>
                                                 </a>
                                             }
 
@@ -458,7 +469,7 @@
                                                     data-bs-target="#comments-section-@post.Id"
                                                     aria-expanded="false"
                                                     aria-controls="comments-section-@post.Id">
-                                                <span>💬</span>
+                                                <i class="bi bi-chat-left-text"></i>
                                                 <span>Comments (<span id="comment-count-@post.Id">@post.CommentCount</span>)</span>
                                             </button>
                                         </div>
@@ -466,7 +477,7 @@
                                     else
                                     {
                                         <div class="d-flex align-items-center gap-2 text-muted small py-1">
-                                            <span>🔒 <em>Reactions and comments will become available once this post is approved by an administrator.</em></span>
+                                            <i class="bi bi-lock me-1"></i> <em>Reactions and comments will become available once this post is approved by an administrator.</em>
                                         </div>
                                     }
                                 </div>
@@ -524,7 +535,7 @@
                                                                required
                                                                maxlength="4000" />
                                                         <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-xs flex-shrink-0">
-                                                            Reply
+                                                            <i class="bi bi-send-fill me-1"></i> Reply
                                                         </button>
                                                     </div>
                                                 </form>
@@ -553,7 +564,7 @@
                 <div class="sidebar-widget">
                     <div class="d-flex align-items-center gap-2.5 mb-3">
                         <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                            💡
+                            <i class="bi bi-lightbulb fs-5"></i>
                         </div>
                         <h6 class="fw-bold text-dark mb-0 fs-6">About Community Forum</h6>
                     </div>
@@ -562,19 +573,25 @@
                     </p>
                     <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-3">
                         <li class="d-flex align-items-center gap-2">
-                            <span class="text-success">✓</span> Respectful academic discussions
+                            <span class="text-success"><i class="bi bi-check-circle-fill"></i></span> Respectful academic discussions
                         </li>
                         <li class="d-flex align-items-center gap-2">
-                            <span class="text-success">✓</span> Constructive feedback & assistance
+                            <span class="text-success"><i class="bi bi-check-circle-fill"></i></span> Constructive feedback & assistance
                         </li>
                         <li class="d-flex align-items-center gap-2">
-                            <span class="text-success">✓</span> Verified educator moderation
+                            <span class="text-success"><i class="bi bi-check-circle-fill"></i></span> Verified educator moderation
                         </li>
                     </ul>
                     @if (Model.IsAuthenticated)
                     {
                         <a asp-action="Create" class="btn btn-primary btn-sm w-100 rounded-pill py-2 fw-semibold shadow-xs">
-                            ✍️ Ask a Question / Post
+                            <i class="bi bi-pencil-square me-1"></i> Ask a Question / Post
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Forum" class="btn btn-outline-primary btn-sm w-100 rounded-pill py-2 fw-semibold shadow-xs">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Post
                         </a>
                     }
                 </div>
@@ -628,6 +645,8 @@
                 const url = type === 'Like' ? `/Forum/ToggleLike/${postId}` : `/Forum/ToggleDislike/${postId}`;
                 const likeBtn = document.getElementById(`like-btn-${postId}`);
                 const dislikeBtn = document.getElementById(`dislike-btn-${postId}`);
+                const likeIcon = document.getElementById(`like-icon-${postId}`);
+                const dislikeIcon = document.getElementById(`dislike-icon-${postId}`);
                 const likeCountEl = document.getElementById(`like-count-${postId}`);
                 const dislikeCountEl = document.getElementById(`dislike-count-${postId}`);
 
@@ -638,7 +657,8 @@
                             'RequestVerificationToken': antiForgeryToken,
                             'X-Requested-With': 'XMLHttpRequest',
                             'Content-Type': 'application/x-www-form-urlencoded'
-                        }
+                        },
+                        body: '__RequestVerificationToken=' + encodeURIComponent(antiForgeryToken)
                     });
 
                     if (response.ok) {
@@ -647,19 +667,25 @@
                             if (likeCountEl) likeCountEl.textContent = data.likeCount;
                             if (dislikeCountEl) dislikeCountEl.textContent = data.dislikeCount;
 
-                            // Update Like button styling
+                            // Update Like button styling & icon
                             if (data.userReaction === 'Like') {
                                 likeBtn.classList.add('liked');
+                                if (likeIcon) likeIcon.className = 'bi bi-hand-thumbs-up-fill';
                             } else {
                                 likeBtn.classList.remove('liked');
+                                if (likeIcon) likeIcon.className = 'bi bi-hand-thumbs-up';
                             }
 
-                            // Update Dislike button styling
+                            // Update Dislike button styling & icon
                             if (data.userReaction === 'Dislike') {
                                 dislikeBtn.classList.add('disliked');
+                                if (dislikeIcon) dislikeIcon.className = 'bi bi-hand-thumbs-down-fill';
                             } else {
                                 dislikeBtn.classList.remove('disliked');
+                                if (dislikeIcon) dislikeIcon.className = 'bi bi-hand-thumbs-down';
                             }
+                        } else if (data.message) {
+                            alert(data.message);
                         }
                     }
                 } catch (err) {
@@ -721,6 +747,8 @@
                                     </div>
                                 `;
                                 listEl.appendChild(commentDiv);
+                            } else if (data.message) {
+                                alert(data.message);
                             }
                         }
                     } catch (err) {
@@ -748,12 +776,9 @@
                         if (response.ok) {
                             const data = await response.json();
                             if (data.success) {
-                                const badge = document.getElementById(`status-badge-${postId}`);
-                                if (badge) {
-                                    badge.className = 'badge badge-status-active rounded-pill px-3 py-1.5';
-                                    badge.textContent = '● Active';
-                                }
                                 location.reload();
+                            } else if (data.message) {
+                                alert(data.message);
                             }
                         }
                     } catch (err) {
@@ -781,16 +806,52 @@
                         if (response.ok) {
                             const data = await response.json();
                             if (data.success) {
-                                const badge = document.getElementById(`status-badge-${postId}`);
-                                if (badge) {
-                                    badge.className = 'badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1.5 fw-semibold';
-                                    badge.textContent = '✕ Declined';
-                                }
                                 location.reload();
+                            } else if (data.message) {
+                                alert(data.message);
                             }
                         }
                     } catch (err) {
                         console.error('Error disapproving post:', err);
+                    }
+                });
+            });
+
+            // Handle Delete Post via AJAX
+            document.querySelectorAll('.delete-post-form').forEach(form => {
+                form.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    if (!confirm('Are you sure you want to delete this discussion? This action cannot be undone.')) {
+                        return;
+                    }
+                    const postId = this.getAttribute('data-post-id');
+                    const formData = new FormData(this);
+
+                    try {
+                        const response = await fetch(`/Forum/DeletePost/${postId}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                const card = document.getElementById(`post-card-${postId}`);
+                                if (card) {
+                                    card.style.transition = 'all 0.35s ease';
+                                    card.style.opacity = '0';
+                                    card.style.transform = 'scale(0.96)';
+                                    setTimeout(() => card.remove(), 350);
+                                }
+                            } else if (data.message) {
+                                alert(data.message);
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Error deleting post:', err);
                     }
                 });
             });

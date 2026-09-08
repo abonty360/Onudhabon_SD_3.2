@@ -20,6 +20,7 @@ namespace Onudhabon_ISD.Data
         public DbSet<ForumComment> ForumComments { get; set; }
         public DbSet<ForumPostReaction> ForumPostReactions { get; set; }
         public DbSet<ClassPlan> ClassPlans { get; set; }
+        public DbSet<Donation> Donations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

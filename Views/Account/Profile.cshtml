@@ -3,194 +3,639 @@
 
 @{
     ViewData["Title"] = $"{Model.FullName} - User Profile";
+    bool isOwnProfile = (ViewBag.IsOwnProfile as bool?) ?? true;
+    int lectureCount = (ViewBag.LectureCount as int?) ?? 0;
+    int materialCount = (ViewBag.MaterialCount as int?) ?? 0;
+    int forumPostCount = (ViewBag.ForumPostCount as int?) ?? 0;
+
+    var statusNormalized = (Model.VerificationStatus ?? "Pending").Trim();
+    bool isVerified = Model.IsVerified ||
+                      string.Equals(statusNormalized, "Active", StringComparison.OrdinalIgnoreCase) ||
+                      string.Equals(statusNormalized, "Approved", StringComparison.OrdinalIgnoreCase) ||
+                      string.Equals(statusNormalized, "Verified", StringComparison.OrdinalIgnoreCase);
+    bool isDeclined = string.Equals(statusNormalized, "Declined", StringComparison.OrdinalIgnoreCase);
+    bool isPending = !isVerified && !isDeclined;
+
+    var isCertPdf = !string.IsNullOrWhiteSpace(Model.CertificatePicture) &&
+                    (Model.CertificatePicture.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) ||
+                     Model.CertificatePicture.Contains("/raw/upload/"));
 }
 
-<div class="container py-4">
+<div class="container py-4 py-lg-5">
+    <!-- Status & Feedback Alerts -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+            <div>@TempData["SuccessMessage"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+            <div>@TempData["ErrorMessage"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Restriction Alert Banner -->
+    @if (Model.IsRestricted)
+    {
+        <div class="alert alert-danger rounded-4 shadow-sm border-danger-subtle d-flex align-items-center gap-3 mb-4" role="alert">
+            <i class="bi bi-shield-x fs-2 text-danger"></i>
+            <div>
+                <h6 class="fw-bold mb-1 text-danger">Account Restricted</h6>
+                <p class="small mb-0 text-danger-emphasis">
+                    This account is currently restricted by the administrator. Volunteer and upload capabilities may be disabled. Please contact the administrator or support for further information.
+                </p>
+            </div>
+        </div>
+    }
+
+    <!-- Volunteer Application Pending Banner -->
+    @if (isPending && isOwnProfile)
+    {
+        <div class="alert alert-warning rounded-4 shadow-sm border-warning-subtle bg-warning-subtle d-flex align-items-center gap-3 mb-4" role="alert">
+            <i class="bi bi-clock-history fs-2 text-warning-emphasis"></i>
+            <div>
+                <h6 class="fw-bold mb-1 text-warning-emphasis">Volunteer Application Under Review</h6>
+                <p class="small mb-0 text-warning-emphasis">
+                    Your volunteer verification application is currently awaiting review by administrators. You can update your profile information or explore learning materials in the meantime.
+                </p>
+            </div>
+        </div>
+    }
+    else if (isDeclined && isOwnProfile)
+    {
+        <div class="alert alert-danger rounded-4 shadow-sm border-danger-subtle bg-danger-subtle d-flex align-items-center gap-3 mb-4" role="alert">
+            <i class="bi bi-x-octagon fs-2 text-danger"></i>
+            <div>
+                <h6 class="fw-bold mb-1 text-danger">Volunteer Application Declined</h6>
+                <p class="small mb-0 text-danger-emphasis">
+                    Your volunteer status has been declined by the platform administrator. If you believe this is in error, please update your qualifications or contact support.
+                </p>
+            </div>
+        </div>
+    }
+
     <div class="row g-4">
-        <!-- Left Sidebar: Profile Card -->
+        <!-- ================= Left Sidebar: Profile Card & Quick Actions ================= -->
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 text-center p-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 text-center mb-4 bg-white position-relative">
+                <!-- Avatar with Badge -->
                 <div class="position-relative d-inline-block mx-auto mb-3">
                     @if (!string.IsNullOrWhiteSpace(Model.Picture))
                     {
-                        <img src="@CloudinaryService.GetAvatarUrl(Model.Picture, 180)"
+                        <img src="@CloudinaryService.GetAvatarUrl(Model.Picture, 240)"
                              alt="@Model.FullName"
-                             class="rounded-circle shadow-sm border border-3 border-primary"
-                             style="width: 130px; height: 130px; object-fit: cover;" />
+                             class="rounded-circle shadow-sm border border-3 border-primary-subtle"
+                             style="width: 136px; height: 136px; object-fit: cover;"
+                             onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <div class="rounded-circle bg-primary-subtle text-primary fw-bold align-items-center justify-content-center mx-auto shadow-sm"
+                             style="width: 136px; height: 136px; font-size: 2.8rem; display: none;">
+                            @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName.Substring(0, 1).ToUpper())
+                        </div>
                     }
                     else
                     {
                         <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center mx-auto shadow-sm"
-                             style="width: 130px; height: 130px; font-size: 2.8rem; border: 3px solid var(--bs-primary);">
+                             style="width: 136px; height: 136px; font-size: 2.8rem; border: 3px solid var(--bs-primary-border-subtle);">
                             @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName.Substring(0, 1).ToUpper())
                         </div>
                     }
+
+                    <!-- Verified / Restricted Overlays -->
+                    @if (isVerified)
+                    {
+                        <span class="position-absolute bottom-0 end-0 bg-success text-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                              style="width: 32px; height: 32px;" title="Verified Volunteer">
+                            <i class="bi bi-patch-check-fill fs-6"></i>
+                        </span>
+                    }
+                    else if (Model.IsRestricted)
+                    {
+                        <span class="position-absolute bottom-0 end-0 bg-danger text-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                              style="width: 32px; height: 32px;" title="Account Restricted">
+                            <i class="bi bi-slash-circle-fill fs-6"></i>
+                        </span>
+                    }
                 </div>
 
+                <!-- Name & Email -->
                 <h4 class="fw-bold text-dark mb-1">@Model.FullName</h4>
-                <p class="text-muted small mb-2"><a href="mailto:@Model.Email" class="text-decoration-none text-muted">@Model.Email</a></p>
+                <p class="text-muted small mb-3">
+                    <a href="mailto:@Model.Email" class="text-decoration-none text-muted d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-envelope"></i>
+                        <span>@Model.Email</span>
+                    </a>
+                </p>
 
+                <!-- Status Badges -->
                 <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
                     @if (Model.Role == "Educator")
                     {
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill fs-6">
-                            Educator
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill fs-6 fw-semibold">
+                            <i class="bi bi-mortarboard me-1"></i> Educator
                         </span>
                     }
                     else if (Model.Role == "Local Guardian")
                     {
-                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fs-6">
-                            Local Guardian
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fs-6 fw-semibold">
+                            <i class="bi bi-shield-heart me-1"></i> Local Guardian
+                        </span>
+                    }
+                    else if (Model.Role == "Admin")
+                    {
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill fs-6 fw-semibold">
+                            <i class="bi bi-shield-lock me-1"></i> Administrator
                         </span>
                     }
                     else
                     {
-                        <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill fs-6">
+                        <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill fs-6 fw-semibold">
                             @Model.Role
                         </span>
                     }
 
-                    <span class="badge @(Model.VerificationStatus?.ToLower() == "verified" ? "bg-success" : "bg-warning text-dark") px-2.5 py-1.5 rounded-pill">
-                        @(Model.VerificationStatus ?? "Pending")
-                    </span>
+                    <!-- Verification Badge -->
+                    @if (isVerified)
+                    {
+                        <span class="badge bg-success text-white px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-check-circle"></i> Active & Verified
+                        </span>
+                    }
+                    else if (isDeclined)
+                    {
+                        <span class="badge bg-danger text-white px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-x-circle"></i> Declined
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-hourglass-split"></i> Pending Verification
+                        </span>
+                    }
                 </div>
 
+                <!-- Account Metadata -->
                 <div class="border-top pt-3 text-start small">
-                    <div class="d-flex justify-content-between py-1.5 border-bottom">
-                        <span class="text-muted">User ID:</span>
-                        <span class="fw-semibold">#@Model.Id</span>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted"><i class="bi bi-hash me-1"></i>User ID:</span>
+                        <span class="fw-semibold font-monospace">#@Model.Id</span>
                     </div>
-                    <div class="d-flex justify-content-between py-1.5 border-bottom">
-                        <span class="text-muted">Member Since:</span>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted"><i class="bi bi-calendar3 me-1"></i>Member Since:</span>
                         <span class="fw-semibold">@Model.CreatedAt.ToString("MMM dd, yyyy")</span>
                     </div>
-                    <div class="d-flex justify-content-between py-1.5">
-                        <span class="text-muted">Age:</span>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted"><i class="bi bi-person me-1"></i>Age:</span>
                         <span class="fw-semibold">@(Model.Age.HasValue ? $"{Model.Age} years" : "—")</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted"><i class="bi bi-geo-alt me-1"></i>Location:</span>
+                        <span class="fw-semibold">@(!string.IsNullOrWhiteSpace(Model.City) ? $"{Model.City}, {Model.Area}" : "—")</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="text-muted"><i class="bi bi-shield-check me-1"></i>Account Status:</span>
+                        <span class="fw-semibold @(Model.IsRestricted ? "text-danger" : "text-success")">
+                            @(Model.IsRestricted ? "Restricted" : "Good Standing")
+                        </span>
                     </div>
                 </div>
 
-                @if (Model.Role == "Educator")
+                <!-- Edit Profile Button -->
+                @if (isOwnProfile)
                 {
-                    <div class="border-top pt-3 mt-2 d-grid gap-2">
-                        <a asp-controller="Lecture" asp-action="Upload" class="btn btn-primary btn-sm rounded-pill py-2">
-                            + Upload Lecture Video
-                        </a>
-                        <a asp-controller="Material" asp-action="Upload" class="btn btn-outline-primary btn-sm rounded-pill py-2">
-                            + Upload Study Material
-                        </a>
+                    <div class="border-top pt-3 mt-2">
+                        <button type="button" class="btn btn-outline-primary rounded-pill w-100 py-2 d-inline-flex align-items-center justify-content-center gap-2 fw-semibold"
+                                data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Edit Profile</span>
+                        </button>
                     </div>
                 }
             </div>
+
+            <!-- Quick Action Links Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-lightning-charge text-primary"></i>
+                    <span>Quick Actions</span>
+                </h6>
+                <div class="d-grid gap-2">
+                    @if (Model.Role == "Educator")
+                    {
+                        <a asp-controller="Lecture" asp-action="Upload" class="btn btn-primary btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-camera-video"></i>
+                            <span>Upload Lecture Video</span>
+                        </a>
+                        <a asp-controller="Material" asp-action="Upload" class="btn btn-outline-primary btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span>Upload Study Material</span>
+                        </a>
+                        <a asp-controller="Lecture" asp-action="Index" class="btn btn-light btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-2 text-dark">
+                            <i class="bi bi-collection-play"></i>
+                            <span>Browse Recorded Lectures</span>
+                        </a>
+                    }
+                    else if (Model.Role == "Local Guardian")
+                    {
+                        <a asp-controller="Lecture" asp-action="Index" class="btn btn-primary btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-collection-play"></i>
+                            <span>Browse Video Lectures</span>
+                        </a>
+                        <a asp-controller="Material" asp-action="Index" class="btn btn-outline-primary btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span>Browse Study Materials</span>
+                        </a>
+                        <a asp-controller="Forum" asp-action="Index" class="btn btn-light btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-2 text-dark">
+                            <i class="bi bi-chat-dots"></i>
+                            <span>Join Community Forum</span>
+                        </a>
+                    }
+                    else if (Model.Role == "Admin")
+                    {
+                        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-danger btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-shield-lock"></i>
+                            <span>Admin Dashboard</span>
+                        </a>
+                        <a asp-controller="Lecture" asp-action="Index" class="btn btn-outline-primary btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-collection-play"></i>
+                            <span>Explore Lectures</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-house"></i>
+                            <span>Home Page</span>
+                        </a>
+                    }
+
+                    <a asp-controller="Forum" asp-action="Index" class="btn btn-light btn-sm rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-2 text-secondary">
+                        <i class="bi bi-chat-square-quote"></i>
+                        <span>Community Forum</span>
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <!-- Right Main Column: Full Details -->
+        <!-- ================= Right Main Column: Full Details & Contributions ================= -->
         <div class="col-lg-8">
-            <!-- Contact & Location Card -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Personal & Contact Information</h5>
-                <div class="row g-3">
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Email Address</div>
-                        <div class="fw-semibold text-dark">@Model.Email</div>
+            <!-- Contributions KPI Bar -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 d-flex flex-row align-items-center gap-3">
+                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; flex-shrink: 0;">
+                            <i class="bi bi-camera-video fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Lectures</div>
+                            <div class="fs-4 fw-bold text-dark">@lectureCount</div>
+                        </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Phone Number</div>
-                        <div class="fw-semibold font-monospace text-dark">@Model.PhoneNumber</div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 d-flex flex-row align-items-center gap-3">
+                        <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; flex-shrink: 0;">
+                            <i class="bi bi-file-earmark-text fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Study Materials</div>
+                            <div class="fs-4 fw-bold text-dark">@materialCount</div>
+                        </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">City</div>
-                        <div class="fw-semibold text-dark">@Model.City</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Region / Area</div>
-                        <div class="fw-semibold text-dark">@Model.Area</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">Detailed Address</div>
-                        <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.Location) ? "—" : Model.Location)</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="text-muted small">NID / Identification Number</div>
-                        <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.NidNumber) ? "—" : Model.NidNumber)</div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 d-flex flex-row align-items-center gap-3">
+                        <div class="rounded-circle bg-info-subtle text-info d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; flex-shrink: 0;">
+                            <i class="bi bi-chat-square-dots fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Forum Posts</div>
+                            <div class="fs-4 fw-bold text-dark">@forumPostCount</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Academic & Educational Background Card -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Academic & Educational Qualifications</h5>
+            <!-- Card 1: Personal & Contact Information -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-person-lines-fill text-primary"></i>
+                        <span>Personal & Contact Information</span>
+                    </h5>
+                    @if (isOwnProfile)
+                    {
+                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3 py-1 text-primary fw-medium" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            <i class="bi bi-pencil me-1"></i>Edit
+                        </button>
+                    }
+                </div>
                 <div class="row g-3">
                     <div class="col-sm-6">
-                        <div class="text-muted small">Highest Education Level</div>
+                        <div class="text-muted small"><i class="bi bi-person me-1"></i>Full Name</div>
+                        <div class="fw-semibold text-dark">@Model.FullName</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small"><i class="bi bi-envelope me-1"></i>Email Address</div>
+                        <div class="fw-semibold text-dark text-break">@Model.Email</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small"><i class="bi bi-telephone me-1"></i>Phone Number</div>
+                        <div class="fw-semibold font-monospace text-dark">@(!string.IsNullOrWhiteSpace(Model.PhoneNumber) ? Model.PhoneNumber : "—")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small"><i class="bi bi-calendar me-1"></i>Age</div>
+                        <div class="fw-semibold text-dark">@(Model.Age.HasValue ? $"{Model.Age} years" : "—")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small"><i class="bi bi-building me-1"></i>City</div>
+                        <div class="fw-semibold text-dark">@(!string.IsNullOrWhiteSpace(Model.City) ? Model.City : "—")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small"><i class="bi bi-map me-1"></i>Region / Area</div>
+                        <div class="fw-semibold text-dark">@(!string.IsNullOrWhiteSpace(Model.Area) ? Model.Area : "—")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i>Detailed Address</div>
+                        <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.Location) ? "—" : Model.Location)</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small"><i class="bi bi-card-heading me-1"></i>NID / Identification Number</div>
+                        <div class="fw-semibold text-dark font-monospace">@(string.IsNullOrWhiteSpace(Model.NidNumber) ? "—" : Model.NidNumber)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Academic & Educational Background -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-mortarboard-fill text-primary"></i>
+                        <span>Academic & Educational Qualifications</span>
+                    </h5>
+                    @if (isOwnProfile)
+                    {
+                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3 py-1 text-primary fw-medium" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            <i class="bi bi-pencil me-1"></i>Edit
+                        </button>
+                    }
+                </div>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="text-muted small"><i class="bi bi-award me-1"></i>Highest Education Level</div>
                         <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.EducationLevel) ? "—" : Model.EducationLevel)</div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="text-muted small">Currently Enrolled / Studying</div>
+                        <div class="text-muted small"><i class="bi bi-journal-bookmark me-1"></i>Currently Enrolled / Studying</div>
                         <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.CurrentlyStudying) ? "—" : Model.CurrentlyStudying)</div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="text-muted small">Major / Department</div>
+                        <div class="text-muted small"><i class="bi bi-book me-1"></i>Major / Field of Study</div>
                         <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(Model.Major) ? "—" : Model.Major)</div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="text-muted small">University / College</div>
+                        <div class="text-muted small"><i class="bi bi-bank me-1"></i>University / Institute</div>
                         <div class="fw-semibold text-dark">
-                            @(string.IsNullOrWhiteSpace(Model.UniversityName) ? "—" : Model.UniversityName)
+                            @(string.IsNullOrWhiteSpace(Model.UniversityName) ? (string.IsNullOrWhiteSpace(Model.Institution) ? "—" : Model.Institution) : Model.UniversityName)
                             @(!string.IsNullOrWhiteSpace(Model.UniversityPassingYear) ? $" (Batch: {Model.UniversityPassingYear})" : "")
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="text-muted small">HSC / College Institute</div>
+                        <div class="text-muted small"><i class="bi bi-buildings me-1"></i>HSC / College Institute</div>
                         <div class="fw-semibold text-dark">
                             @(string.IsNullOrWhiteSpace(Model.HscInstitute) ? "—" : Model.HscInstitute)
                             @(!string.IsNullOrWhiteSpace(Model.HscPassingYear) ? $" ({Model.HscPassingYear})" : "")
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="text-muted small">SSC / School Institute</div>
+                        <div class="text-muted small"><i class="bi bi-building me-1"></i>SSC / School Institute</div>
                         <div class="fw-semibold text-dark">
                             @(string.IsNullOrWhiteSpace(Model.SscInstitute) ? "—" : Model.SscInstitute)
                             @(!string.IsNullOrWhiteSpace(Model.SscPassingYear) ? $" ({Model.SscPassingYear})" : "")
                         </div>
                     </div>
 
+                    <!-- Certificate / Educational Document Preview -->
                     @if (!string.IsNullOrWhiteSpace(Model.CertificatePicture))
                     {
-                        <div class="col-12 border-top pt-2">
-                            <div class="text-muted small mb-1">Attached Certificate / Education Document:</div>
-                            <div class="d-flex align-items-center gap-2">
-                                <a href="@Model.CertificatePicture" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-                                    📄 View Document on Cloudinary
-                                </a>
+                        <div class="col-12 border-top pt-3 mt-2">
+                            <div class="text-muted small mb-2"><i class="bi bi-file-earmark-check me-1"></i>Attached Certificate / Educational Verification Document:</div>
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                @if (!isCertPdf)
+                                {
+                                    <a href="@Model.CertificatePicture" target="_blank" class="d-inline-block">
+                                        <img src="@Model.CertificatePicture"
+                                             alt="Certificate Preview"
+                                             class="rounded-3 border shadow-sm"
+                                             style="max-height: 90px; max-width: 140px; object-fit: cover;" />
+                                    </a>
+                                }
+                                <div class="d-flex flex-column gap-1">
+                                    <a href="@Model.CertificatePicture" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-2">
+                                        <i class="@(isCertPdf ? "bi bi-file-earmark-pdf" : "bi bi-image")"></i>
+                                        <span>View Document on Cloudinary</span>
+                                    </a>
+                                    <span class="text-muted small">Opens full document in a secure external tab</span>
+                                </div>
                             </div>
                         </div>
                     }
                 </div>
             </div>
 
-            <!-- Bio & Community Card -->
-            @if (!string.IsNullOrWhiteSpace(Model.Bio) || !string.IsNullOrWhiteSpace(Model.VolunteerReason))
-            {
-                <div class="card border-0 shadow-sm rounded-4 p-4">
-                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">About & Volunteer Motivation</h5>
-                    @if (!string.IsNullOrWhiteSpace(Model.Bio))
+            <!-- Card 3: Bio & Volunteer Motivation -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-chat-square-quote text-primary"></i>
+                        <span>About & Volunteer Motivation</span>
+                    </h5>
+                    @if (isOwnProfile)
                     {
-                        <div class="mb-3">
-                            <div class="text-muted small">Bio</div>
-                            <p class="mb-0 text-dark">@Model.Bio</p>
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(Model.VolunteerReason))
-                    {
-                        <div>
-                            <div class="text-muted small">Motivation for Joining / Volunteering</div>
-                            <p class="mb-0 text-dark">@Model.VolunteerReason</p>
-                        </div>
+                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3 py-1 text-primary fw-medium" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            <i class="bi bi-pencil me-1"></i>Edit
+                        </button>
                     }
                 </div>
-            }
+                
+                <div class="mb-3">
+                    <div class="text-muted small mb-1 fw-semibold"><i class="bi bi-card-text me-1"></i>Short Bio</div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Bio))
+                    {
+                        <p class="text-dark mb-0 bg-light p-3 rounded-3" style="white-space: pre-line;">@Model.Bio</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic mb-0 small">No personal bio provided yet.</p>
+                    }
+                </div>
+
+                <div>
+                    <div class="text-muted small mb-1 fw-semibold"><i class="bi bi-heart-pulse me-1"></i>Motivation for Joining / Volunteering</div>
+                    @if (!string.IsNullOrWhiteSpace(Model.VolunteerReason))
+                    {
+                        <p class="text-dark mb-0 bg-light p-3 rounded-3" style="white-space: pre-line;">@Model.VolunteerReason</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic mb-0 small">No volunteer motivation details recorded.</p>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- ================= Edit Profile Modal ================= -->
+@if (isOwnProfile)
+{
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header border-bottom px-4 py-3 bg-light">
+                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="editProfileModalLabel">
+                        <i class="bi bi-person-gear text-primary"></i>
+                        <span>Edit Profile Information</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form asp-controller="Account" asp-action="EditProfile" method="post" enctype="multipart/form-data" id="editProfileForm">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body p-4">
+                        <!-- Section 1: Basic & Contact Info -->
+                        <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-person me-1"></i> Personal & Contact Info
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="editFullName" class="form-label small fw-semibold text-dark">Full Name *</label>
+                                <input type="text" name="FullName" id="editFullName" class="form-control rounded-3" value="@Model.FullName" required maxlength="150" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editPhoneNumber" class="form-label small fw-semibold text-dark">Phone Number *</label>
+                                <input type="text" name="PhoneNumber" id="editPhoneNumber" class="form-control rounded-3" value="@Model.PhoneNumber" required maxlength="50" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editCity" class="form-label small fw-semibold text-dark">City *</label>
+                                <input type="text" name="City" id="editCity" class="form-control rounded-3" value="@Model.City" required maxlength="100" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editArea" class="form-label small fw-semibold text-dark">Region / Area *</label>
+                                <input type="text" name="Area" id="editArea" class="form-control rounded-3" value="@Model.Area" required maxlength="100" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editAge" class="form-label small fw-semibold text-dark">Age</label>
+                                <input type="number" name="Age" id="editAge" class="form-control rounded-3" value="@Model.Age" min="10" max="120" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editLocation" class="form-label small fw-semibold text-dark">Street / Detailed Address</label>
+                                <input type="text" name="Location" id="editLocation" class="form-control rounded-3" value="@Model.Location" maxlength="255" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editNidNumber" class="form-label small fw-semibold text-dark">NID / Identification Number</label>
+                                <input type="text" name="NidNumber" id="editNidNumber" class="form-control rounded-3" value="@Model.NidNumber" maxlength="50" />
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Educational Qualifications -->
+                        <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-mortarboard me-1"></i> Academic Qualifications
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="editEducationLevel" class="form-label small fw-semibold text-dark">Highest Education Level</label>
+                                <select name="EducationLevel" id="editEducationLevel" class="form-select rounded-3">
+                                    <option value="">-- Select Level --</option>
+                                    <!option value="Secondary School Certificate (SSC)" @(Model.EducationLevel == "Secondary School Certificate (SSC)" ? "selected" : "")>SSC</!option>
+                                    <!option value="Higher Secondary Certificate (HSC)" @(Model.EducationLevel == "Higher Secondary Certificate (HSC)" ? "selected" : "")>HSC</!option>
+                                    <!option value="Undergraduate / Bachelor's" @(Model.EducationLevel == "Undergraduate / Bachelor's" ? "selected" : "")>Bachelor's</!option>
+                                    <!option value="Postgraduate / Master's" @(Model.EducationLevel == "Postgraduate / Master's" ? "selected" : "")>Master's</!option>
+                                    <!option value="Doctorate / PhD" @(Model.EducationLevel == "Doctorate / PhD" ? "selected" : "")>PhD</!option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editCurrentlyStudying" class="form-label small fw-semibold text-dark">Currently Studying</label>
+                                <input type="text" name="CurrentlyStudying" id="editCurrentlyStudying" class="form-control rounded-3" value="@Model.CurrentlyStudying" maxlength="100" placeholder="e.g. B.Sc. in CSE" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editMajor" class="form-label small fw-semibold text-dark">Major / Department</label>
+                                <input type="text" name="Major" id="editMajor" class="form-control rounded-3" value="@Model.Major" maxlength="150" placeholder="e.g. Computer Science" />
+                            </div>
+                            <div class="col-md-8">
+                                <label for="editUniversityName" class="form-label small fw-semibold text-dark">University / College Name</label>
+                                <input type="text" name="UniversityName" id="editUniversityName" class="form-control rounded-3" value="@(!string.IsNullOrWhiteSpace(Model.UniversityName) ? Model.UniversityName : Model.Institution)" maxlength="200" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editUniversityPassingYear" class="form-label small fw-semibold text-dark">University Batch / Year</label>
+                                <input type="text" name="UniversityPassingYear" id="editUniversityPassingYear" class="form-control rounded-3" value="@Model.UniversityPassingYear" maxlength="20" placeholder="e.g. 2024" />
+                            </div>
+                            <div class="col-md-8">
+                                <label for="editHscInstitute" class="form-label small fw-semibold text-dark">HSC / College Institute</label>
+                                <input type="text" name="HscInstitute" id="editHscInstitute" class="form-control rounded-3" value="@Model.HscInstitute" maxlength="200" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editHscPassingYear" class="form-label small fw-semibold text-dark">HSC Passing Year</label>
+                                <input type="text" name="HscPassingYear" id="editHscPassingYear" class="form-control rounded-3" value="@Model.HscPassingYear" maxlength="20" placeholder="e.g. 2020" />
+                            </div>
+                            <div class="col-md-8">
+                                <label for="editSscInstitute" class="form-label small fw-semibold text-dark">SSC / School Institute</label>
+                                <input type="text" name="SscInstitute" id="editSscInstitute" class="form-control rounded-3" value="@Model.SscInstitute" maxlength="200" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editSscPassingYear" class="form-label small fw-semibold text-dark">SSC Passing Year</label>
+                                <input type="text" name="SscPassingYear" id="editSscPassingYear" class="form-control rounded-3" value="@Model.SscPassingYear" maxlength="20" placeholder="e.g. 2018" />
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Bio & Volunteer Motivation -->
+                        <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-chat-quote me-1"></i> About & Motivation
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label for="editBio" class="form-label small fw-semibold text-dark">Short Bio</label>
+                                <textarea name="Bio" id="editBio" class="form-control rounded-3" rows="3" maxlength="1000" placeholder="Share a few words about your background and interests...">@Model.Bio</textarea>
+                            </div>
+                            <div class="col-12">
+                                <label for="editVolunteerReason" class="form-label small fw-semibold text-dark">Motivation for Joining / Volunteering</label>
+                                <textarea name="VolunteerReason" id="editVolunteerReason" class="form-control rounded-3" rows="3" maxlength="1000" placeholder="Why do you want to contribute as a volunteer or mentor?">@Model.VolunteerReason</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Section 4: File Uploads -->
+                        <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-cloud-arrow-up me-1"></i> Photos & Verification Documents
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="editPictureFile" class="form-label small fw-semibold text-dark">Update Profile Photo</label>
+                                <input type="file" name="PictureFile" id="editPictureFile" class="form-control rounded-3" accept="image/*" />
+                                <div class="form-text small">Accepted formats: JPG, PNG, WEBP. Max 10MB.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editCertificatePictureFile" class="form-label small fw-semibold text-dark">Update Education / Certificate Document</label>
+                                <input type="file" name="CertificatePictureFile" id="editCertificatePictureFile" class="form-control rounded-3" accept="image/*,.pdf" />
+                                <div class="form-text small">Accepted formats: PDF or Image document. Max 15MB.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-top px-4 py-3 bg-light">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-check2-circle"></i>
+                            <span>Save Changes</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}

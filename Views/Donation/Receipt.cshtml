@@ -1,0 +1,196 @@
+@model Onudhabon_ISD.Models.DonationReceiptViewModel
+
+@{
+    ViewData["Title"] = "Official Donation Voucher & Receipt - Onudhabon Foundation";
+    var d = Model?.Donation ?? new Onudhabon_ISD.Models.Donation();
+}
+
+<style>
+    @@media print {
+        body {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+        header, footer, nav, .d-print-none, #chat-widget-container, .chat-widget, .chat-bubble {
+            display: none !important;
+        }
+        .container {
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .card {
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: none !important;
+            page-break-inside: avoid;
+        }
+    }
+</style>
+
+<div class="container py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <!-- Top Actions -->
+            <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 rounded-pill d-inline-flex align-items-center gap-1.5 shadow-sm">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Return to Portal</span>
+                </a>
+                <div class="d-flex gap-2">
+                    <button type="button" onclick="window.print()" class="btn btn-primary btn-sm px-3.5 rounded-pill d-inline-flex align-items-center gap-1.5 shadow-sm" style="background-color: #0f172a; border-color: #0f172a;">
+                        <i class="bi bi-printer"></i>
+                        <span>Print Official Receipt</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Receipt Certificate Card -->
+            <div class="card border shadow-sm rounded-4 overflow-hidden bg-white p-4 p-md-5 position-relative">
+
+                <!-- Formal Header Banner -->
+                <div class="text-center pb-4 mb-4 border-bottom position-relative">
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary-subtle text-primary border border-primary-subtle small fw-bold mb-3">
+                        <i class="bi bi-patch-check-fill"></i>
+                        <span>Verified Charitable Contribution</span>
+                    </div>
+                    <h2 class="fw-bold text-dark mb-1 tracking-tight" style="letter-spacing: -0.02em;">@(Model?.OrganizationName ?? "Onudhabon Educational Foundation")</h2>
+                    <div class="text-muted small">Registered Non-Profit Educational Charity • Dhaka, Bangladesh</div>
+                    <div class="text-muted small mt-0.5">Government Accreditation & Philanthropic Oversight Ref: <code>@(Model?.AccreditationRef ?? "REG-ONUD-2026-BD")</code></div>
+                </div>
+
+                <!-- Receipt Document Box -->
+                <div class="border rounded-4 p-4 mb-4" style="background-color: #f8fafc;">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom pb-3 mb-3">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Electronic Voucher Receipt</span>
+                            <div class="fw-bold text-dark fs-5 font-monospace">
+                                @if (d.Id > 0)
+                                {
+                                    <span>#ONUD-@d.Id.ToString("D6")</span>
+                                }
+                                else if (!string.IsNullOrWhiteSpace(d.InvoiceNumber))
+                                {
+                                    <span>@d.InvoiceNumber</span>
+                                }
+                                else
+                                {
+                                    <span>#ONUD-@DateTime.UtcNow.ToString("yyyyMMdd")</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-shield-check"></i>
+                                <span>Settled via bKash Merchant</span>
+                            </span>
+                            <div class="text-muted small mt-1 font-monospace" style="font-size: 0.75rem;">@d.CreatedAt.ToString("MMMM dd, yyyy • hh:mm tt") UTC</div>
+                        </div>
+                    </div>
+
+                    <!-- Amount Highlight -->
+                    <div class="text-center py-3 my-3 bg-white rounded-3 border shadow-sm">
+                        <div class="text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Authorized Contribution Amount</div>
+                        <div class="display-6 fw-bold text-dark mb-0 font-monospace" style="letter-spacing: -0.02em;">
+                            ৳ @d.Amount.ToString("N2") <span class="fs-5 text-muted fw-normal">BDT</span>
+                        </div>
+                    </div>
+
+                    <!-- Key Details Grid -->
+                    <div class="row g-3 small mt-1">
+                        <div class="col-sm-6">
+                            <div class="text-muted" style="font-size: 0.75rem;">Benefactor / Contributor</div>
+                            <div class="fw-bold text-dark">
+                                @if (d.IsAnonymous)
+                                {
+                                    <span>@(string.IsNullOrWhiteSpace(d.DonorName) ? "Anonymous Benefactor" : $"{d.DonorName} (Anonymous Ledger)")</span>
+                                }
+                                else
+                                {
+                                    <span>@(string.IsNullOrWhiteSpace(d.DonorName) ? "Valued Benefactor" : d.DonorName)</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted" style="font-size: 0.75rem;">Mobile Contact</div>
+                            <div class="fw-bold text-dark font-monospace">@(!string.IsNullOrWhiteSpace(d.DonorPhone) ? d.DonorPhone : "—")</div>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(d.DonorEmail))
+                        {
+                            <div class="col-sm-6">
+                                <div class="text-muted" style="font-size: 0.75rem;">Registered Email</div>
+                                <div class="fw-bold text-dark">@d.DonorEmail</div>
+                            </div>
+                        }
+
+                        <div class="col-sm-6">
+                            <div class="text-muted" style="font-size: 0.75rem;">Transaction Status</div>
+                            <div class="fw-bold text-success d-flex align-items-center gap-1">
+                                <i class="bi bi-check-circle-fill"></i> Completed & Verified
+                            </div>
+                        </div>
+
+                        <div class="col-12 border-top pt-2.5">
+                            <div class="text-muted" style="font-size: 0.75rem;">Allocated Educational Program</div>
+                            <div class="fw-bold text-primary">@(!string.IsNullOrWhiteSpace(d.Purpose) ? d.Purpose : "General Education & Student Welfare Fund")</div>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(d.Message))
+                        {
+                            <div class="col-12 bg-white p-3 rounded-3 border">
+                                <div class="text-muted mb-1" style="font-size: 0.75rem;">Donor Dedication / Statement:</div>
+                                <div class="fst-italic text-dark">“@d.Message”</div>
+                            </div>
+                        }
+
+                        <!-- bKash Gateway Audit Log -->
+                        <div class="col-12 border-top pt-3">
+                            <div class="p-3 rounded-3 bg-white border">
+                                <div class="text-muted mb-2 fw-semibold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Payment Gateway Verification Log</div>
+                                <div class="row g-2 font-monospace" style="font-size: 0.8rem;">
+                                    <div class="col-sm-6">
+                                        <div class="text-muted" style="font-size: 0.72rem;">bKash Transaction ID (TRXID)</div>
+                                        <div class="fw-bold text-dark text-break">@(!string.IsNullOrWhiteSpace(d.BkashTransactionId) ? d.BkashTransactionId : (!string.IsNullOrWhiteSpace(d.TransactionId) ? d.TransactionId : "N/A"))</div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="text-muted" style="font-size: 0.72rem;">Gateway Reference / Invoice</div>
+                                        <div class="fw-bold text-dark text-break">@(!string.IsNullOrWhiteSpace(d.BkashPaymentId) ? d.BkashPaymentId : (!string.IsNullOrWhiteSpace(d.InvoiceNumber) ? d.InvoiceNumber : "N/A"))</div>
+                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(d.BkashWalletNumber))
+                                    {
+                                        <div class="col-sm-6">
+                                            <div class="text-muted" style="font-size: 0.72rem;">Origin Wallet</div>
+                                            <div class="fw-bold text-dark">@d.BkashWalletNumber</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certification Signature & Verification Footer -->
+                <div class="pt-2 text-center text-muted small">
+                    <p class="mb-1" style="font-size: 0.78rem;">
+                        This document serves as an official electronic confirmation of charitable contribution for accounting, institutional governance, and tax audit compliance.
+                    </p>
+                    <div style="font-size: 0.76rem;">
+                        @(Model?.OrganizationName ?? "Onudhabon ISD Foundation") • Helpline: <strong>@(Model?.Helpline ?? "16247")</strong> • <a href="mailto:@(Model?.ContactEmail ?? "support@onudhabon.com")" class="text-decoration-none text-primary">@(Model?.ContactEmail ?? "support@onudhabon.com")</a>
+                    </div>
+                </div>
+
+                <!-- Bottom Action Buttons -->
+                <div class="mt-4 pt-3 border-top d-flex justify-content-center gap-3 d-print-none flex-wrap">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 d-inline-flex align-items-center gap-1.5">
+                        <i class="bi bi-house"></i>
+                        <span>Home</span>
+                    </a>
+                    <a asp-controller="Donation" asp-action="Index" class="btn btn-primary rounded-pill px-4 text-white d-inline-flex align-items-center gap-1.5" style="background-color: #0f172a; border-color: #0f172a;">
+                        <i class="bi bi-cash-stack"></i>
+                        <span>Make Another Contribution</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

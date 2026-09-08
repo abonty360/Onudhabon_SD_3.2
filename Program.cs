@@ -55,6 +55,12 @@ builder.Services.AddSession(options =>
 // Add MVC Services
 builder.Services.AddControllersWithViews();
 
+// Antiforgery header support for AJAX requests
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "RequestVerificationToken";
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
