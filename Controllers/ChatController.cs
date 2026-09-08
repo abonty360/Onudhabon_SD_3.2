@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Onudhabon_ISD.Data;
 using Onudhabon_ISD.Services;
@@ -8,12 +8,67 @@ namespace Onudhabon_ISD.Controllers
     public class ChatController : Controller
     {
         private readonly ILlmChatService _llmService;
+        private readonly IPdfKnowledgeService _pdfService;
         private readonly ApplicationDbContext _context;
 
-        public ChatController(ILlmChatService llmService, ApplicationDbContext context)
+        public ChatController(
+            ILlmChatService llmService,
+            IPdfKnowledgeService pdfService,
+            ApplicationDbContext context)
         {
             _llmService = llmService;
+            _pdfService = pdfService;
             _context = context;
+        }
+
+        [HttpPost]
+        public IActionResult UploadPdfForChat(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new { success = false, message = "Please select a valid PDF file." });
+            }
+
+            if (!file.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { success = false, message = "Only PDF (.pdf) documents are supported." });
+            }
+
+            if (file.Length > 25 * 1024 * 1024)
+            {
+                return BadRequest(new { success = false, message = "PDF file size must be 25MB or less." });
+            }
+
+            try
+            {
+                using var stream = file.OpenReadStream();
+                var extractedText = _pdfService.ExtractTextFromStream(stream, 40);
+
+                if (string.IsNullOrWhiteSpace(extractedText))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Could not extract readable text from this PDF. Please ensure it is not password-protected or image-only scanned."
+                    });
+                }
+
+                var words = extractedText.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
+                var preview = extractedText.Length > 280 ? extractedText.Substring(0, 280) + "..." : extractedText;
+
+                return Ok(new
+                {
+                    success = true,
+                    fileName = file.FileName,
+                    text = extractedText,
+                    wordCount = words,
+                    preview
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = $"Error processing PDF: {ex.Message}" });
+            }
         }
 
         [HttpPost]
@@ -26,12 +81,14 @@ namespace Onudhabon_ISD.Controllers
 
             // Retrieve recent course lectures & materials from DB to provide context to the LLM
             var recentLectures = await _context.Lectures
+                .AsNoTracking()
                 .OrderByDescending(l => l.CreatedAt)
                 .Take(5)
                 .Select(l => $"{l.Title} (Class: {l.ClassLevel}, Subject: {l.Subject})")
                 .ToListAsync();
 
             var recentMaterials = await _context.Materials
+                .AsNoTracking()
                 .OrderByDescending(m => m.Date)
                 .Take(5)
                 .Select(m => $"{m.Title} (Subject: {m.Subject})")
@@ -76,12 +133,25 @@ namespace Onudhabon_ISD.Controllers
     2. Select **Upload Study Material** from the dropdown menu.
     3. Or navigate directly: [Upload Study Material](/Material/Upload)""
 
-    User: ""আমি আমার প্রোফাইল কোথায় দেখতে পাব?""                                                                                                    
-    Assistant: ""আপনার প্রোফাইল দেখতে:                                                                                                              
-    1. উপরের ডানপাশে আপনার নামের ড্রপডাউনে ক্লিক করুন।                                                                                                
+    User: ""আমি আমার প্রোফাইল কোথায় দেখতে পাব?""
+    Assistant: ""আপনার প্রোফাইল দেখতে:
+    1. উপরের ডানপাশে আপনার নামের ড্রপডাউনে ক্লিক করুন।
     2. **View Profile** অপশনে যান।
     3. অথবা সরাসরি যেতে ক্লিক করুন: [View Profile](/Account/Profile)""
 ";
+
+            // 2. Add PDF Knowledge Context (Attached PDF and/or platform materials)
+            var pdfKnowledgeContext = await _pdfService.GetGroundingContextForQueryAsync(request.Message, request.AttachedPdfText);
+            if (!string.IsNullOrWhiteSpace(pdfKnowledgeContext))
+            {
+                contextInfo += "\n\n" + pdfKnowledgeContext + @"
+    PDF DOCUMENT QUESTION-ANSWERING RULES:
+    1. When answering questions regarding the attached document or platform PDF study materials, prioritize and strictly use the verified facts, definitions, formulas, and explanations extracted from the PDF above.
+    2. If the user asks for a summary, provide key takeaways, headings, and core points clearly.
+    3. If the user asks about a specific topic, explain it based on the document, quoting or citing page references if present.
+    4. If the question cannot be answered from the document, clarify what information is available in the document and guide the student accordingly.
+";
+            }
 
             if (request.History != null && request.History.Any())
             {
@@ -102,6 +172,8 @@ namespace Onudhabon_ISD.Controllers
         {
             public string Message { get; set; } = string.Empty;
             public List<ChatMessageItem>? History { get; set; }
+            public string? AttachedPdfText { get; set; }
+            public string? AttachedPdfName { get; set; }
         }
 
         public class ChatMessageItem

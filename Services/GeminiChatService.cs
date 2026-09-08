@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 
 namespace Onudhabon_ISD.Services
@@ -20,7 +20,7 @@ namespace Onudhabon_ISD.Services
 
             _model = Environment.GetEnvironmentVariable("GEMINI_MODEL")
                      ?? configuration["Gemini:Model"]
-                     ?? "gemini-3.6-flash";
+                     ?? "gemini-3.5-flash-lite";
         }
 
         public async Task<string> GetChatResponseAsync(string userMessage, string? systemContext = null)
