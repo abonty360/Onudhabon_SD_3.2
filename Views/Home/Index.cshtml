@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Home - Onudhabon";
+    ViewData["HideFooter"] = true;
 }
 
 <div class="home-page">
@@ -40,7 +41,7 @@
     <section class="home-updates">
         <div class="section-header">
             <h2>Latest Updates</h2>
-            <a href="#" class="view-all-btn">View All Posts</a>
+            <a asp-controller="Forum" asp-action="Index" class="view-all-btn">View All Posts</a>
         </div>
 
         <div class="updates-grid">
@@ -113,11 +114,10 @@
             <div class="footer-column navigation-column">
                 <h3>Navigation</h3>
                 <ul>
-                    <li>Home</li>
-                    <li>Lectures</li>
-                    <li>Materials</li>
-                    <li>About</li>
-                    <li>Forum</li>
+                    <li><a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Home</a></li>
+                    <li><a asp-controller="Lecture" asp-action="Index" class="text-decoration-none text-muted">Lectures</a></li>
+                    <li><a asp-controller="Material" asp-action="Index" class="text-decoration-none text-muted">Materials</a></li>
+                    <li><a asp-controller="Forum" asp-action="Index" class="text-decoration-none text-muted">Community Forum</a></li>
                 </ul>
             </div>
 

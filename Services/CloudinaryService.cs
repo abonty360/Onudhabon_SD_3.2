@@ -1,4 +1,4 @@
-﻿using CloudinaryDotNet;
+using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -7,7 +7,7 @@ namespace Onudhabon_ISD.Services
 {
     public class CloudinaryService : ICloudinaryService
     {
-        private readonly Cloudinary _cloudinary;
+        private readonly Cloudinary? _cloudinary;
         private readonly ILogger<CloudinaryService> _logger;
 
         public const string FOLDER_LECTURES = "onudhabon/lectures";
@@ -36,16 +36,23 @@ namespace Onudhabon_ISD.Services
                 string.IsNullOrWhiteSpace(apiKey) ||
                 string.IsNullOrWhiteSpace(apiSecret))
             {
-                _logger.LogWarning("Cloudinary credentials missing in .env (CloudName, ApiKey, ApiSecret). Please configure them.");
+                _logger.LogWarning("Cloudinary credentials missing in .env (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET). Cloudinary uploads will be disabled until configured.");
             }
-
-            var account = new Account(cloudName, apiKey, apiSecret);
-            _cloudinary = new Cloudinary(account);
-            _cloudinary.Api.Secure = true;
+            else
+            {
+                var account = new Account(cloudName, apiKey, apiSecret);
+                _cloudinary = new Cloudinary(account);
+                _cloudinary.Api.Secure = true;
+            }
         }
 
         public async Task<CloudinaryUploadResult> UploadLectureVideoAsync(IFormFile file)
         {
+            if (_cloudinary == null)
+            {
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = "Cloudinary credentials are not configured in .env." };
+            }
+
             if (file == null || file.Length == 0)
             {
                 return new CloudinaryUploadResult { Success = false, ErrorMessage = "Video file is required." };
@@ -101,6 +108,11 @@ namespace Onudhabon_ISD.Services
 
         public async Task<CloudinaryUploadResult> UploadMaterialPdfAsync(IFormFile file)
         {
+            if (_cloudinary == null)
+            {
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = "Cloudinary credentials are not configured in .env." };
+            }
+
             if (file == null || file.Length == 0)
             {
                 return new CloudinaryUploadResult { Success = false, ErrorMessage = "Material file is required." };
@@ -150,6 +162,11 @@ namespace Onudhabon_ISD.Services
 
         public async Task<CloudinaryUploadResult> UploadProfilePictureAsync(IFormFile file)
         {
+            if (_cloudinary == null)
+            {
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = "Cloudinary credentials are not configured in .env." };
+            }
+
             if (file == null || file.Length == 0)
             {
                 return new CloudinaryUploadResult { Success = false, ErrorMessage = "Profile image file is required." };
@@ -198,6 +215,11 @@ namespace Onudhabon_ISD.Services
 
         public async Task<CloudinaryUploadResult> UploadConsentLetterAsync(IFormFile file)
         {
+            if (_cloudinary == null)
+            {
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = "Cloudinary credentials are not configured in .env." };
+            }
+
             if (file == null || file.Length == 0)
             {
                 return new CloudinaryUploadResult { Success = false, ErrorMessage = "Consent file is required." };
@@ -243,6 +265,11 @@ namespace Onudhabon_ISD.Services
 
         public async Task<CloudinaryUploadResult> UploadEducationDocAsync(IFormFile file)
         {
+            if (_cloudinary == null)
+            {
+                return new CloudinaryUploadResult { Success = false, ErrorMessage = "Cloudinary credentials are not configured in .env." };
+            }
+
             if (file == null || file.Length == 0)
             {
                 return new CloudinaryUploadResult { Success = false, ErrorMessage = "Education document file is required." };
@@ -365,7 +392,7 @@ namespace Onudhabon_ISD.Services
 
         public async Task<bool> DeleteAsync(string publicId)
         {
-            if (string.IsNullOrWhiteSpace(publicId)) return false;
+            if (_cloudinary == null || string.IsNullOrWhiteSpace(publicId)) return false;
 
             try
             {

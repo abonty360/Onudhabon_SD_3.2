@@ -5,6 +5,7 @@ using Onudhabon_ISD.Data;
 using Onudhabon_ISD.Models;
 using Onudhabon_ISD.Services;
 
+// Load environment variables from .env file
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Cloudinary & Storage Services
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+// AI Chat Service (Gemini Cloud API or Local Ollama)
+var aiProvider = builder.Configuration["AiProvider"] ?? "Gemini";
+if (string.Equals(aiProvider, "Ollama", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddSingleton<ILlmChatService, OllamaChatService>();
+}
+else
+{
+    builder.Services.AddSingleton<ILlmChatService, GeminiChatService>();
+}
 
 // Password Hasher for User
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
