@@ -59,7 +59,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.UniversityName).HasMaxLength(200);
                 entity.Property(e => e.UniversityPassingYear).HasMaxLength(20);
                 entity.Property(e => e.CurrentlyStudying).HasMaxLength(100);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -81,7 +81,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.GuardianName).HasMaxLength(150);
                 entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Active");
                 entity.Property(e => e.CompletedClasses).HasDefaultValue(0);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -95,7 +95,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Post).HasMaxLength(100);
                 entity.Property(e => e.Type).HasMaxLength(50);
                 entity.Property(e => e.IsRead).HasDefaultValue(false);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -115,7 +115,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Size).HasMaxLength(50);
                 entity.Property(e => e.Downloads).HasDefaultValue(0);
                 entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Active");
-                entity.Property(e => e.Date).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -134,7 +134,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Thumbnail).HasMaxLength(500);
                 entity.Property(e => e.VideoUrl).HasMaxLength(500);
                 entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Active");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -148,7 +148,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Tags).HasMaxLength(255);
                 entity.Property(e => e.Author).HasMaxLength(150);
                 entity.Property(e => e.Replies).HasDefaultValue(0);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -165,7 +165,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.LikeCount).HasDefaultValue(0);
                 entity.Property(e => e.DislikeCount).HasDefaultValue(0);
                 entity.Property(e => e.Replies).HasDefaultValue(0);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
 
                 entity.HasMany(e => e.Comments)
@@ -186,7 +186,7 @@ namespace Onudhabon_ISD.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Author).HasMaxLength(150);
                 entity.Property(e => e.Content).IsRequired().HasMaxLength(4000);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -197,7 +197,7 @@ namespace Onudhabon_ISD.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.ReactionType).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
 
                 entity.HasIndex(e => new { e.PostId, e.UserId }).IsUnique();
@@ -208,7 +208,7 @@ namespace Onudhabon_ISD.Data
                 entity.ToTable("ClassPlans");
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.ClassLevel).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
 
                 entity.OwnsMany(e => e.Subjects, subject =>

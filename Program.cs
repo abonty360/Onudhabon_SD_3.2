@@ -10,9 +10,14 @@ DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Database Context
+var rawConnectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? builder.Configuration["DATABASE_URL"];
+
+var postgresConnectionString = PostgresConnectionHelper.ConvertUrlToConnectionString(rawConnectionString);
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(postgresConnectionString));
 
 // Cloudinary & Storage Services
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
