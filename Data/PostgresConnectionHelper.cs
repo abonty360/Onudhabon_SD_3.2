@@ -1,7 +1,7 @@
 using System;
 using Npgsql;
 
-namespace Onudhabon_ISD.Data
+namespace Onudhabon.Data
 {
     public static class PostgresConnectionHelper
     {

@@ -1,0 +1,1015 @@
+<!-- Floating AI Chatbot Widget -->
+<div id="ai-chat-widget" class="ai-chat-container">
+    <!-- Floating Launcher Button -->
+    <button id="toggle-chat-btn" class="chat-fab shadow-lg" type="button" aria-label="Open AI Assistant" title="Chat with Onudhabon AI">
+        <!-- Chat Icon (Visible when closed) -->
+        <svg class="fab-icon fab-chat-icon" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            <circle cx="8.5" cy="11.5" r="1" fill="currentColor"></circle>
+            <circle cx="12" cy="11.5" r="1" fill="currentColor"></circle>
+            <circle cx="15.5" cy="11.5" r="1" fill="currentColor"></circle>
+        </svg>
+        <!-- Close Icon (Visible when open) -->
+        <svg class="fab-icon fab-close-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        <!-- Status indicator badge -->
+        <span class="fab-status-badge" title="AI Online"></span>
+    </button>
+
+    <!-- Chat Card Window -->
+    <div id="chat-window" class="chat-window-card shadow-lg" style="display: none;">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <div class="position-relative">
+                    <img src="/images/bot-avatar.svg" alt="Onudhabon AI" class="bot-header-avatar rounded-circle" width="40" height="40" />
+                    <span class="header-status-dot" title="Active"></span>
+                </div>
+                <div class="chat-header-info">
+                    <div class="d-flex align-items-center gap-1.5">
+                        <span class="chat-header-title">Onudhabon AI</span>
+                        <span class="chat-header-badge">Bot</span>
+                    </div>
+                    <div class="chat-header-status">
+                        <span class="status-live-beacon"></span>
+                        <span>Learning Companion • Online</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-header-actions">
+                <button type="button" class="chat-header-btn" id="clear-chat-btn" title="Reset conversation" aria-label="Reset conversation">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                        <path d="M21 3v5h-5"></path>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                        <path d="M3 21v-5h5"></path>
+                    </svg>
+                </button>
+                <button type="button" class="chat-header-btn" id="close-chat-btn" title="Minimize chat" aria-label="Minimize chat">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Messages Body -->
+        <div id="chat-body" class="chat-body">
+            <!-- Initial Welcome Message Container with Bot Profile Picture -->
+            <div id="initial-welcome-row" class="chat-msg-row bot-msg-row">
+                <div class="bot-avatar-col">
+                    <img src="/images/bot-avatar.svg" alt="Onudhabon AI" class="bot-avatar-img rounded-circle shadow-sm" width="34" height="34" />
+                </div>
+                <div class="msg-bubble-wrapper">
+                    <div class="msg-sender-meta">
+                        <span class="sender-name">Onudhabon AI</span>
+                        <span class="sender-badge">Assistant</span>
+                    </div>
+                    <div class="chat-bubble bot-bubble">
+                        <div class="mb-1"><strong>Hello! I'm your AI Academic Companion.</strong> 👋</div>
+                        <div>I can answer your questions, help you navigate courses and materials, or guide you through the Onudhabon platform.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Suggestion Chips -->
+            <div id="chat-suggestions" class="chat-suggestions-container">
+                <div class="suggestions-label">Quick Inquiries:</div>
+                <div class="d-flex flex-wrap gap-1.5">
+                    <button type="button" class="suggestion-chip" data-prompt="Where can I find recorded lectures?">
+                        <span class="chip-icon">🎥</span> Recorded Lectures
+                    </button>
+                    <button type="button" class="suggestion-chip" data-prompt="Where can I find study materials?">
+                        <span class="chip-icon">📄</span> Study Materials
+                    </button>
+                    <button type="button" class="suggestion-chip" data-prompt="How do I view my profile?">
+                        <span class="chip-icon">👤</span> My Profile
+                    </button>
+                    <button type="button" class="suggestion-chip" data-prompt="What features does Onudhabon offer?">
+                        <span class="chip-icon">💡</span> Platform Guide
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer / Input Box -->
+        <div class="chat-footer">
+            <form id="chat-form" class="chat-input-form" onsubmit="return false;">
+                <div class="input-wrapper">
+                    <input type="text" id="chat-input" class="chat-input-field" 
+                           placeholder="Ask anything about courses, materials..." 
+                           autocomplete="off" maxlength="1000" />
+                    <button type="button" id="chat-send-btn" class="chat-send-btn" title="Send message" aria-label="Send message">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+            <div class="chat-footer-note">
+                ⚡ Powered by Onudhabon AI • Press Enter to send
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Chatbot Root Container */
+    .ai-chat-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1055;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* Floating Action Button (FAB) */
+    .chat-fab {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+        color: #ffffff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.45), 0 4px 12px -2px rgba(0, 0, 0, 0.12);
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        outline: none;
+    }
+
+    .chat-fab:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 14px 28px -4px rgba(37, 99, 235, 0.55), 0 6px 14px -2px rgba(0, 0, 0, 0.15);
+    }
+
+    .chat-fab:active {
+        transform: scale(0.96);
+    }
+
+    .chat-fab .fab-icon {
+        transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .chat-fab .fab-chat-icon {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .chat-fab .fab-close-icon {
+        display: none;
+        opacity: 0;
+        transform: rotate(-90deg) scale(0.7);
+    }
+
+    .chat-fab.is-open .fab-chat-icon {
+        display: none;
+        opacity: 0;
+    }
+
+    .chat-fab.is-open .fab-close-icon {
+        display: block;
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+    }
+
+    /* Status dot on FAB */
+    .fab-status-badge {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 13px;
+        height: 13px;
+        background-color: #10b981;
+        border: 2.5px solid #ffffff;
+        border-radius: 50%;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        animation: fabPulse 2.2s infinite;
+    }
+
+    @@keyframes fabPulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+
+    /* Chat Window Container */
+    .chat-window-card {
+        position: absolute;
+        bottom: 74px;
+        right: 0;
+        width: 380px;
+        height: 540px;
+        max-height: calc(100vh - 110px);
+        background-color: #ffffff;
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.22), 0 8px 16px -4px rgba(15, 23, 42, 0.08);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: chatSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @@keyframes chatSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(16px) scale(0.96);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Header */
+    .chat-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 45%, #1e40af 100%);
+        padding: 13px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        user-select: none;
+    }
+
+    .chat-header-left {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .bot-header-avatar {
+        width: 38px;
+        height: 38px;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        background-color: #1e1b4b;
+        display: block;
+    }
+
+    .header-status-dot {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        background-color: #10b981;
+        border: 2px solid #0f172a;
+        border-radius: 50%;
+    }
+
+    .chat-header-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.01em;
+    }
+
+    .chat-header-badge {
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.18);
+        color: #93c5fd;
+        padding: 1px 6px;
+        border-radius: 10px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+
+    .chat-header-status {
+        font-size: 0.72rem;
+        color: rgba(255, 255, 255, 0.75);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 1px;
+    }
+
+    .status-live-beacon {
+        width: 6px;
+        height: 6px;
+        background-color: #34d399;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 6px #34d399;
+    }
+
+    .chat-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .chat-header-btn {
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.75);
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+    }
+
+    .chat-header-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+    }
+
+    /* Chat Body */
+    .chat-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 16px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        scroll-behavior: smooth;
+    }
+
+    .chat-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-body::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chat-body::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .chat-body::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Message Rows */
+    .chat-msg-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        animation: msgFadeIn 0.25s ease-out;
+    }
+
+    @@keyframes msgFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .bot-msg-row {
+        justify-content: flex-start;
+    }
+
+    .user-msg-row {
+        justify-content: flex-end;
+    }
+
+    /* Bot Profile Picture Avatar Column */
+    .bot-avatar-col {
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .bot-avatar-img {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: block;
+        border: 1.5px solid #dbeafe;
+        background-color: #eff6ff;
+    }
+
+    /* Message Bubble Wrappers */
+    .msg-bubble-wrapper {
+        max-width: 82%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .msg-sender-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 3px;
+        padding-left: 2px;
+    }
+
+    .sender-name {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #475569;
+    }
+
+    .sender-badge {
+        font-size: 0.62rem;
+        font-weight: 600;
+        background-color: #e0f2fe;
+        color: #0284c7;
+        padding: 0.5px 5px;
+        border-radius: 6px;
+    }
+
+    /* Bubbles */
+    .chat-bubble {
+        padding: 10px 14px;
+        font-size: 0.88rem;
+        line-height: 1.55;
+        word-break: break-word;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .bot-bubble {
+        background-color: #ffffff;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px 16px 16px 16px;
+    }
+
+    .user-bubble {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: #ffffff;
+        border-radius: 16px 16px 4px 16px;
+        box-shadow: 0 3px 10px rgba(37, 99, 235, 0.22);
+    }
+
+    .msg-time {
+        font-size: 0.68rem;
+        color: #94a3b8;
+        margin-top: 3px;
+        padding: 0 4px;
+    }
+
+    /* Bot Navigation Action Pills */
+    .bot-nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #eff6ff;
+        color: #1d4ed8 !important;
+        border: 1px solid #bfdbfe;
+        text-decoration: none !important;
+        padding: 5px 11px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 6px;
+        margin-right: 4px;
+        box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
+        transition: all 0.18s ease-in-out;
+    }
+
+    .bot-nav-btn:hover {
+        background: #2563eb;
+        color: #ffffff !important;
+        border-color: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
+    }
+
+    .bot-nav-arrow {
+        transition: transform 0.18s ease-in-out;
+    }
+
+    .bot-nav-btn:hover .bot-nav-arrow {
+        transform: translateX(3px);
+    }
+
+    /* Inline code styling */
+    .bot-inline-code {
+        background-color: #f1f5f9;
+        color: #0f172a;
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 0.82rem;
+        font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* Suggestion Chips Box */
+    .chat-suggestions-container {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 10px 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .suggestions-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #64748b;
+        margin-bottom: 7px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .suggestion-chip {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #334155;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 4px 10px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.18s ease;
+    }
+
+    .suggestion-chip .chip-icon {
+        font-size: 0.85rem;
+    }
+
+    .suggestion-chip:hover {
+        background-color: #eff6ff;
+        border-color: #93c5fd;
+        color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    /* Modern 3-Dot Typing Indicator */
+    .typing-bubble {
+        padding: 11px 16px !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .typing-dot {
+        width: 7px;
+        height: 7px;
+        background-color: #3b82f6;
+        border-radius: 50%;
+        display: inline-block;
+        animation: typingBounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) {
+        animation-delay: -0.32s;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: -0.16s;
+    }
+
+    @@keyframes typingBounce {
+        0%, 80%, 100% {
+            transform: scale(0.5);
+            opacity: 0.4;
+        }
+        40% {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+    }
+
+    /* Error Bubble */
+    .error-bubble {
+        background-color: #fef2f2 !important;
+        border: 1px solid #fecaca !important;
+        color: #b91c1c !important;
+    }
+
+    /* Footer & Input Controls */
+    .chat-footer {
+        background-color: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        padding: 10px 14px 8px;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .chat-input-field {
+        width: 100%;
+        padding: 9px 44px 9px 14px;
+        font-size: 0.875rem;
+        color: #0f172a;
+        background: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 24px;
+        outline: none;
+        transition: all 0.2s ease-in-out;
+        font-family: inherit;
+    }
+
+    .chat-input-field:focus {
+        background: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3.5px rgba(59, 130, 246, 0.15);
+    }
+
+    .chat-input-field:disabled {
+        background-color: #f1f5f9;
+        cursor: not-allowed;
+    }
+
+    .chat-send-btn {
+        position: absolute;
+        right: 4px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    }
+
+    .chat-send-btn:hover:not(:disabled) {
+        transform: scale(1.06);
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        box-shadow: 0 3px 8px rgba(37, 99, 235, 0.4);
+    }
+
+    .chat-send-btn:disabled {
+        background: #cbd5e1;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+
+    .chat-footer-note {
+        font-size: 0.68rem;
+        color: #94a3b8;
+        text-align: center;
+        margin-top: 5px;
+        user-select: none;
+    }
+
+    /* Mobile Responsive Optimizations */
+    @@media (max-width: 480px) {
+        .ai-chat-container {
+            bottom: 16px;
+            right: 16px;
+        }
+
+        .chat-window-card {
+            width: calc(100vw - 32px);
+            right: 0;
+            bottom: 70px;
+            height: calc(100vh - 100px);
+            max-height: none;
+        }
+
+        .msg-bubble-wrapper {
+            max-width: 86%;
+        }
+    }
+</style>
+
+<script>
+    (function () {
+        const STORAGE_HISTORY_KEY = 'onudhabon_chat_history';
+        const STORAGE_OPEN_KEY = 'onudhabon_chat_open';
+        const BOT_AVATAR_URL = '/images/bot-avatar.svg';
+
+        const toggleBtn = document.getElementById('toggle-chat-btn');
+        const closeBtn = document.getElementById('close-chat-btn');
+        const clearBtn = document.getElementById('clear-chat-btn');
+        const chatWindow = document.getElementById('chat-window');
+        const sendBtn = document.getElementById('chat-send-btn');
+        const chatInput = document.getElementById('chat-input');
+        const chatBody = document.getElementById('chat-body');
+        const suggestionsBox = document.getElementById('chat-suggestions');
+        const welcomeRow = document.getElementById('initial-welcome-row');
+
+        // Formats current time into a clean "12:15 PM" format
+        function getCurrentTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const strMinutes = minutes < 10 ? '0' + minutes : minutes;
+            return hours + ':' + strMinutes + ' ' + ampm;
+        }
+
+        // Retrieve conversation history from sessionStorage
+        function getHistory() {
+            try {
+                const stored = sessionStorage.getItem(STORAGE_HISTORY_KEY);
+                return stored ? JSON.parse(stored) : [];
+            } catch {
+                return [];
+            }
+        }
+
+        // Save conversation history to sessionStorage
+        function saveHistory(history) {
+            try {
+                sessionStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(history));
+            } catch (e) {
+                console.warn('Could not save chat history to sessionStorage', e);
+            }
+        }
+
+        // Format bot text: bold, code, bullet points, numbered lists, and interactive action buttons
+        function formatMessage(text) {
+            if (!text) return '';
+
+            // 1. Sanitize HTML
+            let safe = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            // 2. Bold: **text**
+            safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            // 3. Italic: *text*
+            safe = safe.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+            // 4. Inline code: `code`
+            safe = safe.replace(/`([^`]+)`/g, '<code class="bot-inline-code">$1</code>');
+
+            // 5. Markdown links: [Label](url) -> Interactive Navigation Action Pill
+            safe = safe.replace(/\[(.*?)\]\((.*?)\)/g, function (match, label, url) {
+                const cleanUrl = url.trim();
+                if (cleanUrl.toLowerCase().startsWith('javascript:')) return label;
+                return `<a href="${cleanUrl}" class="bot-nav-btn">
+                            <span>${label}</span>
+                            <svg class="bot-nav-arrow" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 8h10M9 4l4 4-4 4"/>
+                            </svg>
+                        </a>`;
+            });
+
+            // 6. Bullet points
+            safe = safe.replace(/^\s*[-*]\s+(.*)$/gm, '• $1');
+
+            // 7. Convert newlines to line breaks
+            safe = safe.replace(/\n/g, '<br>');
+
+            return safe;
+        }
+
+        // Append a message bubble to DOM with Bot profile picture
+        function renderBubble(role, text, timeStr) {
+            const isUser = role === 'user';
+            const time = timeStr || getCurrentTime();
+            const row = document.createElement('div');
+            row.className = `chat-msg-row ${isUser ? 'user-msg-row' : 'bot-msg-row'}`;
+
+            if (isUser) {
+                row.innerHTML = `
+                    <div class="msg-bubble-wrapper align-items-end">
+                        <div class="chat-bubble user-bubble shadow-sm text-start">
+                            ${escapeHtml(text)}
+                        </div>
+                        <div class="msg-time text-end">${time}</div>
+                    </div>
+                `;
+            } else {
+                row.innerHTML = `
+                    <div class="bot-avatar-col">
+                        <img src="${BOT_AVATAR_URL}" alt="Onudhabon AI" class="bot-avatar-img rounded-circle shadow-sm" width="34" height="34" />
+                    </div>
+                    <div class="msg-bubble-wrapper">
+                        <div class="msg-sender-meta">
+                            <span class="sender-name">Onudhabon AI</span>
+                            <span class="sender-badge">Assistant</span>
+                        </div>
+                        <div class="chat-bubble bot-bubble shadow-sm">
+                            ${formatMessage(text)}
+                        </div>
+                        <div class="msg-time">${time}</div>
+                    </div>
+                `;
+            }
+
+            chatBody.appendChild(row);
+            scrollChatToBottom();
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;')
+                .replace(/\n/g, '<br>');
+        }
+
+        function scrollChatToBottom() {
+            setTimeout(() => {
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 10);
+        }
+
+        // Restore chat state on page load from sessionStorage
+        function restoreSession() {
+            const history = getHistory();
+            if (history.length > 0) {
+                if (suggestionsBox) suggestionsBox.style.display = 'none';
+                history.forEach(item => {
+                    renderBubble(item.role, item.text, item.time);
+                });
+                scrollChatToBottom();
+            }
+
+            // Restore chat window open/closed state
+            const wasOpen = sessionStorage.getItem(STORAGE_OPEN_KEY) === 'true';
+            if (wasOpen) {
+                chatWindow.style.display = 'flex';
+                toggleBtn.classList.add('is-open');
+                toggleBtn.setAttribute('title', 'Close AI Assistant');
+            }
+        }
+
+        // Toggle chat window open/closed
+        toggleBtn.addEventListener('click', () => {
+            const isHidden = chatWindow.style.display === 'none' || !chatWindow.style.display;
+            chatWindow.style.display = isHidden ? 'flex' : 'none';
+            toggleBtn.classList.toggle('is-open', isHidden);
+            toggleBtn.setAttribute('title', isHidden ? 'Close AI Assistant' : 'Chat with Onudhabon AI');
+            sessionStorage.setItem(STORAGE_OPEN_KEY, isHidden ? 'true' : 'false');
+            if (isHidden) {
+                chatInput.focus();
+                scrollChatToBottom();
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            chatWindow.style.display = 'none';
+            toggleBtn.classList.remove('is-open');
+            toggleBtn.setAttribute('title', 'Chat with Onudhabon AI');
+            sessionStorage.setItem(STORAGE_OPEN_KEY, 'false');
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && chatWindow.style.display === 'flex') {
+                chatWindow.style.display = 'none';
+                toggleBtn.classList.remove('is-open');
+                sessionStorage.setItem(STORAGE_OPEN_KEY, 'false');
+            }
+        });
+
+        // Reset chat history
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Clear chat history and start a fresh session?')) {
+                    sessionStorage.removeItem(STORAGE_HISTORY_KEY);
+                    // Remove all rendered message rows except the original welcome row
+                    const rows = chatBody.querySelectorAll('.chat-msg-row:not(#initial-welcome-row)');
+                    rows.forEach(r => r.remove());
+                    if (suggestionsBox) {
+                        suggestionsBox.style.display = 'block';
+                    }
+                    scrollChatToBottom();
+                }
+            });
+        }
+
+        // Handle suggestion chips
+        if (suggestionsBox) {
+            suggestionsBox.addEventListener('click', (e) => {
+                const chip = e.target.closest('.suggestion-chip');
+                if (chip && chip.dataset.prompt) {
+                    chatInput.value = chip.dataset.prompt;
+                    sendMessage();
+                }
+            });
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            const timeNow = getCurrentTime();
+
+            // Hide quick suggestions once user sends a message
+            if (suggestionsBox) {
+                suggestionsBox.style.display = 'none';
+            }
+
+            // Render and store user message
+            renderBubble('user', text, timeNow);
+            const history = getHistory();
+            history.push({ role: 'user', text: text, time: timeNow });
+            saveHistory(history);
+
+            chatInput.value = '';
+            chatInput.disabled = true;
+            sendBtn.disabled = true;
+            scrollChatToBottom();
+
+            // Render typing indicator with Bot Profile Picture Icon
+            const loadingRow = document.createElement('div');
+            loadingRow.id = 'typing-indicator-row';
+            loadingRow.className = 'chat-msg-row bot-msg-row';
+            loadingRow.innerHTML = `
+                <div class="bot-avatar-col">
+                    <img src="${BOT_AVATAR_URL}" alt="Onudhabon AI" class="bot-avatar-img rounded-circle shadow-sm" width="34" height="34" />
+                </div>
+                <div class="msg-bubble-wrapper">
+                    <div class="msg-sender-meta">
+                        <span class="sender-name">Onudhabon AI</span>
+                        <span class="sender-badge" style="background-color: #f1f5f9; color: #64748b;">Thinking</span>
+                    </div>
+                    <div class="chat-bubble bot-bubble typing-bubble shadow-sm">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                </div>
+            `;
+            chatBody.appendChild(loadingRow);
+            scrollChatToBottom();
+
+            try {
+                // Send current message and recent history context to server
+                const res = await fetch('/Chat/SendMessage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message: text,
+                        history: history.slice(-6)
+                    })
+                });
+
+                const data = await res.json();
+                loadingRow.remove();
+
+                const botReply = data.reply || 'I apologize, but I could not generate a response. Please try again.';
+                const replyTime = getCurrentTime();
+                renderBubble('bot', botReply, replyTime);
+
+                // Append bot reply to history
+                history.push({ role: 'bot', text: botReply, time: replyTime });
+                saveHistory(history);
+            } catch (err) {
+                loadingRow.remove();
+                const errRow = document.createElement('div');
+                errRow.className = 'chat-msg-row bot-msg-row';
+                errRow.innerHTML = `
+                    <div class="bot-avatar-col">
+                        <img src="${BOT_AVATAR_URL}" alt="Onudhabon AI" class="bot-avatar-img rounded-circle shadow-sm" width="34" height="34" />
+                    </div>
+                    <div class="msg-bubble-wrapper">
+                        <div class="msg-sender-meta">
+                            <span class="sender-name">Onudhabon AI</span>
+                            <span class="sender-badge" style="background-color: #fee2e2; color: #b91c1c;">Error</span>
+                        </div>
+                        <div class="chat-bubble bot-bubble error-bubble shadow-sm">
+                            ⚠️ Unable to connect to the AI service. Please verify your connection or model service.
+                        </div>
+                    </div>
+                `;
+                chatBody.appendChild(errRow);
+            } finally {
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                chatInput.focus();
+                scrollChatToBottom();
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Initialize session restore on page load
+        restoreSession();
+    })();
+</script>

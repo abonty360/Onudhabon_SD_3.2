@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Onudhabon.Data;
 using Onudhabon.Models;
-using Onudhabon_ISD.Data;
-using Onudhabon_ISD.Models;
 using System.Diagnostics;
 
-namespace Onudhabon_ISD.Controllers
+namespace Onudhabon.Controllers
 {
     public class HomeController : Controller
     {

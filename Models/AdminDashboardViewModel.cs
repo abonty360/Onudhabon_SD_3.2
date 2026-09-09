@@ -1,4 +1,4 @@
-namespace Onudhabon_ISD.Models
+namespace Onudhabon.Models
 {
     public class AdminDashboardViewModel
     {

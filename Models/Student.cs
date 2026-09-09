@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Onudhabon_ISD.Models
+namespace Onudhabon.Models
 {
     [Table("Students")]
     public class Student

@@ -4,13 +4,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Onudhabon.Data;
 using Onudhabon.Models;
-using Onudhabon_ISD.Data;
-using Onudhabon_ISD.Models;
-using Onudhabon_ISD.Services;
+using Onudhabon.Services;
 using System.Security.Claims;
 
-namespace Onudhabon_ISD.Controllers
+namespace Onudhabon.Controllers
 {
     public class AccountController : Controller
     {

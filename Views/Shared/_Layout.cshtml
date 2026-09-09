@@ -1,11 +1,10 @@
 @using System.Security.Claims
-@inject Onudhabon_ISD.Services.ICloudinaryService CloudinaryService
-@inject Onudhabon_ISD.Data.ApplicationDbContext DbContext
+@inject Onudhabon.Services.ICloudinaryService CloudinaryService
+@inject Onudhabon.Data.ApplicationDbContext DbContext
 
 @{
     string? userPicture = null;
     string? userRole = null;
-
     if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         userPicture = User.FindFirst("Picture")?.Value;
@@ -14,13 +13,10 @@
         if (string.IsNullOrEmpty(userPicture))
         {
             var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (int.TryParse(userIdStr, out int uid))
             {
                 var dbUser = DbContext.Users.Find(uid);
-
                 userPicture = dbUser?.Picture;
-
                 if (string.IsNullOrEmpty(userRole))
                 {
                     userRole = dbUser?.Role;
@@ -32,696 +28,167 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>@ViewData["Title"] - Onudhabon</title>
-
     <script type="importmap"></script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
-
-    <link rel="stylesheet"
-          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <link rel="stylesheet"
-          href="~/css/site.css"
-          asp-append-version="true" />
-
-    <link rel="stylesheet"
-          href="~/Onudhabon_ISD.styles.css"
-          asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Onudhabon.styles.css" asp-append-version="true" />
 </head>
-
 <body>
-
     <header>
-
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3 py-2.5">
-
             <div class="container-fluid px-lg-4">
-
-                <!-- LOGO -->
-                <a class="navbar-brand d-flex align-items-center me-4"
-                   asp-area=""
-                   asp-controller="Home"
-                   asp-action="Index">
-
-                    <img src="~/images/navbar_logo.png"
-                         asp-append-version="true"
-                         alt="Onudhabon"
-                         style="height: 38px; width: auto;" />
-
+                <a class="navbar-brand d-flex align-items-center me-4" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/navbar_logo.png" asp-append-version="true" alt="Onudhabon" style="height: 38px; width: auto;" />
                 </a>
-
-
-                <!-- MOBILE TOGGLER -->
-                <button class="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation">
-
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
-
                 </button>
-
-
                 <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
-
-                    <!-- MAIN NAVIGATION -->
                     <ul class="navbar-nav flex-grow-1 align-items-center">
-
-                        <!-- HOME -->
                         <li class="nav-item">
-
-                            <a class="nav-link text-dark fw-medium px-3"
-                               asp-area=""
-                               asp-controller="Home"
-                               asp-action="Index">
-
-                                Home
-
-                            </a>
-
+                            <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-
-
-                        <!-- RECORDED LECTURES -->
                         <li class="nav-item">
-
-                            <a class="nav-link text-dark fw-medium px-3"
-                               asp-area=""
-                               asp-controller="Lecture"
-                               asp-action="Index">
-
-                                Recorded Lectures
-
-                            </a>
-
+                            <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Lecture" asp-action="Index">Recorded Lectures</a>
                         </li>
-
-
-                        <!-- STUDY MATERIALS -->
                         <li class="nav-item">
-
-                            <a class="nav-link text-dark fw-medium px-3"
-                               asp-area=""
-                               asp-controller="Material"
-                               asp-action="Index">
-
-                                Study Materials
-
-                            </a>
-
+                            <a class="nav-link text-dark fw-medium px-3" asp-area="" asp-controller="Material" asp-action="Index">Study Materials</a>
                         </li>
-
-
-                        <!-- ABOUT -->
-                        <li class="nav-item">
-
-                            <a class="nav-link text-dark fw-medium px-3"
-                               asp-area=""
-                               asp-controller="Home"
-                               asp-action="About">
-
-                                About
-
-                            </a>
-
-                        </li>
-
-
-                        <!-- FORUM -->
-                        <li class="nav-item">
-
-                            <a class="nav-link text-dark fw-medium px-3"
-                               asp-area=""
-                               asp-controller="Forum"
-                               asp-action="Index">
-
-                                Forum
-
-                            </a>
-
-                        </li>
-
-
-                        <!-- ADMIN DASHBOARD -->
                         @if (userRole == "Admin" || User.IsInRole("Admin"))
                         {
-
                             <li class="nav-item">
-
-                                <a class="nav-link text-danger fw-semibold px-3"
-                                   asp-controller="Admin"
-                                   asp-action="Dashboard">
-
+                                <a class="nav-link text-danger fw-semibold px-3" asp-controller="Admin" asp-action="Dashboard">
                                     🛡️ Admin Dashboard
-
                                 </a>
-
                             </li>
-
                         }
-
                     </ul>
-
-
-                    <!-- RIGHT SIDE NAVIGATION -->
                     <ul class="navbar-nav align-items-center mt-2 mt-lg-0">
-
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-
-                            <!-- EDUCATOR UPLOAD -->
                             @if (userRole == "Educator" || User.IsInRole("Educator"))
                             {
-
                                 <li class="nav-item dropdown me-3">
-
-                                    <a class="btn btn-outline-primary btn-sm dropdown-toggle rounded-pill px-3 py-1.5"
-                                       href="#"
-                                       role="button"
-                                       data-bs-toggle="dropdown"
-                                       aria-expanded="false">
-
+                                    <a class="btn btn-outline-primary btn-sm dropdown-toggle rounded-pill px-3 py-1.5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         + Upload
-
                                     </a>
-
-
                                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2">
-
-                                        <!-- UPLOAD LECTURE -->
                                         <li>
-
-                                            <a class="dropdown-item rounded-3 py-2"
-                                               asp-controller="Lecture"
-                                               asp-action="Upload">
-
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Lecture" asp-action="Upload">
                                                 🎥 Upload Lecture Video
-
                                             </a>
-
                                         </li>
-
-
-                                        <!-- UPLOAD MATERIAL -->
                                         <li>
-
-                                            <a class="dropdown-item rounded-3 py-2"
-                                               asp-controller="Material"
-                                               asp-action="Upload">
-
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Material" asp-action="Upload">
                                                 📄 Upload Study Material
-
                                             </a>
-
                                         </li>
-
                                     </ul>
-
                                 </li>
-
                             }
 
-
-                            <!-- NOTIFICATIONS BELL DROPDOWN -->
-                            <li class="nav-item dropdown me-2 position-relative">
-                                <a class="nav-link text-dark position-relative p-2 rounded-circle hover-bg d-flex align-items-center justify-content-center"
-                                   href="#"
-                                   id="notificationDropdown"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false"
-                                   title="Notifications"
-                                   style="width: 38px; height: 38px; font-size: 1.15rem;">
-                                    🔔
-                                    <span id="notificationBadge"
-                                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                          style="display: none; font-size: 0.65rem; padding: 0.25em 0.5em;">
-                                        0
-                                    </span>
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-0 mt-2"
-                                     aria-labelledby="notificationDropdown"
-                                     style="width: 360px; max-width: 92vw; overflow: hidden; z-index: 1060;">
-                                    <div class="d-flex align-items-center justify-content-between p-3 border-bottom bg-light">
-                                        <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                                            <span>🔔</span> Notifications
-                                            <span id="notificationHeaderBadge" class="badge bg-secondary-subtle text-secondary rounded-pill small">0 unread</span>
-                                        </h6>
-                                        <button type="button" id="markAllReadBtn" class="btn btn-sm btn-link text-decoration-none p-0 text-primary small fw-semibold" style="display: none;">
-                                            Mark all read
-                                        </button>
-                                    </div>
-                                    
-                                    <div id="notificationItemsList" class="list-group list-group-flush" style="max-height: 380px; overflow-y: auto;">
-                                        <div class="text-center py-4 text-muted small" id="notificationLoadingState">
-                                            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
-                                            <div>Loading notifications...</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="p-2 border-top text-center bg-light">
-                                        <a asp-controller="Notification" asp-action="Index" class="btn btn-link btn-sm text-decoration-none text-muted fw-semibold small w-100">
-                                            View all notifications →
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-
-                            <!-- PROFILE DROPDOWN -->
                             <li class="nav-item dropdown">
-
-                                <a class="nav-link d-flex align-items-center gap-2 text-dark dropdown-toggle py-1 px-2 rounded-pill hover-bg"
-                                   href="#"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
-
-
-                                    <!-- PROFILE IMAGE -->
+                                <a class="nav-link d-flex align-items-center gap-2 text-dark dropdown-toggle py-1 px-2 rounded-pill hover-bg" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     @if (!string.IsNullOrWhiteSpace(userPicture))
                                     {
-
                                         <img src="@CloudinaryService.GetAvatarUrl(userPicture, 70)"
                                              alt="@User.Identity.Name"
                                              class="rounded-circle border"
                                              style="width: 34px; height: 34px; object-fit: cover;" />
-
                                     }
                                     else
                                     {
-
                                         <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center border"
                                              style="width: 34px; height: 34px; font-size: 0.85rem;">
-
-                                            @(string.IsNullOrEmpty(User.Identity.Name)
-                                                ? "U"
-                                                : User.Identity.Name.Substring(0, 1).ToUpper())
-
+                                            @(string.IsNullOrEmpty(User.Identity.Name) ? "U" : User.Identity.Name.Substring(0, 1).ToUpper())
                                         </div>
-
                                     }
-
-
-                                    <!-- USERNAME -->
-                                    <span class="fw-semibold">
-
-                                        @(User.Identity.Name)
-
-                                    </span>
-
+                                    <span class="fw-semibold">@(User.Identity.Name)</span>
                                 </a>
-
-
-                                <!-- PROFILE DROPDOWN MENU -->
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2"
-                                    style="min-width: 220px;">
-
-
-                                    <!-- USER INFORMATION -->
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2" style="min-width: 220px;">
                                     <li class="px-3 py-2 border-bottom mb-1">
-
-                                        <div class="fw-bold text-dark">
-
-                                            @(User.Identity.Name)
-
-                                        </div>
-
+                                        <div class="fw-bold text-dark">@(User.Identity.Name)</div>
                                         <div class="text-muted small">
-
-                                            Role:
-
-                                            <span class="badge @(userRole == "Admin" ? "bg-danger" : "bg-secondary") rounded-pill">
-
-                                                @(userRole ?? "User")
-
-                                            </span>
-
+                                            Role: <span class="badge @(userRole == "Admin" ? "bg-danger" : "bg-secondary") rounded-pill">@(userRole ?? "User")</span>
                                         </div>
-
                                     </li>
-
-
-                                    <!-- ADMIN DASHBOARD -->
                                     @if (userRole == "Admin" || User.IsInRole("Admin"))
                                     {
-
                                         <li>
-
-                                            <a class="dropdown-item rounded-3 py-2 text-danger fw-semibold"
-                                               asp-controller="Admin"
-                                               asp-action="Dashboard">
-
+                                            <a class="dropdown-item rounded-3 py-2 text-danger fw-semibold" asp-controller="Admin" asp-action="Dashboard">
                                                 🛡️ Admin Dashboard
-
                                             </a>
-
                                         </li>
-
                                     }
-
-
-                                    <!-- VIEW PROFILE -->
                                     <li>
-
-                                        <a class="dropdown-item rounded-3 py-2"
-                                           asp-controller="Account"
-                                           asp-action="Profile">
-
+                                        <a class="dropdown-item rounded-3 py-2" asp-controller="Account" asp-action="Profile">
                                             👤 View Profile
-
                                         </a>
-
                                     </li>
-
-
-                                    <!-- EDUCATOR OPTIONS -->
                                     @if (userRole == "Educator" || User.IsInRole("Educator"))
                                     {
-
-                                        <!-- UPLOAD LECTURE -->
                                         <li>
-
-                                            <a class="dropdown-item rounded-3 py-2"
-                                               asp-controller="Lecture"
-                                               asp-action="Upload">
-
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Lecture" asp-action="Upload">
                                                 🎥 Upload Lecture
-
                                             </a>
-
                                         </li>
-
-
-                                        <!-- UPLOAD MATERIAL -->
                                         <li>
-
-                                            <a class="dropdown-item rounded-3 py-2"
-                                               asp-controller="Material"
-                                               asp-action="Upload">
-
+                                            <a class="dropdown-item rounded-3 py-2" asp-controller="Material" asp-action="Upload">
                                                 📄 Upload Material
-
                                             </a>
-
                                         </li>
-
                                     }
-
-
-                                    <!-- DIVIDER -->
+                                    <li><hr class="dropdown-divider my-1"></li>
                                     <li>
-
-                                        <hr class="dropdown-divider my-1">
-
-                                    </li>
-
-
-                                    <!-- LOGOUT -->
-                                    <li>
-
-                                        <form asp-controller="Account"
-                                              asp-action="Logout"
-                                              method="post"
-                                              class="px-1 py-1">
-
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="px-1 py-1">
                                             @Html.AntiForgeryToken()
-
-                                            <button type="submit"
-                                                    class="dropdown-item rounded-3 text-danger py-2 w-100 text-start">
-
+                                            <button type="submit" class="dropdown-item rounded-3 text-danger py-2 w-100 text-start">
                                                 🚪 Sign Out
-
                                             </button>
-
                                         </form>
-
                                     </li>
-
                                 </ul>
-
                             </li>
-
                         }
                         else
                         {
-
-                            <!-- LOGIN -->
                             <li class="nav-item">
-
-                                <a class="nav-link btn btn-outline-primary px-3.5 py-1.5 text-primary ms-2 rounded-pill"
-                                   asp-area=""
-                                   asp-controller="Account"
-                                   asp-action="Login">
-
-                                    Login
-
-                                </a>
-
+                                <a class="nav-link btn btn-outline-primary px-3.5 py-1.5 text-primary ms-2 rounded-pill" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
-
-
-                            <!-- REGISTER -->
                             <li class="nav-item">
-
-                                <a class="nav-link btn btn-primary px-3.5 py-1.5 text-white ms-2 rounded-pill"
-                                   asp-area=""
-                                   asp-controller="Account"
-                                   asp-action="Register">
-
-                                    Register
-
-                                </a>
-
+                                <a class="nav-link btn btn-primary px-3.5 py-1.5 text-white ms-2 rounded-pill" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
                             </li>
-
                         }
-
                     </ul>
-
                 </div>
-
             </div>
-
         </nav>
-
     </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
 
-
-    <!-- MAIN CONTENT -->
-    <main role="main" class="pb-3">
-
-        @RenderBody()
-
-    </main>
-
-
-    <!-- FOOTER -->
     <footer class="border-top footer text-muted">
-
         <div class="container">
-
             &copy; @DateTime.Now.Year - Onudhabon - Exploring Education
-
         </div>
-
     </footer>
-
-
-    <!-- SCRIPTS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="~/js/site.js"
-            asp-append-version="true"></script>
-
-    @if (User.Identity != null && User.Identity.IsAuthenticated)
-    {
-        <form id="globalAntiforgeryForm" style="display:none;">
-            @Html.AntiForgeryToken()
-        </form>
-
-        <script>
-            (function () {
-                const badge = document.getElementById('notificationBadge');
-                const headerBadge = document.getElementById('notificationHeaderBadge');
-                const list = document.getElementById('notificationItemsList');
-                const markAllBtn = document.getElementById('markAllReadBtn');
-
-                function getAntiForgeryToken() {
-                    const tokenInput = document.querySelector('#globalAntiforgeryForm input[name="__RequestVerificationToken"]') ||
-                                       document.querySelector('input[name="__RequestVerificationToken"]');
-                    return tokenInput ? tokenInput.value : '';
-                }
-
-                async function fetchNotifications() {
-                    try {
-                        const response = await fetch('/Notification/GetNotifications', {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        });
-                        if (!response.ok) return;
-                        const data = await response.json();
-                        if (!data || !data.success) return;
-
-                        const unreadCount = data.unreadCount || 0;
-                        if (unreadCount > 0) {
-                            if (badge) {
-                                badge.style.display = 'inline-block';
-                                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-                            }
-                            if (headerBadge) {
-                                headerBadge.textContent = `${unreadCount} unread`;
-                                headerBadge.className = 'badge bg-danger text-white rounded-pill small';
-                            }
-                            if (markAllBtn) markAllBtn.style.display = 'inline-block';
-                        } else {
-                            if (badge) {
-                                badge.style.display = 'none';
-                                badge.textContent = '0';
-                            }
-                            if (headerBadge) {
-                                headerBadge.textContent = '0 unread';
-                                headerBadge.className = 'badge bg-secondary-subtle text-secondary rounded-pill small';
-                            }
-                            if (markAllBtn) markAllBtn.style.display = 'none';
-                        }
-
-                        if (!list) return;
-
-                        if (!data.notifications || data.notifications.length === 0) {
-                            list.innerHTML = `
-                                <div class="text-center py-4 text-muted">
-                                    <div class="fs-4 mb-1">🎉</div>
-                                    <div class="fw-semibold small">All caught up!</div>
-                                    <div class="small text-muted">No notifications yet.</div>
-                                </div>
-                            `;
-                            return;
-                        }
-
-                        list.innerHTML = data.notifications.map(item => `
-                            <a href="${escapeHtml(item.link || '#')}" 
-                               class="list-group-item list-group-item-action p-3 border-bottom d-flex gap-2 align-items-start ${item.isRead ? '' : 'bg-primary-subtle bg-opacity-25'}"
-                               onclick="handleNotificationClick(event, ${item.id}, '${escapeHtml(item.link || '#')}')">
-                                <div class="fs-5 lh-1 mt-1">${item.icon || '🔔'}</div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <div class="d-flex align-items-center justify-content-between gap-1 mb-1">
-                                        <span class="badge ${getBadgeClass(item.type)} rounded-pill" style="font-size: 0.65rem;">${escapeHtml(item.type)}</span>
-                                        <span class="text-muted" style="font-size: 0.72rem;">${escapeHtml(item.timeAgo)}</span>
-                                    </div>
-                                    <p class="mb-0 small text-dark ${item.isRead ? '' : 'fw-bold'}" style="line-height: 1.35;">
-                                        ${escapeHtml(item.message)}
-                                    </p>
-                                </div>
-                                ${!item.isRead ? '<span class="p-1 bg-primary rounded-circle mt-2 flex-shrink-0" style="width: 8px; height: 8px;" title="Unread"></span>' : ''}
-                            </a>
-                        `).join('');
-
-                    } catch (err) {
-                        console.error('Error fetching notifications:', err);
-                    }
-                }
-
-                function getBadgeClass(type) {
-                    switch(type) {
-                        case 'LectureApproval': return 'bg-success text-white';
-                        case 'MaterialApproval': return 'bg-info text-white';
-                        case 'StudentApproval': return 'bg-warning text-dark';
-                        case 'ForumApproval': return 'bg-primary text-white';
-                        case 'VolunteerApproval': return 'bg-dark text-white';
-                        case 'Like': return 'bg-danger-subtle text-danger';
-                        case 'Dislike': return 'bg-secondary-subtle text-secondary';
-                        case 'Comment': return 'bg-primary-subtle text-primary';
-                        default: return 'bg-secondary text-white';
-                    }
-                }
-
-                function escapeHtml(text) {
-                    if (!text) return '';
-                    const div = document.createElement('div');
-                    div.textContent = text;
-                    return div.innerHTML;
-                }
-
-                window.handleNotificationClick = async function (e, id, link) {
-                    e.preventDefault();
-                    try {
-                        const token = getAntiForgeryToken();
-                        const formData = new FormData();
-                        formData.append('id', id);
-                        if (token) formData.append('__RequestVerificationToken', token);
-
-                        await fetch(`/Notification/MarkSingleNotificationAsRead/${id}`, {
-                            method: 'POST',
-                            headers: {
-                                'RequestVerificationToken': token,
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: formData
-                        });
-                    } catch (err) {
-                        console.error('Error marking as read:', err);
-                    } finally {
-                        if (link && link !== '#' && link !== '') {
-                            window.location.href = link;
-                        } else {
-                            fetchNotifications();
-                        }
-                    }
-                };
-
-                if (markAllBtn) {
-                    markAllBtn.addEventListener('click', async function (e) {
-                        e.preventDefault();
-                        try {
-                            const token = getAntiForgeryToken();
-                            const formData = new FormData();
-                            if (token) formData.append('__RequestVerificationToken', token);
-
-                            const res = await fetch('/Notification/MarkNotificationsAsRead', {
-                                method: 'POST',
-                                headers: {
-                                    'RequestVerificationToken': token,
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                },
-                                body: formData
-                            });
-                            if (res.ok) {
-                                fetchNotifications();
-                            }
-                        } catch (err) {
-                            console.error('Error marking all as read:', err);
-                        }
-                    });
-                }
-
-                // Initial fetch
-                fetchNotifications();
-
-                // Periodic polling every 10 seconds
-                setInterval(fetchNotifications, 10000);
-            })();
-        </script>
-    }
-
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
+    <!-- Floating AI Chatbot Widget -->
+    <partial name="_ChatWidget" />
 </body>
-
 </html>

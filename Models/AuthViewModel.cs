@@ -1,6 +1,6 @@
 using Onudhabon.Models;
 
-namespace Onudhabon_ISD.Models
+namespace Onudhabon.Models
 {
     public class AuthViewModel
     {
