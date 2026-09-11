@@ -1,8 +1,8 @@
-@model Onudhabon_ISD.Models.DonationInitiateViewModel
+@model Onudhabon.Models.DonationInitiateViewModel
 
 @{
     ViewData["Title"] = "Donate - Onudhabon Foundation";
-    var recentDonations = (List<Onudhabon_ISD.Models.Donation>?)ViewBag.RecentDonations ?? new List<Onudhabon_ISD.Models.Donation>();
+    var recentDonations = (List<Onudhabon.Models.Donation>?)ViewBag.RecentDonations ?? new List<Onudhabon.Models.Donation>();
     decimal totalDonated = (decimal)(ViewBag.TotalDonated ?? 0m);
     int totalDonorsCount = (int)(ViewBag.TotalDonorsCount ?? 0);
 }

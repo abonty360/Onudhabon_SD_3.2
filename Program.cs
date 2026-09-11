@@ -1,19 +1,28 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Onudhabon_ISD.Data;
-using Onudhabon_ISD.Models;
-using Onudhabon_ISD.Services;
+using Onudhabon.Data;
+using Onudhabon.Models;
+using Onudhabon.Services;
+
+// Enable legacy timestamp behavior for Npgsql to handle DateTime conversions smoothly
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Load environment variables from .env file
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Database Context
+// Add Database Context (PostgreSQL via DATABASE_URL from .env or configuration)
+var rawConnectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? builder.Configuration["DATABASE_URL"]
+    ?? throw new InvalidOperationException("DATABASE_URL not found in .env or configuration.");
+
+var npgsqlConnectionString = PostgresConnectionHelper.ConvertUrlToConnectionString(rawConnectionString);
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(npgsqlConnectionString));
 
 // Cloudinary & Storage Services
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();

@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Onudhabon_ISD.Services
+namespace Onudhabon.Services
 {
     public class GeminiChatService : ILlmChatService
     {

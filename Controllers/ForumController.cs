@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Onudhabon_ISD.Data;
-using Onudhabon_ISD.Models;
+using Onudhabon.Data;
+using Onudhabon.Models;
 using System.Security.Claims;
 
-namespace Onudhabon_ISD.Controllers
+namespace Onudhabon.Controllers
 {
     public class ForumController : Controller
     {

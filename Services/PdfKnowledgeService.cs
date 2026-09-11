@@ -2,11 +2,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Onudhabon_ISD.Data;
-using Onudhabon_ISD.Models;
+using Onudhabon.Data;
+using Onudhabon.Models;
 using UglyToad.PdfPig;
 
-namespace Onudhabon_ISD.Services
+namespace Onudhabon.Services
 {
     public class PdfKnowledgeService : IPdfKnowledgeService
     {

@@ -1,6 +1,6 @@
 @using System.Security.Claims
-@inject Onudhabon_ISD.Services.ICloudinaryService CloudinaryService
-@inject Onudhabon_ISD.Data.ApplicationDbContext DbContext
+@inject Onudhabon.Services.ICloudinaryService CloudinaryService
+@inject Onudhabon.Data.ApplicationDbContext DbContext
 
 @{
     string? userPicture = null;
@@ -47,7 +47,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Onudhabon_ISD.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Onudhabon.styles.css" asp-append-version="true" />
 </head>
 <body class="d-flex flex-column min-vh-100 @(isHeroPage ? "has-hero" : "")">
     <header class="site-header @(isHeroPage ? "header-transparent" : "header-solid")" id="siteHeader">

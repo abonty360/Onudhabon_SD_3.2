@@ -1,6 +1,6 @@
-using Onudhabon_ISD.Models;
+using Onudhabon.Models;
 
-namespace Onudhabon_ISD.Services
+namespace Onudhabon.Services
 {
     public interface IVolunteerRankingService
     {

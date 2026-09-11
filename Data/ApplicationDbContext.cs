@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Onudhabon_ISD.Models;
+using Onudhabon.Models;
 
-namespace Onudhabon_ISD.Data
+namespace Onudhabon.Data
 {
     public class ApplicationDbContext : DbContext
     {
@@ -60,7 +60,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.UniversityName).HasMaxLength(200);
                 entity.Property(e => e.UniversityPassingYear).HasMaxLength(20);
                 entity.Property(e => e.CurrentlyStudying).HasMaxLength(100);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -88,8 +88,8 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Notes).HasMaxLength(2000);
                 entity.Property(e => e.PhotoUrl).HasMaxLength(500);
                 entity.Property(e => e.SubjectProgressJson).HasMaxLength(4000);
-                entity.Property(e => e.LastActivityDate).HasDefaultValueSql("GETUTCDATE()");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.LastActivityDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -103,7 +103,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Post).HasMaxLength(100);
                 entity.Property(e => e.Type).HasMaxLength(50);
                 entity.Property(e => e.IsRead).HasDefaultValue(false);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -123,7 +123,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Size).HasMaxLength(50);
                 entity.Property(e => e.Downloads).HasDefaultValue(0);
                 entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Active");
-                entity.Property(e => e.Date).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -142,7 +142,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Thumbnail).HasMaxLength(500);
                 entity.Property(e => e.VideoUrl).HasMaxLength(500);
                 entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Active");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -156,7 +156,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Tags).HasMaxLength(255);
                 entity.Property(e => e.Author).HasMaxLength(150);
                 entity.Property(e => e.Replies).HasDefaultValue(0);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -175,7 +175,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Dislikes).HasDefaultValue(0);
                 entity.Property(e => e.Replies).HasDefaultValue(0);
                 entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Pending");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
 
@@ -187,7 +187,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Content).IsRequired().HasMaxLength(2000);
                 entity.Property(e => e.Author).HasMaxLength(150);
                 entity.Property(e => e.AuthorRole).HasMaxLength(50);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // ForumPostReaction Entity Configuration
@@ -196,7 +196,7 @@ namespace Onudhabon_ISD.Data
                 entity.ToTable("ForumPostReactions");
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => new { e.PostId, e.UserId }).IsUnique();
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // ClassPlan Entity Configuration
@@ -205,7 +205,7 @@ namespace Onudhabon_ISD.Data
                 entity.ToTable("ClassPlans");
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.ClassLevel).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
 
                 entity.OwnsMany(e => e.Subjects, subject =>
@@ -235,7 +235,7 @@ namespace Onudhabon_ISD.Data
                 entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Completed");
                 entity.Property(e => e.IsAnonymous).HasDefaultValue(false);
                 entity.Property(e => e.UserId).HasMaxLength(100);
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.__v).HasDefaultValue(0);
             });
         }

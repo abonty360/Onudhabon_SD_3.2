@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Onudhabon_ISD.Models
+namespace Onudhabon.Models
 {
     public class SubjectProgressItem
     {

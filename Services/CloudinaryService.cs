@@ -3,7 +3,7 @@ using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Onudhabon_ISD.Services
+namespace Onudhabon.Services
 {
     public class CloudinaryService : ICloudinaryService
     {

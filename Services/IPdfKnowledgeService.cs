@@ -1,4 +1,4 @@
-﻿namespace Onudhabon_ISD.Services
+namespace Onudhabon.Services
 {
     public interface IPdfKnowledgeService
     {
