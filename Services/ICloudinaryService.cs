@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace Onudhabon_ISD.Services
+namespace Onudhabon.Services
 {
     public class CloudinaryUploadResult
     {

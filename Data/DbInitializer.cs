@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
-using Onudhabon_ISD.Models;
+using Onudhabon.Models;
 
-namespace Onudhabon_ISD.Data
+namespace Onudhabon.Data
 {
     public static class DbInitializer
     {

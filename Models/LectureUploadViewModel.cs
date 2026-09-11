@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Onudhabon_ISD.Models
+namespace Onudhabon.Models
 {
     public class LectureUploadViewModel
     {

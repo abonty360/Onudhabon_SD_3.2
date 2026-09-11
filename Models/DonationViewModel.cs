@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Onudhabon_ISD.Models
+namespace Onudhabon.Models
 {
     public class DonationInitiateViewModel
     {
