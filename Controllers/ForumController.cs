@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Onudhabon.Data;
 using Onudhabon.Models;
+using Onudhabon.Services;
 using System.Security.Claims;
 
 namespace Onudhabon.Controllers
@@ -10,10 +11,12 @@ namespace Onudhabon.Controllers
     public class ForumController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public ForumController(ApplicationDbContext context)
+        public ForumController(ApplicationDbContext context, ICloudinaryService cloudinaryService)
         {
             _context = context;
+            _cloudinaryService = cloudinaryService;
         }
 
         private int? GetCurrentUserId()
@@ -30,6 +33,24 @@ namespace Onudhabon.Controllers
             }
 
             return null;
+        }
+
+        private async Task<User?> FindUserByAuthorAsync(string? authorName)
+        {
+            if (string.IsNullOrWhiteSpace(authorName)) return null;
+
+            var clean = authorName.Trim();
+            var user = await _context.Users.FirstOrDefaultAsync(u =>
+                u.FullName.ToLower() == clean.ToLower() ||
+                u.Email.ToLower() == clean.ToLower() ||
+                (clean.Equals("System Admin", StringComparison.OrdinalIgnoreCase) && u.Role == "Admin"));
+
+            if (user == null && int.TryParse(clean, out int uid))
+            {
+                user = await _context.Users.FindAsync(uid);
+            }
+
+            return user;
         }
 
         [HttpGet]
@@ -72,6 +93,45 @@ namespace Onudhabon.Controllers
                 userReactions = reactions.ToDictionary(r => r.PostId, r => r.IsLike);
             }
 
+            // Build map of author profiles
+            var authorNames = posts
+                .Where(p => !string.IsNullOrEmpty(p.Author))
+                .Select(p => p.Author!)
+                .Distinct()
+                .ToList();
+
+            var users = await _context.Users
+                .Where(u => authorNames.Contains(u.FullName) || authorNames.Contains(u.Email) || (authorNames.Contains("System Admin") && u.Role == "Admin"))
+                .ToListAsync();
+
+            var authorProfiles = new Dictionary<string, ForumAuthorDto>(StringComparer.OrdinalIgnoreCase);
+            foreach (var aName in authorNames)
+            {
+                var matchingUser = users.FirstOrDefault(u =>
+                    u.FullName.Equals(aName, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email.Equals(aName, StringComparison.OrdinalIgnoreCase) ||
+                    (aName.Equals("System Admin", StringComparison.OrdinalIgnoreCase) && u.Role == "Admin"));
+
+                if (matchingUser != null)
+                {
+                    authorProfiles[aName] = new ForumAuthorDto
+                    {
+                        FullName = matchingUser.FullName,
+                        Role = matchingUser.Role,
+                        AvatarUrl = !string.IsNullOrWhiteSpace(matchingUser.Picture)
+                            ? _cloudinaryService.GetAvatarUrl(matchingUser.Picture, 90)
+                            : null,
+                        Initial = string.IsNullOrEmpty(matchingUser.FullName) ? "U" : matchingUser.FullName.Substring(0, 1).ToUpper(),
+                        IsVerified = matchingUser.IsVerified || string.Equals(matchingUser.VerificationStatus, "Active", StringComparison.OrdinalIgnoreCase) || string.Equals(matchingUser.VerificationStatus, "Approved", StringComparison.OrdinalIgnoreCase),
+                        VerificationStatus = matchingUser.VerificationStatus ?? "Pending",
+                        Bio = matchingUser.Bio,
+                        City = matchingUser.City,
+                        Area = matchingUser.Area
+                    };
+                }
+            }
+
+            ViewBag.AuthorProfiles = authorProfiles;
             ViewBag.UserReactions = userReactions;
             return View(posts);
         }
@@ -281,15 +341,43 @@ namespace Onudhabon.Controllers
             var comments = await _context.ForumComments
                 .Where(c => c.PostId == postId)
                 .OrderBy(c => c.CreatedAt)
-                .Select(c => new {
+                .ToListAsync();
+
+            var authorNames = comments
+                .Where(c => !string.IsNullOrEmpty(c.Author))
+                .Select(c => c.Author!)
+                .Distinct()
+                .ToList();
+
+            var users = await _context.Users
+                .Where(u => authorNames.Contains(u.FullName) || authorNames.Contains(u.Email) || (authorNames.Contains("System Admin") && u.Role == "Admin"))
+                .ToListAsync();
+
+            var result = comments.Select(c => {
+                var user = users.FirstOrDefault(u =>
+                    u.FullName.Equals(c.Author, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email.Equals(c.Author, StringComparison.OrdinalIgnoreCase) ||
+                    (c.Author.Equals("System Admin", StringComparison.OrdinalIgnoreCase) && u.Role == "Admin"));
+
+                var avatarUrl = (user != null && !string.IsNullOrWhiteSpace(user.Picture))
+                    ? _cloudinaryService.GetAvatarUrl(user.Picture, 80)
+                    : null;
+
+                var initial = !string.IsNullOrEmpty(c.Author) ? c.Author.Substring(0, 1).ToUpper() : "U";
+
+                return new {
                     c.Id,
                     c.Content,
                     c.Author,
                     c.AuthorRole,
+                    avatarUrl,
+                    initial,
+                    isVerified = user != null && (user.IsVerified || string.Equals(user.VerificationStatus, "Active", StringComparison.OrdinalIgnoreCase) || string.Equals(user.VerificationStatus, "Approved", StringComparison.OrdinalIgnoreCase)),
                     createdAt = c.CreatedAt.ToString("M/d/yyyy, h:mm:ss tt")
-                })
-                .ToListAsync();
-            return Json(comments);
+                };
+            });
+
+            return Json(result);
         }
 
         [HttpPost]
@@ -339,6 +427,23 @@ namespace Onudhabon.Controllers
 
             await _context.SaveChangesAsync();
 
+            var currentUserId = GetCurrentUserId();
+            User? currentUser = null;
+            if (currentUserId.HasValue)
+            {
+                currentUser = await _context.Users.FindAsync(currentUserId.Value);
+            }
+            else
+            {
+                currentUser = await FindUserByAuthorAsync(userName);
+            }
+
+            var avatarUrl = (currentUser != null && !string.IsNullOrWhiteSpace(currentUser.Picture))
+                ? _cloudinaryService.GetAvatarUrl(currentUser.Picture, 80)
+                : null;
+
+            var initial = !string.IsNullOrEmpty(userName) ? userName.Substring(0, 1).ToUpper() : "U";
+
             return Json(new { 
                 success = true, 
                 replies = post.Replies,
@@ -347,7 +452,88 @@ namespace Onudhabon.Controllers
                     comment.Content,
                     comment.Author,
                     comment.AuthorRole,
+                    avatarUrl,
+                    initial,
+                    isVerified = currentUser != null && (currentUser.IsVerified || string.Equals(currentUser.VerificationStatus, "Active", StringComparison.OrdinalIgnoreCase) || string.Equals(currentUser.VerificationStatus, "Approved", StringComparison.OrdinalIgnoreCase)),
                     createdAt = comment.CreatedAt.ToString("M/d/yyyy, h:mm:ss tt")
+                }
+            });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserProfile(string author)
+        {
+            if (string.IsNullOrWhiteSpace(author))
+            {
+                return Json(new { success = false, message = "Author identifier is required." });
+            }
+
+            var cleanAuthor = author.Trim();
+            var user = await FindUserByAuthorAsync(cleanAuthor);
+
+            if (user == null)
+            {
+                var postCount = await _context.ForumPosts.CountAsync(p => p.Author == cleanAuthor);
+                return Json(new {
+                    success = true,
+                    user = new {
+                        fullName = cleanAuthor,
+                        role = cleanAuthor.Equals("System Admin", StringComparison.OrdinalIgnoreCase) ? "Admin" : "Community Member",
+                        picture = (string?)null,
+                        avatarUrl = (string?)null,
+                        initial = string.IsNullOrEmpty(cleanAuthor) ? "U" : cleanAuthor.Substring(0, 1).ToUpper(),
+                        isVerified = cleanAuthor.Equals("System Admin", StringComparison.OrdinalIgnoreCase),
+                        verificationStatus = "Active",
+                        email = "",
+                        city = "",
+                        area = "",
+                        location = "",
+                        bio = "Active participant in the Onudhabon community discussions.",
+                        educationLevel = "",
+                        major = "",
+                        institution = "",
+                        universityName = "",
+                        memberSince = "Community Member",
+                        totalPosts = postCount,
+                        totalLectures = 0
+                    }
+                });
+            }
+
+            var avatarUrl = !string.IsNullOrWhiteSpace(user.Picture)
+                ? _cloudinaryService.GetAvatarUrl(user.Picture, 180)
+                : null;
+
+            var totalPosts = await _context.ForumPosts.CountAsync(p =>
+                p.Author == user.FullName || p.Author == user.Email);
+
+            var totalLectures = await _context.Lectures.CountAsync(l =>
+                l.Instructor == user.FullName || l.Instructor == user.Email);
+
+            return Json(new {
+                success = true,
+                user = new {
+                    id = user.Id,
+                    fullName = user.FullName,
+                    role = user.Role,
+                    picture = user.Picture,
+                    avatarUrl = avatarUrl,
+                    initial = string.IsNullOrEmpty(user.FullName) ? "U" : user.FullName.Substring(0, 1).ToUpper(),
+                    isVerified = user.IsVerified || string.Equals(user.VerificationStatus, "Active", StringComparison.OrdinalIgnoreCase) || string.Equals(user.VerificationStatus, "Approved", StringComparison.OrdinalIgnoreCase),
+                    verificationStatus = user.VerificationStatus ?? "Pending",
+                    email = user.Email,
+                    city = user.City,
+                    area = user.Area,
+                    location = user.Location,
+                    bio = user.Bio,
+                    educationLevel = user.EducationLevel,
+                    major = user.Major,
+                    institution = user.Institution,
+                    universityName = user.UniversityName,
+                    memberSince = user.CreatedAt.ToString("MMMM yyyy"),
+                    totalPosts = totalPosts,
+                    totalLectures = totalLectures
                 }
             });
         }
