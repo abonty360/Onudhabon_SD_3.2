@@ -51,50 +51,6 @@ namespace Onudhabon.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index(string? classLevel, string? subject, string? topic)
         {
-            // Automatically discover and sync any existing Cloudinary material assets if present
-            try
-            {
-                var cloudinaryDocs = await _cloudinaryService.FetchCloudinaryMaterialsAsync();
-                if (cloudinaryDocs.Any())
-                {
-                    var existingUrls = await _context.Materials.Select(m => m.FileUrl).ToListAsync();
-                    var newMaterials = new List<Material>();
-
-                    foreach (var cDoc in cloudinaryDocs)
-                    {
-                        if (!string.IsNullOrEmpty(cDoc.SecureUrl) && !existingUrls.Contains(cDoc.SecureUrl))
-                        {
-                            newMaterials.Add(new Material
-                            {
-                                Title = cDoc.DisplayTitle,
-                                Description = $"Educational study material for {cDoc.DisplayTitle}",
-                                Instructor = "Educator",
-                                Version = "Bangla",
-                                ClassLevel = "General",
-                                Subject = "General",
-                                Topic = cDoc.DisplayTitle,
-                                FileUrl = cDoc.SecureUrl,
-                                Size = cDoc.FormattedSize,
-                                Status = "Active",
-                                Downloads = 0,
-                                Date = cDoc.CreatedAt,
-                                __v = 0
-                            });
-                        }
-                    }
-
-                    if (newMaterials.Any())
-                    {
-                        _context.Materials.AddRange(newMaterials);
-                        await _context.SaveChangesAsync();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation("Cloudinary material discovery skipped: {Message}", ex.Message);
-            }
-
             var isAdmin = User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin";
             var isEducator = User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator";
             var query = _context.Materials.AsQueryable();

@@ -51,63 +51,6 @@ namespace Onudhabon.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index(string? classLevel, string? subject, string? topic)
         {
-            // Automatically discover and sync any existing Cloudinary assets if present
-            try
-            {
-                var cloudinaryVideos = await _cloudinaryService.FetchCloudinaryLecturesAsync();
-                if (cloudinaryVideos.Any())
-                {
-                    var existingUrls = await _context.Lectures.Select(l => l.VideoUrl).ToListAsync();
-                    var newLectures = new List<Lecture>();
-
-                    foreach (var cVid in cloudinaryVideos)
-                    {
-                        if (!string.IsNullOrEmpty(cVid.SecureUrl) && !existingUrls.Contains(cVid.SecureUrl))
-                        {
-                            newLectures.Add(new Lecture
-                            {
-                                Title = cVid.DisplayTitle,
-                                Description = $"Recorded lecture video for {cVid.DisplayTitle}",
-                                Instructor = "Educator",
-                                Version = "Bangla",
-                                ClassLevel = "General",
-                                Subject = "General",
-                                Topic = cVid.DisplayTitle,
-                                VideoUrl = cVid.SecureUrl,
-                                Thumbnail = _cloudinaryService.GetVideoThumbnailUrl(cVid.SecureUrl, 480, 270),
-                                Status = "Active",
-                                CreatedAt = cVid.CreatedAt,
-                                __v = 0
-                            });
-                        }
-                    }
-
-                    if (newLectures.Any())
-                    {
-                        _context.Lectures.AddRange(newLectures);
-                        await _context.SaveChangesAsync();
-                    }
-                }
-
-                // Automatically ensure all existing lectures have Cloudinary thumbnails generated
-                var lecturesNeedingThumbnails = await _context.Lectures
-                    .Where(l => !string.IsNullOrEmpty(l.VideoUrl) && string.IsNullOrEmpty(l.Thumbnail))
-                    .ToListAsync();
-
-                if (lecturesNeedingThumbnails.Any())
-                {
-                    foreach (var lec in lecturesNeedingThumbnails)
-                    {
-                        lec.Thumbnail = _cloudinaryService.GetVideoThumbnailUrl(lec.VideoUrl, 480, 270);
-                    }
-                    await _context.SaveChangesAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation("Cloudinary video discovery skipped: {Message}", ex.Message);
-            }
-
             var isAdmin = User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin";
             var isEducator = User.IsInRole("Educator") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Educator";
             var query = _context.Lectures.AsQueryable();
