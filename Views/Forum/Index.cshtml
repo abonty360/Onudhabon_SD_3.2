@@ -114,50 +114,45 @@
                         authorProfiles.TryGetValue(post.Author ?? "", out var authorDto);
                         var authorInitial = authorDto?.Initial ?? (!string.IsNullOrEmpty(post.Author) ? post.Author.Substring(0, 1).ToUpper() : "U");
                     }
-                    <div class="d-flex align-items-center gap-2.5 mb-3">
+                    <div class="d-flex align-items-center flex-wrap gap-2 mb-3">
                         @if (authorDto != null && !string.IsNullOrWhiteSpace(authorDto.AvatarUrl))
                         {
                             <img src="@authorDto.AvatarUrl" 
                                  alt="@post.Author" 
-                                 class="rounded-circle border cursor-pointer author-profile-trigger" 
-                                 style="width: 42px; height: 42px; object-fit: cover;" 
+                                 class="rounded-circle border cursor-pointer author-profile-trigger flex-shrink-0" 
+                                 style="width: 24px; height: 24px; object-fit: cover;" 
                                  data-author="@post.Author" 
                                  role="button" 
                                  title="Click to view @post.Author's profile preview" />
                         }
                         else
                         {
-                            <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center cursor-pointer author-profile-trigger border border-primary-subtle" 
-                                 style="width: 42px; height: 42px; font-size: 1.05rem;" 
+                            <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center cursor-pointer author-profile-trigger flex-shrink-0 border border-primary-subtle" 
+                                 style="width: 24px; height: 24px; font-size: 0.72rem; line-height: 1;" 
                                  data-author="@post.Author" 
                                  role="button" 
                                  title="Click to view @post.Author's profile preview">
                                 @authorInitial
                             </div>
                         }
-                        <div>
-                            <div class="d-flex align-items-center gap-1.5 flex-wrap">
-                                <button type="button" 
-                                        class="btn btn-link p-0 text-decoration-none fw-bold text-dark author-profile-trigger user-preview-name-btn" 
-                                        data-author="@post.Author" 
-                                        title="Click to view @post.Author's profile preview">
-                                    @post.Author
-                                </button>
-                                @if (!string.IsNullOrEmpty(post.AuthorRole))
-                                {
-                                    <span class="badge @(post.AuthorRole == "Educator" ? "bg-primary-subtle text-primary border border-primary-subtle" : (post.AuthorRole == "Local Guardian" ? "bg-success-subtle text-success border border-success-subtle" : (post.AuthorRole == "Admin" ? "bg-danger-subtle text-danger border border-danger-subtle" : "bg-secondary-subtle text-secondary"))) rounded-pill" style="font-size: 0.72rem;">
-                                        @post.AuthorRole
-                                    </span>
-                                }
-                                @if (authorDto != null && authorDto.IsVerified)
-                                {
-                                    <i class="bi bi-patch-check-fill text-primary" title="Verified Member" style="font-size: 0.85rem;"></i>
-                                }
-                            </div>
-                            <div class="text-muted" style="font-size: 0.78rem;">
-                                <i class="bi bi-clock me-1"></i>@post.CreatedAt.ToString("M/d/yyyy, h:mm:ss tt")
-                            </div>
-                        </div>
+
+                        <button type="button" 
+                                class="btn btn-link p-0 text-decoration-none fw-bold text-dark author-profile-trigger user-preview-name-btn px-1" 
+                                data-author="@post.Author" 
+                                title="Click to view @post.Author's profile preview">
+                            @post.Author
+                        </button>
+
+                        @if (!string.IsNullOrEmpty(post.AuthorRole))
+                        {
+                            <span class="badge @(post.AuthorRole == "Educator" ? "bg-primary-subtle text-primary border border-primary-subtle" : (post.AuthorRole == "Local Guardian" ? "bg-success-subtle text-success border border-success-subtle" : (post.AuthorRole == "Admin" ? "bg-danger-subtle text-danger border border-danger-subtle" : "bg-secondary-subtle text-secondary"))) rounded-pill px-2.5 py-1" style="font-size: 0.72rem;">
+                                @post.AuthorRole
+                            </span>
+                        }
+
+                        <span class="text-muted small ms-1">
+                            • @post.CreatedAt.ToString("M/d/yyyy, h:mm:ss tt")
+                        </span>
                     </div>
 
                     @if (!string.IsNullOrEmpty(post.Tags))
@@ -345,7 +340,7 @@
 
             <div class="modal-footer bg-light border-0 py-2.5 px-4 justify-content-between">
                 <span class="text-muted" style="font-size: 0.78rem;">
-                    <i class="bi bi-shield-check text-primary me-1"></i> Onudhabon Community Verified
+                    Onudhabon Community Exchange
                 </span>
                 <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Close</button>
             </div>
@@ -440,9 +435,9 @@
                         $.each(data, function (i, c) {
                             var avatarHtml = '';
                             if (c.avatarUrl) {
-                                avatarHtml = '<img src="' + c.avatarUrl + '" alt="' + escapeHtml(c.author) + '" class="rounded-circle border author-profile-trigger flex-shrink-0" style="width: 32px; height: 32px; object-fit: cover; cursor: pointer;" data-author="' + escapeHtml(c.author) + '" role="button" title="View profile preview" />';
+                                avatarHtml = '<img src="' + c.avatarUrl + '" alt="' + escapeHtml(c.author) + '" class="rounded-circle border author-profile-trigger flex-shrink-0 me-2" style="width: 22px; height: 22px; object-fit: cover; cursor: pointer;" data-author="' + escapeHtml(c.author) + '" role="button" title="View profile preview" />';
                             } else {
-                                avatarHtml = '<div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center author-profile-trigger flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.8rem; cursor: pointer;" data-author="' + escapeHtml(c.author) + '" role="button" title="View profile preview">' + escapeHtml(c.initial || 'U') + '</div>';
+                                avatarHtml = '<div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center author-profile-trigger flex-shrink-0 me-2" style="width: 22px; height: 22px; font-size: 0.7rem; line-height: 1; cursor: pointer;" data-author="' + escapeHtml(c.author) + '" role="button" title="View profile preview">' + escapeHtml(c.initial || 'U') + '</div>';
                             }
 
                             var roleBadgeClass = 'bg-secondary-subtle text-secondary';
@@ -450,22 +445,16 @@
                             else if (c.authorRole === 'Local Guardian') roleBadgeClass = 'bg-success-subtle text-success border border-success-subtle';
                             else if (c.authorRole === 'Admin') roleBadgeClass = 'bg-danger-subtle text-danger border border-danger-subtle';
 
-                            var authorRoleHtml = c.authorRole ? ' <span class="badge ' + roleBadgeClass + ' rounded-pill" style="font-size: 0.68rem;">' + escapeHtml(c.authorRole) + '</span>' : '';
-                            var verifiedHtml = c.isVerified ? ' <i class="bi bi-patch-check-fill text-primary" title="Verified" style="font-size: 0.75rem;"></i>' : '';
+                            var authorRoleHtml = c.authorRole ? '<span class="badge ' + roleBadgeClass + ' rounded-pill px-2.5 py-0.5 me-2" style="font-size: 0.68rem;">' + escapeHtml(c.authorRole) + '</span>' : '';
 
                             var item = '<div class="p-2.5 bg-light rounded-3 border small">' +
-                                '<div class="d-flex align-items-center gap-2 mb-1.5">' +
+                                '<div class="d-flex align-items-center flex-wrap gap-1 mb-1.5">' +
                                     avatarHtml +
-                                    '<div class="flex-grow-1">' +
-                                        '<div class="d-flex align-items-center gap-1.5 flex-wrap">' +
-                                            '<button type="button" class="btn btn-link p-0 text-decoration-none fw-semibold text-dark author-profile-trigger user-preview-name-btn" data-author="' + escapeHtml(c.author) + '" title="View profile preview">' + escapeHtml(c.author) + '</button>' +
-                                            authorRoleHtml +
-                                            verifiedHtml +
-                                            '<span class="text-muted fw-normal ms-auto" style="font-size: 0.72rem;">' + escapeHtml(c.createdAt) + '</span>' +
-                                        '</div>' +
-                                    '</div>' +
+                                    '<button type="button" class="btn btn-link p-0 text-decoration-none fw-semibold text-dark author-profile-trigger user-preview-name-btn px-1 me-1" data-author="' + escapeHtml(c.author) + '" title="View profile preview">' + escapeHtml(c.author) + '</button>' +
+                                    authorRoleHtml +
+                                    '<span class="text-muted fw-normal ms-auto" style="font-size: 0.72rem;">' + escapeHtml(c.createdAt) + '</span>' +
                                 '</div>' +
-                                '<div class="text-dark ps-4 ms-2" style="white-space: pre-wrap; word-break: break-word;">' + escapeHtml(c.content) + '</div>' +
+                                '<div class="text-dark ps-4 ms-1" style="white-space: pre-wrap; word-break: break-word;">' + escapeHtml(c.content) + '</div>' +
                                 '</div>';
                             commentsList.append(item);
                         });
@@ -568,8 +557,7 @@
                     if (res && res.success && res.user) {
                         var u = res.user;
 
-                        var verifiedBadge = u.isVerified ? ' <i class="bi bi-patch-check-fill text-primary" title="Verified Member"></i>' : '';
-                        $('#profileModalName').html(escapeHtml(u.fullName) + verifiedBadge);
+                        $('#profileModalName').text(u.fullName);
 
                         if (u.avatarUrl) {
                             $('#profileModalAvatarContainer').html('<img src="' + u.avatarUrl + '" alt="' + escapeHtml(u.fullName) + '" class="w-100 h-100" style="object-fit: cover;" />');
