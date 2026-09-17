@@ -226,6 +226,19 @@ namespace Onudhabon.Controllers
                 }
             }
 
+            // If EducationLevel is HSC or SSC, clear university fields; if SSC, also clear college fields
+            var eduLevel = model.EducationLevel?.ToLower() ?? string.Empty;
+            if (eduLevel.Contains("ssc") || eduLevel.Contains("hsc"))
+            {
+                model.UniversityName = null;
+                model.UniversityPassingYear = null;
+            }
+            if (eduLevel.Contains("ssc"))
+            {
+                model.HscInstitute = null;
+                model.HscPassingYear = null;
+            }
+
             // Create new User entity with all submitted registration information
             var user = new User
             {

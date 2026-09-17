@@ -366,7 +366,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                                     </svg>
                                 </span>
-                                <select asp-for="EducationLevel" class="auth-select is-placeholder" onchange="updateSelectColor(this)">
+                                <select asp-for="EducationLevel" class="auth-select is-placeholder" id="educationLevelSelect" onchange="handleEducationLevelChange(); updateSelectColor(this);">
                                     <option value="">Select Education Level</option>
                                     <option value="Secondary (SSC / O-Level)">Secondary (SSC / O-Level)</option>
                                     <option value="Higher Secondary (HSC / A-Level)">Higher Secondary (HSC / A-Level)</option>
@@ -420,12 +420,12 @@
                     </div>
 
                     <!-- University Name & Passing Year -->
-                    <div class="form-row-2col">
+                    <div class="form-row-2col" id="universityFieldsRow">
                         <div class="form-group">
                             <label asp-for="UniversityName" class="form-label">
-                                <span class="form-label-title">University / College</span>
+                                <span class="form-label-title">University Name</span>
                             </label>
-                            <input asp-for="UniversityName" class="auth-input" placeholder="e.g. BUET, DU, NSU..." />
+                            <input asp-for="UniversityName" id="universityNameInput" class="auth-input" placeholder="e.g. BUET, DU, NSU..." />
                             <span asp-validation-for="UniversityName" class="validation-error-text"></span>
                         </div>
 
@@ -433,18 +433,18 @@
                             <label asp-for="UniversityPassingYear" class="form-label">
                                 <span class="form-label-title">University Passing / Expected Year</span>
                             </label>
-                            <input asp-for="UniversityPassingYear" class="auth-input" placeholder="e.g. 2024" />
+                            <input asp-for="UniversityPassingYear" id="universityPassingYearInput" class="auth-input" placeholder="e.g. 2024" />
                             <span asp-validation-for="UniversityPassingYear" class="validation-error-text"></span>
                         </div>
                     </div>
 
                     <!-- HSC Institute & Passing Year -->
-                    <div class="form-row-2col">
+                    <div class="form-row-2col" id="collegeFieldsRow">
                         <div class="form-group">
                             <label asp-for="HscInstitute" class="form-label">
-                                <span class="form-label-title">HSC / College Institute</span>
+                                <span class="form-label-title">College / HSC Institute</span>
                             </label>
-                            <input asp-for="HscInstitute" class="auth-input" placeholder="e.g. Notre Dame College" />
+                            <input asp-for="HscInstitute" id="hscInstituteInput" class="auth-input" placeholder="e.g. Notre Dame College" />
                             <span asp-validation-for="HscInstitute" class="validation-error-text"></span>
                         </div>
 
@@ -452,18 +452,18 @@
                             <label asp-for="HscPassingYear" class="form-label">
                                 <span class="form-label-title">HSC Passing Year</span>
                             </label>
-                            <input asp-for="HscPassingYear" class="auth-input" placeholder="e.g. 2020" />
+                            <input asp-for="HscPassingYear" id="hscPassingYearInput" class="auth-input" placeholder="e.g. 2020" />
                             <span asp-validation-for="HscPassingYear" class="validation-error-text"></span>
                         </div>
                     </div>
 
                     <!-- SSC Institute & Passing Year -->
-                    <div class="form-row-2col">
+                    <div class="form-row-2col" id="sscFieldsRow">
                         <div class="form-group">
                             <label asp-for="SscInstitute" class="form-label">
                                 <span class="form-label-title">SSC / School Institute</span>
                             </label>
-                            <input asp-for="SscInstitute" class="auth-input" placeholder="e.g. Ideal School and College" />
+                            <input asp-for="SscInstitute" id="sscInstituteInput" class="auth-input" placeholder="e.g. Ideal School and College" />
                             <span asp-validation-for="SscInstitute" class="validation-error-text"></span>
                         </div>
 
@@ -471,7 +471,7 @@
                             <label asp-for="SscPassingYear" class="form-label">
                                 <span class="form-label-title">SSC Passing Year</span>
                             </label>
-                            <input asp-for="SscPassingYear" class="auth-input" placeholder="e.g. 2018" />
+                            <input asp-for="SscPassingYear" id="sscPassingYearInput" class="auth-input" placeholder="e.g. 2018" />
                             <span asp-validation-for="SscPassingYear" class="validation-error-text"></span>
                         </div>
                     </div>
@@ -691,10 +691,58 @@
             }
         }
 
+        function handleEducationLevelChange() {
+            const eduSelect = document.getElementById('educationLevelSelect');
+            if (!eduSelect) return;
+
+            const val = (eduSelect.value || '').toLowerCase();
+            const isSsc = val.includes('ssc');
+            const isHsc = val.includes('hsc');
+
+            const universityRow = document.getElementById('universityFieldsRow');
+            const collegeRow = document.getElementById('collegeFieldsRow');
+
+            const uniNameInput = document.getElementById('universityNameInput');
+            const uniYearInput = document.getElementById('universityPassingYearInput');
+            const collegeNameInput = document.getElementById('hscInstituteInput');
+            const collegeYearInput = document.getElementById('hscPassingYearInput');
+
+            if (isSsc) {
+                // When SSC is chosen: remove both university name and college name
+                if (universityRow) universityRow.style.display = 'none';
+                if (collegeRow) collegeRow.style.display = 'none';
+
+                if (uniNameInput) { uniNameInput.value = ''; uniNameInput.disabled = true; }
+                if (uniYearInput) { uniYearInput.value = ''; uniYearInput.disabled = true; }
+                if (collegeNameInput) { collegeNameInput.value = ''; collegeNameInput.disabled = true; }
+                if (collegeYearInput) { collegeYearInput.value = ''; collegeYearInput.disabled = true; }
+            } else if (isHsc) {
+                // When HSC is chosen: remove university name, keep college name
+                if (universityRow) universityRow.style.display = 'none';
+                if (collegeRow) collegeRow.style.display = '';
+
+                if (uniNameInput) { uniNameInput.value = ''; uniNameInput.disabled = true; }
+                if (uniYearInput) { uniYearInput.value = ''; uniYearInput.disabled = true; }
+                if (collegeNameInput) { collegeNameInput.disabled = false; }
+                if (collegeYearInput) { collegeYearInput.disabled = false; }
+            } else {
+                // Other qualifications or not selected: keep both visible
+                if (universityRow) universityRow.style.display = '';
+                if (collegeRow) collegeRow.style.display = '';
+
+                if (uniNameInput) { uniNameInput.disabled = false; }
+                if (uniYearInput) { uniYearInput.disabled = false; }
+                if (collegeNameInput) { collegeNameInput.disabled = false; }
+                if (collegeYearInput) { collegeYearInput.disabled = false; }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('select.auth-select').forEach(function (select) {
                 updateSelectColor(select);
             });
+
+            handleEducationLevelChange();
 
             const citySelect = document.getElementById('citySelect');
             const initialArea = '@(Model?.Area ?? "")';

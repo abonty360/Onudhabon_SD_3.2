@@ -100,11 +100,11 @@ namespace Onudhabon.Models
         public string? HscPassingYear { get; set; }
 
         [MaxLength(200)]
-        [Display(Name = "HSC Institute")]
+        [Display(Name = "College / HSC Institute")]
         public string? HscInstitute { get; set; }
 
         [MaxLength(200)]
-        [Display(Name = "University / College Name")]
+        [Display(Name = "University Name")]
         public string? UniversityName { get; set; }
 
         [MaxLength(20)]
