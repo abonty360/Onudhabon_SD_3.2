@@ -157,9 +157,42 @@ namespace Onudhabon.Models
         [System.Text.Json.Serialization.JsonPropertyName("completedLectures")]
         public int CompletedLectures { get; set; } = 0;
 
+        [System.Text.Json.Serialization.JsonPropertyName("syllabus")]
+        public string? Syllabus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("marks")]
+        public double? Marks { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("grade")]
+        public string? Grade { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("lectures")]
+        public List<LectureEvaluationItem> LectureEvaluations { get; set; } = new();
+
         [System.Text.Json.Serialization.JsonIgnore]
         public int ProgressPercentage => TotalLectures > 0
             ? (int)Math.Clamp(Math.Round((double)CompletedLectures / TotalLectures * 100), 0, 100)
             : 0;
+    }
+
+    public class LectureEvaluationItem
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("no")]
+        public int LectureNumber { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("top")]
+        public string Topic { get; set; } = string.Empty;
+
+        [System.Text.Json.Serialization.JsonPropertyName("m")]
+        public double? Marks { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("g")]
+        public string Grade { get; set; } = string.Empty;
+
+        [System.Text.Json.Serialization.JsonPropertyName("d")]
+        public string? Date { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("rem")]
+        public string? Remarks { get; set; }
     }
 }

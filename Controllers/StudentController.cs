@@ -384,11 +384,22 @@ namespace Onudhabon.Controllers
                 if (existing != null)
                 {
                     int totalL = sub.TotalLectures > 0 ? sub.TotalLectures : (existing.TotalLectures > 0 ? existing.TotalLectures : 12);
+                    var evals = existing.LectureEvaluations ?? new List<LectureEvaluationItem>();
+                    int completed = evals.Any() ? Math.Clamp(evals.Count, 0, totalL) : Math.Clamp(existing.CompletedLectures, 0, totalL);
+
+                    string syllabusText = !string.IsNullOrWhiteSpace(existing.Syllabus)
+                        ? existing.Syllabus
+                        : (completed > 0 ? (completed == 1 ? "Lecture 1" : $"Lectures 1 to {completed}") : "No lectures completed");
+
                     result.Add(new SubjectProgressItem
                     {
                         SubjectName = sub.Name,
                         TotalLectures = totalL,
-                        CompletedLectures = Math.Clamp(existing.CompletedLectures, 0, totalL)
+                        CompletedLectures = completed,
+                        Syllabus = syllabusText,
+                        Marks = existing.Marks,
+                        Grade = existing.Grade,
+                        LectureEvaluations = evals
                     });
                 }
                 else
@@ -397,7 +408,11 @@ namespace Onudhabon.Controllers
                     {
                         SubjectName = sub.Name,
                         TotalLectures = sub.TotalLectures > 0 ? sub.TotalLectures : 12,
-                        CompletedLectures = 0
+                        CompletedLectures = 0,
+                        Syllabus = "No lectures completed",
+                        Marks = null,
+                        Grade = null,
+                        LectureEvaluations = new List<LectureEvaluationItem>()
                     });
                 }
             }
@@ -410,11 +425,23 @@ namespace Onudhabon.Controllers
                     if (!string.IsNullOrWhiteSpace(saved.SubjectName) &&
                         !result.Any(r => r.SubjectName.Equals(saved.SubjectName, StringComparison.OrdinalIgnoreCase)))
                     {
+                        var evals = saved.LectureEvaluations ?? new List<LectureEvaluationItem>();
+                        int totalL = saved.TotalLectures > 0 ? saved.TotalLectures : 12;
+                        int completed = evals.Any() ? Math.Clamp(evals.Count, 0, totalL) : Math.Clamp(saved.CompletedLectures, 0, totalL);
+
+                        string syllabusText = !string.IsNullOrWhiteSpace(saved.Syllabus)
+                            ? saved.Syllabus
+                            : (completed > 0 ? (completed == 1 ? "Lecture 1" : $"Lectures 1 to {completed}") : "No lectures completed");
+
                         result.Add(new SubjectProgressItem
                         {
                             SubjectName = saved.SubjectName,
-                            TotalLectures = saved.TotalLectures > 0 ? saved.TotalLectures : 12,
-                            CompletedLectures = Math.Clamp(saved.CompletedLectures, 0, saved.TotalLectures > 0 ? saved.TotalLectures : 12)
+                            TotalLectures = totalL,
+                            CompletedLectures = completed,
+                            Syllabus = syllabusText,
+                            Marks = saved.Marks,
+                            Grade = saved.Grade,
+                            LectureEvaluations = evals
                         });
                     }
                 }
@@ -577,11 +604,19 @@ namespace Onudhabon.Controllers
                     ? Math.Clamp(matchingInput.CompletedLectures, 0, baseSub.TotalLectures)
                     : baseSub.CompletedLectures;
 
+                string syllabusText = completed > 0 
+                    ? (completed == 1 ? "Lecture 1" : $"Lectures 1 to {completed}")
+                    : "No lectures completed";
+
                 updatedList.Add(new SubjectProgressItem
                 {
                     SubjectName = baseSub.SubjectName,
                     TotalLectures = baseSub.TotalLectures,
-                    CompletedLectures = completed
+                    CompletedLectures = completed,
+                    Syllabus = syllabusText,
+                    Marks = baseSub.Marks,
+                    Grade = baseSub.Grade,
+                    LectureEvaluations = baseSub.LectureEvaluations ?? new List<LectureEvaluationItem>()
                 });
             }
 
@@ -605,7 +640,262 @@ namespace Onudhabon.Controllers
                 overallProgress = overallProgressDouble,
                 completedLectures = completedLects,
                 totalLectures = totalLects,
-                canPromote = overallProgressDouble >= 100.0
+                canPromote = overallProgressDouble >= 100.0,
+                subjects = updatedList.Select(s => new
+                {
+                    subjectName = s.SubjectName,
+                    completedLectures = s.CompletedLectures,
+                    totalLectures = s.TotalLectures,
+                    syllabus = s.Syllabus ?? "",
+                    marks = s.Marks,
+                    grade = s.Grade ?? "",
+                    displayGrade = s.DisplayGrade,
+                    gradeBadgeClass = s.GradeBadgeClass
+                }).ToList()
+            });
+        }
+
+        // POST: /Student/UpdateExamEvaluation
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateExamEvaluation([FromBody] UpdateExamEvaluationInput input)
+        {
+            if (input == null || input.StudentId <= 0)
+            {
+                return Json(new { success = false, message = "Invalid exam evaluation data." });
+            }
+
+            var student = await _context.Students.FindAsync(input.StudentId);
+            if (student == null)
+            {
+                return Json(new { success = false, message = "Student not found." });
+            }
+
+            var isAdmin = User.IsInRole("Admin");
+            var identifiers = await GetCurrentUserIdentifiersAsync();
+            bool isOwner = (!string.IsNullOrEmpty(student.GuardianId) && identifiers.Contains(student.GuardianId.ToLower())) ||
+                           (!string.IsNullOrEmpty(student.GuardianName) && identifiers.Contains(student.GuardianName.ToLower()));
+
+            if (!isAdmin && !isOwner)
+            {
+                return Json(new { success = false, message = "Unauthorized to update this student's exam evaluation." });
+            }
+
+            if (student.Status != null && student.Status.Trim().Equals("declined", StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new { success = false, message = "Exam evaluation cannot be updated for declined student enrollments." });
+            }
+
+            var classPlans = await _context.ClassPlans.ToListAsync();
+            var basePlanSubjects = GetSubjectProgressForStudent(student, classPlans);
+
+            var updatedList = new List<SubjectProgressItem>();
+            foreach (var baseSub in basePlanSubjects)
+            {
+                var matchingInput = input.Evaluations?.FirstOrDefault(e => e.SubjectName.Equals(baseSub.SubjectName, StringComparison.OrdinalIgnoreCase));
+                
+                string? syllabus = matchingInput != null ? matchingInput.Syllabus?.Trim() : baseSub.Syllabus;
+                double? marks = matchingInput != null ? matchingInput.Marks : baseSub.Marks;
+                string? grade = matchingInput != null ? matchingInput.Grade?.Trim().ToUpperInvariant() : baseSub.Grade;
+
+                if (string.IsNullOrWhiteSpace(grade) || grade == "PENDING" || grade == "NONE")
+                {
+                    grade = null;
+                }
+
+                updatedList.Add(new SubjectProgressItem
+                {
+                    SubjectName = baseSub.SubjectName,
+                    TotalLectures = baseSub.TotalLectures,
+                    CompletedLectures = baseSub.CompletedLectures,
+                    Syllabus = string.IsNullOrWhiteSpace(syllabus) ? null : syllabus,
+                    Marks = marks,
+                    Grade = grade,
+                    LectureEvaluations = baseSub.LectureEvaluations ?? new List<LectureEvaluationItem>()
+                });
+            }
+
+            if (!string.IsNullOrWhiteSpace(input.Remarks))
+            {
+                student.Notes = input.Remarks;
+            }
+
+            student.SubjectProgressJson = System.Text.Json.JsonSerializer.Serialize(updatedList);
+            student.LastActivityDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var card = new StudentProgressCardViewModel
+            {
+                Student = student,
+                SubjectProgress = updatedList
+            };
+
+            return Json(new
+            {
+                success = true,
+                message = $"Exam evaluation for '{student.FullName}' updated successfully.",
+                overallGrade = card.OverallGrade,
+                overallGPA = card.OverallGPA,
+                gradeBadgeClass = card.OverallGradeBadgeClass,
+                evaluatedCount = card.EvaluatedSubjectsCount,
+                hasExamEvaluation = card.HasExamEvaluation,
+                canPromote = card.CanPromote,
+                subjects = updatedList.Select(s => new
+                {
+                    subjectName = s.SubjectName,
+                    syllabus = s.Syllabus ?? "",
+                    marks = s.Marks,
+                    grade = s.Grade ?? "",
+                    displayGrade = s.DisplayGrade,
+                    gradeBadgeClass = s.GradeBadgeClass
+                }).ToList()
+            });
+        }
+
+        // POST: /Student/EvaluateLecture
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EvaluateLecture([FromBody] EvaluateLectureInput input)
+        {
+            if (input == null || input.StudentId <= 0 || string.IsNullOrWhiteSpace(input.SubjectName))
+            {
+                return Json(new { success = false, message = "Invalid lecture evaluation parameters." });
+            }
+
+            var student = await _context.Students.FindAsync(input.StudentId);
+            if (student == null)
+            {
+                return Json(new { success = false, message = "Student not found." });
+            }
+
+            var isAdmin = User.IsInRole("Admin");
+            var identifiers = await GetCurrentUserIdentifiersAsync();
+            bool isOwner = (!string.IsNullOrEmpty(student.GuardianId) && identifiers.Contains(student.GuardianId.ToLower())) ||
+                           (!string.IsNullOrEmpty(student.GuardianName) && identifiers.Contains(student.GuardianName.ToLower()));
+
+            if (!isAdmin && !isOwner)
+            {
+                return Json(new { success = false, message = "Unauthorized to evaluate this student." });
+            }
+
+            if (student.Status != null && student.Status.Trim().Equals("declined", StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new { success = false, message = "Lecture evaluation cannot be updated for declined student enrollments." });
+            }
+
+            var classPlans = await _context.ClassPlans.ToListAsync();
+            var basePlanSubjects = GetSubjectProgressForStudent(student, classPlans);
+
+            var targetSubject = basePlanSubjects.FirstOrDefault(s => s.SubjectName.Equals(input.SubjectName, StringComparison.OrdinalIgnoreCase));
+            if (targetSubject == null)
+            {
+                return Json(new { success = false, message = $"Subject '{input.SubjectName}' not found for student." });
+            }
+
+            if (targetSubject.LectureEvaluations == null)
+            {
+                targetSubject.LectureEvaluations = new List<LectureEvaluationItem>();
+            }
+
+            int lecNo = input.LectureNumber > 0 ? input.LectureNumber : (targetSubject.CompletedLectures + 1);
+            if (lecNo > targetSubject.TotalLectures)
+            {
+                return Json(new { success = false, message = $"Lecture {lecNo} exceeds total planned lectures ({targetSubject.TotalLectures})." });
+            }
+
+            if (input.IsDelete)
+            {
+                targetSubject.LectureEvaluations.RemoveAll(l => l.LectureNumber == lecNo);
+            }
+            else
+            {
+                var existingLec = targetSubject.LectureEvaluations.FirstOrDefault(l => l.LectureNumber == lecNo);
+                if (existingLec != null)
+                {
+                    existingLec.Topic = (input.Topic ?? "").Trim();
+                    existingLec.Marks = input.Marks;
+                    existingLec.Grade = (input.Grade ?? "A+").Trim().ToUpperInvariant();
+                    existingLec.Remarks = input.Remarks?.Trim();
+                    existingLec.Date = DateTime.UtcNow.ToString("yyyy-MM-dd");
+                }
+                else
+                {
+                    targetSubject.LectureEvaluations.Add(new LectureEvaluationItem
+                    {
+                        LectureNumber = lecNo,
+                        Topic = (input.Topic ?? "").Trim(),
+                        Marks = input.Marks,
+                        Grade = (input.Grade ?? "A+").Trim().ToUpperInvariant(),
+                        Remarks = input.Remarks?.Trim(),
+                        Date = DateTime.UtcNow.ToString("yyyy-MM-dd")
+                    });
+                }
+            }
+
+            targetSubject.LectureEvaluations = targetSubject.LectureEvaluations
+                .OrderBy(l => l.LectureNumber)
+                .ToList();
+
+            targetSubject.CompletedLectures = targetSubject.LectureEvaluations.Count;
+            targetSubject.Grade = targetSubject.CalculatedGrade;
+            if (targetSubject.LectureEvaluations.Any())
+            {
+                int count = targetSubject.LectureEvaluations.Count;
+                targetSubject.Syllabus = count == 1 ? "Lecture 1" : $"Lectures 1 to {count}";
+            }
+            else
+            {
+                targetSubject.Syllabus = "No lectures completed";
+            }
+
+            int totalLects = basePlanSubjects.Sum(s => s.TotalLectures);
+            int completedLects = basePlanSubjects.Sum(s => s.CompletedLectures);
+            int overallProgressInt = totalLects > 0 ? (int)Math.Round((double)completedLects / totalLects * 100.0) : 0;
+            double overallProgressDouble = totalLects > 0 ? Math.Round((double)completedLects / totalLects * 100.0, 1) : 0.0;
+
+            student.ProgressPercentage = overallProgressInt;
+            student.SubjectProgressJson = System.Text.Json.JsonSerializer.Serialize(basePlanSubjects);
+            student.LastActivityDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var card = new StudentProgressCardViewModel
+            {
+                Student = student,
+                SubjectProgress = basePlanSubjects
+            };
+
+            return Json(new
+            {
+                success = true,
+                message = input.IsDelete
+                    ? $"Lecture {lecNo} evaluation removed for {targetSubject.SubjectName}."
+                    : $"Lecture {lecNo} evaluated successfully for {targetSubject.SubjectName}.",
+                studentId = student.Id,
+                subjectName = targetSubject.SubjectName,
+                completedLectures = targetSubject.CompletedLectures,
+                totalLectures = targetSubject.TotalLectures,
+                subjectProgress = targetSubject.ProgressPercentage,
+                subjectGrade = targetSubject.CalculatedGrade,
+                subjectGradeBadgeClass = targetSubject.GradeBadgeClass,
+                subjectSyllabus = targetSubject.Syllabus ?? "",
+                overallProgress = overallProgressDouble,
+                overallGrade = card.OverallGrade,
+                overallGPA = card.OverallGPA,
+                gradeBadgeClass = card.OverallGradeBadgeClass,
+                totalCompletedLectures = completedLects,
+                totalLecturesAll = totalLects,
+                canPromote = overallProgressDouble >= 100.0,
+                evaluatedLectures = targetSubject.LectureEvaluations.Select(l => new
+                {
+                    lectureNumber = l.LectureNumber,
+                    topic = l.Topic,
+                    marks = l.Marks,
+                    grade = l.Grade,
+                    date = l.Date,
+                    remarks = l.Remarks ?? ""
+                }).ToList()
             });
         }
 

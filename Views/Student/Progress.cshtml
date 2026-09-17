@@ -218,6 +218,40 @@
                                 </div>
                             </div>
 
+                            <!-- Academic Grade & Exam Evaluation Section (Grade Part) -->
+                            <div class="p-2.5 rounded-3 border mb-3 bg-light-subtle exam-grade-card" id="examGradeCard_@student.Id" style="border-left: 4px solid #6366f1 !important;">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div class="d-flex align-items-center gap-1.5">
+                                        <div class="p-1 rounded-circle d-flex align-items-center justify-content-center" style="width: 26px; height: 26px; background-color: #e0e7ff; color: #4338ca;">
+                                            <i class="bi bi-award-fill" style="font-size: 0.85rem;"></i>
+                                        </div>
+                                        <span class="fw-bold text-dark" style="font-size: 0.88rem;">Academic Grade</span>
+                                    </div>
+                                    <div id="overallGradeBadgeWrap_@student.Id">
+                                        @if (card.HasExamEvaluation)
+                                        {
+                                            <span class="badge @card.OverallGradeBadgeClass px-2.5 py-1 fw-bold rounded-pill" style="font-size: 0.82rem;" id="overallGradeBadge_@student.Id">
+                                                Grade: @card.OverallGrade
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-muted border px-2 py-1 rounded-pill small" id="overallGradeBadge_@student.Id">
+                                                Not Evaluated
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center text-muted" style="font-size: 0.76rem;">
+                                    <span>
+                                        GPA: <strong class="text-dark" id="overallGpaText_@student.Id">@(card.OverallGPA ?? "N/A")</strong>
+                                    </span>
+                                    <span>
+                                        Evaluated: <strong class="text-dark" id="evaluatedCountText_@student.Id">@card.EvaluatedSubjectsCount</strong>/@card.SubjectProgress.Count subjects
+                                    </span>
+                                </div>
+                            </div>
+
                             <!-- Overall Progress Section -->
                             <div class="mb-3 text-center">
                                 <h6 class="fw-bold text-dark text-start mb-2" style="font-size: 0.95rem;">Overall Progress</h6>
@@ -250,27 +284,130 @@
                                     <span class="badge bg-light text-muted border small">@card.SubjectProgress.Count subjects</span>
                                 </div>
 
-                                <!-- Subject Progress List with Visual Bars -->
-                                <div class="subject-progress-list mb-3" id="subjectList_@student.Id" style="max-height: 180px; overflow-y: auto;">
+                                <!-- Subject Progress List with Lecture Milestones & Grade/Syllabus -->
+                                <div class="subject-progress-list mb-3" id="subjectList_@student.Id" style="max-height: 280px; overflow-y: auto;">
                                     @if (card.SubjectProgress.Any())
                                     {
                                         @for (int sIdx = 0; sIdx < card.SubjectProgress.Count; sIdx++)
                                         {
                                             var sub = card.SubjectProgress[sIdx];
                                             var pct = sub.ProgressPercentage;
-                                            <div class="mb-2 pe-1 subject-card-item" id="cardSubRow_@(student.Id)_@sIdx">
+                                            <div class="mb-3 p-2 rounded-3 border bg-light-subtle subject-card-item" id="cardSubRow_@(student.Id)_@sIdx">
                                                 <div class="d-flex justify-content-between align-items-center small mb-1">
-                                                    <span class="fw-medium text-dark text-truncate" style="max-width: 170px;" title="@sub.SubjectName">@sub.SubjectName</span>
-                                                    <span class="text-muted" style="font-size: 0.78rem;" id="cardSubDetail_@(student.Id)_@sIdx">
+                                                    <div class="d-flex align-items-center gap-1.5 flex-grow-1 me-2 text-truncate">
+                                                        <span class="fw-bold text-dark text-truncate" title="@sub.SubjectName">@sub.SubjectName</span>
+                                                        <span class="badge @sub.GradeBadgeClass px-1.5 py-0.5 rounded-1 cardSubGradeBadge_@(student.Id)_@sIdx" style="font-size: 0.68rem;" title="Exam Grade: @sub.DisplayGrade">
+                                                            @(string.IsNullOrWhiteSpace(sub.Grade) ? "—" : sub.Grade)
+                                                        </span>
+                                                    </div>
+                                                    <span class="text-muted flex-shrink-0" style="font-size: 0.76rem;" id="cardSubDetail_@(student.Id)_@sIdx">
                                                         <strong>@sub.CompletedLectures</strong>/@sub.TotalLectures (<span class="cardSubPct_@(student.Id)_@sIdx">@pct.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)</span>%)
                                                     </span>
                                                 </div>
-                                                <div class="progress rounded-pill" style="height: 6px; background-color: #f1f5f9;">
+                                                <div class="text-muted mb-1 text-truncate cardSubSyllabus_@(student.Id)_@sIdx @(string.IsNullOrWhiteSpace(sub.Syllabus) ? "d-none" : "")" style="font-size: 0.7rem;" title="Syllabus: @sub.Syllabus">
+                                                    <i class="bi bi-journal-text me-1 text-primary"></i><span>@(sub.Syllabus ?? "")</span>
+                                                </div>
+                                                <div class="progress rounded-pill mb-2" style="height: 6px; background-color: #e2e8f0;">
                                                     <div class="progress-bar rounded-pill @(pct >= 100 ? "bg-success" : (pct > 0 ? "bg-primary" : "bg-light"))" 
                                                          id="cardSubBar_@(student.Id)_@sIdx"
                                                          role="progressbar" 
                                                          style="width: @(pct.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture))%;" 
                                                          aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+
+                                                <!-- Lecture Milestones (Approach A) -->
+                                                <div class="d-flex flex-wrap gap-1 align-items-center lecture-badges-container" id="lectureBadges_@(student.Id)_@sIdx" data-student-id="@student.Id" data-student-name="@student.FullName" data-class-level="@(student.ClassLevel?.Replace("Class", "").Trim() ?? "1")" data-subject-name="@sub.SubjectName" data-total-lectures="@sub.TotalLectures" data-sidx="@sIdx">
+                                                    @for (int lec = 1; lec <= sub.TotalLectures; lec++)
+                                                    {
+                                                        var eval = sub.LectureEvaluations?.FirstOrDefault(l => l.LectureNumber == lec);
+                                                        if (eval != null)
+                                                        {
+                                                            var badgeBg = eval.Grade switch {
+                                                                "A+" => "background-color: #15803d; color: #fff;",
+                                                                "A" => "background-color: #16a34a; color: #fff;",
+                                                                "A-" => "background-color: #0284c7; color: #fff;",
+                                                                "B" => "background-color: #0d9488; color: #fff;",
+                                                                "C" => "background-color: #eab308; color: #000;",
+                                                                "D" => "background-color: #f97316; color: #fff;",
+                                                                "F" => "background-color: #ef4444; color: #fff;",
+                                                                _ => "background-color: #64748b; color: #fff;"
+                                                            };
+                                                            <button type="button" 
+                                                                    class="btn btn-xs rounded-pill px-2 py-0.5 d-inline-flex align-items-center gap-1 border-0 shadow-2xs" 
+                                                                    style="@badgeBg font-size: 0.68rem; line-height: 1.1;" 
+                                                                    @(!card.IsDeclined ? $"onclick=\"openLectureEvalModal({student.Id}, '{student.FullName.Replace("'", "\\'")}', '{student.ClassLevel?.Replace("Class", "").Trim() ?? "1"}', '{sub.SubjectName.Replace("'", "\\'")}', {lec}, '{eval.Topic.Replace("'", "\\'")}', {(eval.Marks.HasValue ? eval.Marks.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "null")}, '{eval.Grade}', '{(eval.Remarks ?? "").Replace("'", "\\'")}', true, {sIdx})\"" : "disabled")
+                                                                    title="Lecture @lec Completed &amp; Evaluated: @eval.Topic | Grade: @eval.Grade | Marks: @(eval.Marks.HasValue ? eval.Marks.Value.ToString() : "N/A") (@(!card.IsDeclined ? "Click to view/edit" : "Declined"))">
+                                                                <span>L@(lec): @eval.Grade</span>
+                                                                <i class="bi bi-check2"></i>
+                                                            </button>
+                                                        }
+                                                        else if (lec == sub.CompletedLectures + 1 && !card.IsDeclined)
+                                                        {
+                                                            <button type="button" 
+                                                                    class="btn btn-xs rounded-pill px-2 py-0.5 btn-outline-primary fw-semibold d-inline-flex align-items-center gap-1" 
+                                                                    style="font-size: 0.68rem; line-height: 1.1; border-style: dashed;" 
+                                                                    onclick="openLectureEvalModal(@student.Id, '@student.FullName.Replace("'", "\\'")', '@(student.ClassLevel?.Replace("Class", "").Trim() ?? "1")', '@sub.SubjectName.Replace("'", "\\'")', @lec, '', null, 'A+', '', false, @sIdx)"
+                                                                    title="Click to evaluate exam &amp; complete Lecture @lec">
+                                                                <i class="bi bi-plus-circle-fill text-primary" style="font-size: 0.72rem;"></i>
+                                                                <span>L@(lec)</span>
+                                                            </button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-light text-muted border rounded-pill px-1.5 py-0.5" 
+                                                                  style="font-size: 0.65rem; font-weight: normal; opacity: 0.7;" 
+                                                                  title="Lecture @lec (Complete previous lecture first)">
+                                                                L@(lec)
+                                                            </span>
+                                                        }
+                                                    }
+                                                </div>
+
+                                                <!-- Collapsible Lecture Evaluation History Drawer -->
+                                                <div class="mt-1">
+                                                    <button class="btn btn-link btn-sm text-decoration-none p-0 text-secondary d-inline-flex align-items-center gap-1" 
+                                                            type="button" 
+                                                            data-bs-toggle="collapse" 
+                                                            data-bs-target="#lecHistory_@(student.Id)_@sIdx" 
+                                                            aria-expanded="false" 
+                                                            style="font-size: 0.7rem;">
+                                                        <i class="bi bi-journal-check text-primary"></i> 
+                                                        <span id="lecHistoryToggleText_@(student.Id)_@sIdx">@(sub.LectureEvaluations?.Count ?? 0) lectures evaluated (History)</span>
+                                                    </button>
+                                                    <div class="collapse mt-1.5" id="lecHistory_@(student.Id)_@sIdx">
+                                                        <div class="p-2 rounded-2 bg-white border" style="max-height: 120px; overflow-y: auto;">
+                                                            <table class="table table-sm table-borderless align-middle mb-0" style="font-size: 0.7rem;">
+                                                                <thead class="text-muted border-bottom">
+                                                                    <tr>
+                                                                        <th>#</th>
+                                                                        <th>Topic</th>
+                                                                        <th>Marks</th>
+                                                                        <th>Grade</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="lecHistoryTableBody_@(student.Id)_@sIdx">
+                                                                    @if (sub.LectureEvaluations != null && sub.LectureEvaluations.Any())
+                                                                    {
+                                                                        @foreach (var eval in sub.LectureEvaluations.OrderBy(l => l.LectureNumber))
+                                                                        {
+                                                                            <tr>
+                                                                                <td><span class="badge bg-secondary-subtle text-secondary rounded-pill">L@(eval.LectureNumber)</span></td>
+                                                                                <td class="text-truncate" style="max-width: 100px;" title="@eval.Topic">@eval.Topic</td>
+                                                                                <td>@(eval.Marks.HasValue ? eval.Marks.Value.ToString() : "—")</td>
+                                                                                <td><span class="badge @(SubjectProgressItem.GradeToPoint(eval.Grade) >= 4.0 ? "bg-success" : (SubjectProgressItem.GradeToPoint(eval.Grade) >= 3.0 ? "bg-primary" : "bg-warning text-dark")) px-1 py-0.5 rounded-1">@eval.Grade</span></td>
+                                                                            </tr>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <tr>
+                                                                            <td colspan="4" class="text-muted text-center fst-italic py-1">No lectures evaluated yet.</td>
+                                                                        </tr>
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         }
@@ -299,6 +436,15 @@
                                         <i class="bi bi-slash-circle me-1 text-danger"></i> Enrollment Declined (Cannot Update Progress)
                                     </button>
 
+                                    <!-- Declined: Exam Evaluation Cannot Be Updated -->
+                                    <button type="button" 
+                                            class="btn w-100 fw-medium py-2 rounded-2 border text-muted bg-light text-center" 
+                                            style="font-size: 0.82rem; cursor: not-allowed;" 
+                                            disabled
+                                            title="Student enrollment was declined. Exam evaluation cannot be updated.">
+                                        <i class="bi bi-slash-circle me-1 text-danger"></i> Exam Evaluation Unavailable (Declined)
+                                    </button>
+
                                     <!-- Declined: Promotion Not Available -->
                                     <button type="button" 
                                             class="btn btn-light w-100 fw-medium py-2 rounded-2 border text-muted text-center" 
@@ -310,14 +456,28 @@
                                 }
                                 else
                                 {
-                                    <!-- Update Progress Button (Yellow/Amber) -->
-                                    <button type="button" 
-                                            class="btn w-100 fw-bold py-2 rounded-2 shadow-sm text-white btn-update-progress" 
-                                            style="background-color: #f59e0b; border: none; font-size: 0.85rem;"
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#updateProgressModal-@student.Id">
-                                        Update Progress
-                                    </button>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <!-- Update Lecture Progress Button (Yellow/Amber) -->
+                                            <button type="button" 
+                                                    class="btn w-100 fw-bold py-2 rounded-2 shadow-sm text-white btn-update-progress" 
+                                                    style="background-color: #f59e0b; border: none; font-size: 0.82rem;"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#updateProgressModal-@student.Id">
+                                                <i class="bi bi-sliders me-1"></i> Lectures
+                                            </button>
+                                        </div>
+                                        <div class="col-6">
+                                            <!-- Exam Evaluation Button (Indigo) -->
+                                            <button type="button" 
+                                                    class="btn w-100 fw-bold py-2 rounded-2 shadow-sm text-white btn-exam-evaluation" 
+                                                    style="background-color: #6366f1; border: none; font-size: 0.82rem;"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#examEvaluationModal-@student.Id">
+                                                <i class="bi bi-award me-1"></i> Exam Eval
+                                            </button>
+                                        </div>
+                                    </div>
 
                                     <!-- Complete all lectures to unlock promotion Button (Blue) -->
                                     @if (card.CanPromote)
@@ -481,10 +641,232 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Modal for Exam Evaluation for this Student -->
+                        <div class="modal fade" id="examEvaluationModal-@student.Id" tabindex="-1" aria-labelledby="examModalLabel-@student.Id" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content rounded-4 border-0 shadow">
+                                    <div class="modal-header bg-light border-bottom-0 rounded-top-4 pb-3">
+                                        <div>
+                                            <h5 class="modal-title fw-bold text-dark mb-0 d-flex align-items-center gap-2" id="examModalLabel-@student.Id">
+                                                <i class="bi bi-award-fill" style="color: #6366f1;"></i>
+                                                <span>Exam Evaluation &amp; Grade: @student.FullName</span>
+                                            </h5>
+                                            <span class="text-muted small">
+                                                Class @(student.ClassLevel?.Replace("Class", "").Trim() ?? "1") | Birth Cert ID: @(student.BirthCertificateId ?? "N/A") | Enrollment: @(student.EnrollmentYear ?? "2025")
+                                            </span>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+
+                                    <form id="examForm_@student.Id" onsubmit="submitExamEvaluation(event, @student.Id)">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="StudentId" value="@student.Id" />
+
+                                        <div class="modal-body p-4">
+                                            <div class="alert alert-primary border-0 rounded-3 d-flex align-items-center gap-2 p-2.5 mb-3 small" style="background-color: #eef2ff; color: #3730a3;">
+                                                <i class="bi bi-info-circle-fill fs-5" style="color: #6366f1;"></i>
+                                                <span>
+                                                    Syllabus / Topics Covered are <strong>automatically filled</strong> with completed lecture numbers. Please enter the <strong>Grade</strong> (or Marks) for each completed lecture series.
+                                                </span>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="fw-bold text-dark mb-0">Subject Syllabus &amp; Grades</h6>
+                                                <span class="small text-muted fst-italic">Standard Grading: A+ (5.0), A (4.0), A- (3.5), B (3.0), C (2.0), D (1.0), F (0.0)</span>
+                                            </div>
+
+                                            <div class="table-responsive mb-3">
+                                                <table class="table table-sm table-bordered align-middle mb-0 rounded-3 overflow-hidden">
+                                                    <thead class="table-light text-muted small">
+                                                        <tr>
+                                                            <th style="width: 25%;">Subject</th>
+                                                            <th style="width: 45%;">Syllabus / Topics Covered (Auto-filled)</th>
+                                                            <th style="width: 15%;">Marks (0-100)</th>
+                                                            <th style="width: 15%;">Grade</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (int sIdx = 0; sIdx < card.SubjectProgress.Count; sIdx++)
+                                                        {
+                                                            var sub = card.SubjectProgress[sIdx];
+                                                            var sylVal = !string.IsNullOrWhiteSpace(sub.Syllabus) 
+                                                                ? sub.Syllabus 
+                                                                : (sub.CompletedLectures > 0 
+                                                                    ? (sub.CompletedLectures == 1 ? "Lecture 1" : $"Lectures 1 to {sub.CompletedLectures}") 
+                                                                    : "No lectures completed");
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="d-flex flex-column">
+                                                                        <strong class="text-dark small">@sub.SubjectName</strong>
+                                                                        <span class="text-muted" style="font-size: 0.72rem;" id="examLecCount_@(student.Id)_@sIdx">
+                                                                            @(sub.CompletedLectures) of @(sub.TotalLectures) lectures completed
+                                                                        </span>
+                                                                    </div>
+                                                                    <input type="hidden" name="Evaluations[@sIdx].SubjectName" value="@sub.SubjectName" />
+                                                                </td>
+                                                                <td>
+                                                                    <div class="input-group input-group-sm">
+                                                                        <span class="input-group-text bg-light text-primary border-end-0 py-1" style="font-size: 0.78rem;" title="Covered lecture syllabus">
+                                                                            <i class="bi bi-journal-bookmark-fill"></i>
+                                                                        </span>
+                                                                        <input type="text" 
+                                                                               id="examSyllabus_@(student.Id)_@sIdx"
+                                                                               name="Evaluations[@sIdx].Syllabus" 
+                                                                               value="@sylVal" 
+                                                                               class="form-control form-control-sm border-start-0 ps-1 bg-light fw-medium text-secondary" 
+                                                                               placeholder="e.g. Lectures 1 to @sub.CompletedLectures" />
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="number" 
+                                                                           min="0" 
+                                                                           max="100" 
+                                                                           step="0.5"
+                                                                           id="examMarks_@(student.Id)_@sIdx"
+                                                                           name="Evaluations[@sIdx].Marks" 
+                                                                           value="@(sub.Marks.HasValue ? sub.Marks.Value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) : "")" 
+                                                                           class="form-control form-control-sm text-center" 
+                                                                           placeholder="Marks"
+                                                                           oninput="autoSelectGradeFromMarks(@student.Id, @sIdx, this.value)" />
+                                                                </td>
+                                                                <td>
+                                                                    <select name="Evaluations[@sIdx].Grade" 
+                                                                            id="examGrade_@(student.Id)_@sIdx" 
+                                                                            class="form-select form-select-sm fw-semibold border-primary shadow-sm">
+                                                                        <option value="" selected="@(string.IsNullOrWhiteSpace(sub.Grade))">-- Grade --</option>
+                                                                        <option value="A+" selected="@(sub.Grade == "A+")">A+ (5.0)</option>
+                                                                        <option value="A" selected="@(sub.Grade == "A")">A (4.0)</option>
+                                                                        <option value="A-" selected="@(sub.Grade == "A-")">A- (3.5)</option>
+                                                                        <option value="B" selected="@(sub.Grade == "B")">B (3.0)</option>
+                                                                        <option value="C" selected="@(sub.Grade == "C")">C (2.0)</option>
+                                                                        <option value="D" selected="@(sub.Grade == "D")">D (1.0)</option>
+                                                                        <option value="F" selected="@(sub.Grade == "F")">F (0.0)</option>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <div>
+                                                <label class="form-label fw-semibold small text-dark mb-1">Guardian Exam Remarks / Assessment</label>
+                                                <input type="text" name="Remarks" value="@student.Notes" placeholder="e.g. Term exam completed with solid overall understanding" class="form-control form-control-sm rounded-3" />
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer bg-light border-top-0 rounded-bottom-4 pt-0">
+                                            <button type="button" class="btn btn-secondary rounded-pill px-3.5 btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" id="saveExamBtn_@student.Id" class="btn rounded-pill px-4 btn-sm fw-bold text-white d-inline-flex align-items-center gap-1.5" style="background-color: #6366f1;">
+                                                <i class="bi bi-check2-circle"></i>
+                                                <span>Save Exam Evaluation</span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     }
                 }
             </div>
         }
+    </div>
+</div>
+
+<!-- Modal for Lecture-by-Lecture Exam Evaluation (Approach A) -->
+<div class="modal fade" id="singleLectureEvalModal" tabindex="-1" aria-labelledby="singleLecModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header bg-light border-bottom-0 rounded-top-4 pb-2">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark mb-0 d-flex align-items-center gap-2" id="singleLecModalLabel">
+                        <i class="bi bi-award-fill text-primary"></i>
+                        <span id="singleLecModalTitle">Evaluate Lecture Exam</span>
+                    </h5>
+                    <span class="text-muted small" id="singleLecModalSubTitle">
+                        Student | Subject | Lecture #
+                    </span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="singleLectureEvalForm" onsubmit="submitLectureEvaluation(event)">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="lecModalStudentId" name="StudentId" value="" />
+                <input type="hidden" id="lecModalSubjectName" name="SubjectName" value="" />
+                <input type="hidden" id="lecModalLectureNumber" name="LectureNumber" value="" />
+                <input type="hidden" id="lecModalIsDelete" name="IsDelete" value="false" />
+                <input type="hidden" id="lecModalSIdx" value="0" />
+
+                <div class="modal-body p-4">
+                    <div class="alert alert-primary border-0 rounded-3 d-flex align-items-center gap-2 p-2.5 mb-3 small" style="background-color: #eff6ff; color: #1e40af;">
+                        <i class="bi bi-info-circle-fill fs-5 text-primary"></i>
+                        <span>
+                            To complete this lecture milestone, evaluate the student's exam/quiz below. Progress and grade points update automatically.
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-dark mb-1">Lecture Topic / Syllabus Covered <span class="text-danger">*</span></label>
+                        <input type="text" 
+                               id="lecModalTopic" 
+                               class="form-control rounded-3" 
+                               placeholder="e.g. Chapter 4: Quadratic Equations &amp; Formulas" 
+                               required />
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small text-dark mb-1">Exam Marks (0 - 100)</label>
+                            <input type="number" 
+                                   id="lecModalMarks" 
+                                   min="0" 
+                                   max="100" 
+                                   step="0.5" 
+                                   class="form-control rounded-3 text-center fw-bold" 
+                                   placeholder="e.g. 85" 
+                                   oninput="autoSelectLecGrade(this.value)" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small text-dark mb-1">Grade Awarded <span class="text-danger">*</span></label>
+                            <select id="lecModalGrade" class="form-select rounded-3 fw-bold">
+                                <option value="A+">A+ (5.0 GPA | 80-100%)</option>
+                                <option value="A">A (4.0 GPA | 70-79%)</option>
+                                <option value="A-">A- (3.5 GPA | 60-69%)</option>
+                                <option value="B">B (3.0 GPA | 50-59%)</option>
+                                <option value="C">C (2.0 GPA | 40-49%)</option>
+                                <option value="D">D (1.0 GPA | 33-39%)</option>
+                                <option value="F">F (0.0 GPA | &lt;33%)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold small text-dark mb-1">Guardian Remarks (Optional)</label>
+                        <textarea id="lecModalRemarks" class="form-control rounded-3" rows="2" placeholder="e.g. Understood chapter concepts well, strong performance in exercises"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-top-0 rounded-bottom-4 pt-0 d-flex justify-content-between">
+                    <div>
+                        <button type="button" 
+                                id="lecModalRevertBtn" 
+                                class="btn btn-outline-danger rounded-pill px-3 btn-sm d-none" 
+                                onclick="revertLectureCompletion()">
+                            <i class="bi bi-trash3 me-1"></i> Revert Completion
+                        </button>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary rounded-pill px-3 btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="lecModalSaveBtn" class="btn btn-primary rounded-pill px-4 btn-sm fw-bold d-inline-flex align-items-center gap-1.5">
+                            <i class="bi bi-check2-circle"></i>
+                            <span id="lecModalSaveBtnText">Save &amp; Complete Lecture</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -756,16 +1138,60 @@
                         }
                     }
 
-                    // Close modal
+                    // Dynamically update the Syllabus fields in the Exam Evaluation modal with the completed lectures numbers
+                    subjectProgress.forEach((sub, sIdx) => {
+                        const count = parseInt(sub.CompletedLectures) || 0;
+                        const sylText = count === 0 
+                            ? "No lectures completed" 
+                            : (count === 1 ? "Lecture 1" : `Lectures 1 to ${count}`);
+
+                        const sylInput = document.getElementById(`examSyllabus_${studentId}_${sIdx}`);
+                        if (sylInput) {
+                            sylInput.value = sylText;
+                        }
+
+                        const countBadge = document.getElementById(`examLecCount_${studentId}_${sIdx}`);
+                        if (countBadge) {
+                            countBadge.textContent = `${count} of ${sub.TotalLectures} lectures completed`;
+                        }
+
+                        const cardSylEl = document.querySelector(`.cardSubSyllabus_${studentId}_${sIdx}`);
+                        if (cardSylEl) {
+                            if (count > 0) {
+                                cardSylEl.classList.remove('d-none');
+                                const span = cardSylEl.querySelector('span');
+                                if (span) span.textContent = sylText;
+                                cardSylEl.setAttribute('title', 'Syllabus: ' + sylText);
+                            }
+                        }
+                    });
+
+                    // Close Update Progress (Lectures) modal
                     const modalEl = document.getElementById('updateProgressModal-' + studentId);
-                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                    if (modalInstance) {
-                        modalInstance.hide();
+                    if (modalEl) {
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
                     }
 
-                    // If eligible for promotion, reload to update promotion button state
-                    if (data.canPromote) {
-                        window.location.reload();
+                    // Automatically open Exam Evaluation modal for completed lectures
+                    const examModalEl = document.getElementById('examEvaluationModal-' + studentId);
+                    if (examModalEl) {
+                        setTimeout(() => {
+                            const examModal = bootstrap.Modal.getOrCreateInstance(examModalEl);
+                            examModal.show();
+
+                            // Auto-focus the first grade dropdown so local guardian only needs to enter grades
+                            setTimeout(() => {
+                                const allGradeSelects = Array.from(examModalEl.querySelectorAll('select[name$=".Grade"]'));
+                                const emptyGrade = allGradeSelects.find(s => !s.value);
+                                const targetSelect = emptyGrade || allGradeSelects[0];
+                                if (targetSelect) {
+                                    targetSelect.focus();
+                                }
+                            }, 350);
+                        }, 400);
                     }
                 } else {
                     alert(data.message || 'Failed to update progress.');
@@ -777,6 +1203,469 @@
                 saveBtn.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Save Progress';
                 alert('An error occurred while updating student progress.');
             });
+        }
+
+        // Auto-select grade dropdown based on marks input (NCTB scale)
+        function autoSelectGradeFromMarks(studentId, sIdx, val) {
+            const select = document.getElementById('examGrade_' + studentId + '_' + sIdx);
+            if (!select) return;
+            if (val === '' || val === null || isNaN(val)) {
+                return;
+            }
+            const marks = parseFloat(val);
+            if (marks >= 80) select.value = 'A+';
+            else if (marks >= 70) select.value = 'A';
+            else if (marks >= 60) select.value = 'A-';
+            else if (marks >= 50) select.value = 'B';
+            else if (marks >= 40) select.value = 'C';
+            else if (marks >= 33) select.value = 'D';
+            else select.value = 'F';
+        }
+
+        // Handle AJAX Submit of Exam Evaluation
+        function submitExamEvaluation(event, studentId) {
+            event.preventDefault();
+            const form = document.getElementById('examForm_' + studentId);
+            const saveBtn = document.getElementById('saveExamBtn_' + studentId);
+            if (!form || !saveBtn) return;
+
+            const formData = new FormData(form);
+            const evaluations = [];
+
+            let sIdx = 0;
+            while (formData.has(`Evaluations[${sIdx}].SubjectName`)) {
+                const subName = formData.get(`Evaluations[${sIdx}].SubjectName`);
+                const syllabus = formData.get(`Evaluations[${sIdx}].Syllabus`) || '';
+                const marksRaw = formData.get(`Evaluations[${sIdx}].Marks`);
+                const marksVal = (marksRaw !== null && marksRaw !== '' && !isNaN(marksRaw)) ? parseFloat(marksRaw) : null;
+                const gradeVal = formData.get(`Evaluations[${sIdx}].Grade`) || null;
+
+                evaluations.push({
+                    SubjectName: subName,
+                    Syllabus: syllabus,
+                    Marks: marksVal,
+                    Grade: gradeVal
+                });
+                sIdx++;
+            }
+
+            const payload = {
+                StudentId: studentId,
+                Remarks: formData.get('Remarks') || '',
+                Evaluations: evaluations
+            };
+
+            const token = form.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
+
+            fetch('/Student/UpdateExamEvaluation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Save Exam Evaluation';
+
+                if (data.success) {
+                    // 1. Update overall grade badge on student card
+                    const badgeWrap = document.getElementById('overallGradeBadgeWrap_' + studentId);
+                    if (badgeWrap) {
+                        if (data.hasExamEvaluation) {
+                            badgeWrap.innerHTML = '<span class="badge ' + data.gradeBadgeClass + ' px-2.5 py-1 fw-bold rounded-pill" style="font-size: 0.82rem;" id="overallGradeBadge_' + studentId + '">Grade: ' + data.overallGrade + '</span>';
+                        } else {
+                            badgeWrap.innerHTML = '<span class="badge bg-light text-muted border px-2 py-1 rounded-pill small" id="overallGradeBadge_' + studentId + '">Not Evaluated</span>';
+                        }
+                    }
+
+                    // 2. Update GPA text on card
+                    const gpaText = document.getElementById('overallGpaText_' + studentId);
+                    if (gpaText) {
+                        gpaText.textContent = data.overallGPA || 'N/A';
+                    }
+
+                    // 3. Update evaluated subjects count on card
+                    const evalCountText = document.getElementById('evaluatedCountText_' + studentId);
+                    if (evalCountText) {
+                        evalCountText.textContent = data.evaluatedCount;
+                    }
+
+                    // 4. Update each subject\'s Grade badge and Syllabus note in subject list
+                    if (data.subjects && Array.isArray(data.subjects)) {
+                        data.subjects.forEach((sub, idx) => {
+                            const gradeEl = document.querySelector('.cardSubGradeBadge_' + studentId + '_' + idx);
+                            if (gradeEl) {
+                                gradeEl.textContent = sub.grade && sub.grade.trim() !== '' ? sub.grade : '—';
+                                gradeEl.className = 'badge ' + sub.gradeBadgeClass + ' px-1.5 py-0.5 rounded-1 cardSubGradeBadge_' + studentId + '_' + idx;
+                            }
+
+                            const sylEl = document.querySelector('.cardSubSyllabus_' + studentId + '_' + idx);
+                            if (sylEl) {
+                                if (sub.syllabus && sub.syllabus.trim() !== '') {
+                                    sylEl.classList.remove('d-none');
+                                    const span = sylEl.querySelector('span');
+                                    if (span) span.textContent = sub.syllabus;
+                                    sylEl.setAttribute('title', 'Syllabus: ' + sub.syllabus);
+                                } else {
+                                    sylEl.classList.add('d-none');
+                                }
+                            }
+                        });
+                    }
+
+                    // 5. Hide modal
+                    const modalEl = document.getElementById('examEvaluationModal-' + studentId);
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    // 6. If eligible for promotion, reload to update promotion button state
+                    if (data.canPromote) {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 600);
+                    }
+                } else {
+                    alert(data.message || 'Failed to update exam evaluation.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Save Exam Evaluation';
+                alert('An error occurred while saving exam evaluation.');
+            });
+        }
+
+        // ============================================
+        // APPROACH A: LECTURE-BY-LECTURE EVALUATION
+        // ============================================
+
+        function openLectureEvalModal(studentId, studentName, classLvl, subjectName, lectureNo, topic, marks, grade, remarks, isEdit, sIdx) {
+            document.getElementById('lecModalStudentId').value = studentId;
+            document.getElementById('lecModalSubjectName').value = subjectName;
+            document.getElementById('lecModalLectureNumber').value = lectureNo;
+            document.getElementById('lecModalTopic').value = topic || ('Lecture ' + lectureNo);
+            document.getElementById('lecModalMarks').value = (marks !== null && marks !== undefined) ? marks : '';
+            document.getElementById('lecModalGrade').value = grade || 'A+';
+            document.getElementById('lecModalRemarks').value = remarks || '';
+            document.getElementById('lecModalIsDelete').value = 'false';
+            document.getElementById('lecModalSIdx').value = sIdx;
+
+            const titleEl = document.getElementById('singleLecModalTitle');
+            if (titleEl) {
+                titleEl.textContent = (isEdit ? 'Edit Evaluation: Lecture ' : 'Evaluate Lecture ') + lectureNo + ' (' + subjectName + ')';
+            }
+
+            const subTitleEl = document.getElementById('singleLecModalSubTitle');
+            if (subTitleEl) {
+                subTitleEl.textContent = studentName + ' | Class ' + classLvl;
+            }
+
+            const saveBtnText = document.getElementById('lecModalSaveBtnText');
+            if (saveBtnText) {
+                saveBtnText.textContent = isEdit ? 'Update Evaluation' : ('Save & Complete Lecture ' + lectureNo);
+            }
+
+            const revertBtn = document.getElementById('lecModalRevertBtn');
+            if (revertBtn) {
+                if (isEdit) {
+                    revertBtn.classList.remove('d-none');
+                } else {
+                    revertBtn.classList.add('d-none');
+                }
+            }
+
+            const modalEl = document.getElementById('singleLectureEvalModal');
+            if (modalEl) {
+                let modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (!modalInstance) {
+                    modalInstance = new bootstrap.Modal(modalEl);
+                }
+                modalInstance.show();
+
+                setTimeout(() => {
+                    const gradeSelect = document.getElementById('lecModalGrade');
+                    if (gradeSelect) gradeSelect.focus();
+                }, 350);
+            }
+        }
+
+        function autoSelectLecGrade(val) {
+            const select = document.getElementById('lecModalGrade');
+            if (!select) return;
+            if (val === '' || val === null || isNaN(val)) return;
+            const marks = parseFloat(val);
+            if (marks >= 80) select.value = 'A+';
+            else if (marks >= 70) select.value = 'A';
+            else if (marks >= 60) select.value = 'A-';
+            else if (marks >= 50) select.value = 'B';
+            else if (marks >= 40) select.value = 'C';
+            else if (marks >= 33) select.value = 'D';
+            else select.value = 'F';
+        }
+
+        function revertLectureCompletion() {
+            const lecNo = document.getElementById('lecModalLectureNumber').value;
+            const subName = document.getElementById('lecModalSubjectName').value;
+            if (!confirm(`Are you sure you want to revert completion of Lecture ${lecNo} for ${subName}? This will decrement the completed lectures count.`)) {
+                return;
+            }
+            document.getElementById('lecModalIsDelete').value = 'true';
+            document.getElementById('singleLectureEvalForm').dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+
+        function submitLectureEvaluation(event) {
+            event.preventDefault();
+            const form = document.getElementById('singleLectureEvalForm');
+            const saveBtn = document.getElementById('lecModalSaveBtn');
+            if (!form || !saveBtn) return;
+
+            const studentId = parseInt(document.getElementById('lecModalStudentId').value);
+            const subjectName = document.getElementById('lecModalSubjectName').value;
+            const lectureNumber = parseInt(document.getElementById('lecModalLectureNumber').value);
+            const isDelete = document.getElementById('lecModalIsDelete').value === 'true';
+            const sIdx = parseInt(document.getElementById('lecModalSIdx').value) || 0;
+
+            const topic = (document.getElementById('lecModalTopic').value || '').trim() || ('Lecture ' + lectureNumber);
+
+            const marksRaw = document.getElementById('lecModalMarks').value;
+            const marks = (marksRaw !== '' && !isNaN(marksRaw)) ? parseFloat(marksRaw) : null;
+            const grade = document.getElementById('lecModalGrade').value || 'A+';
+            const remarks = document.getElementById('lecModalRemarks').value || '';
+
+            const payload = {
+                StudentId: studentId,
+                SubjectName: subjectName,
+                LectureNumber: lectureNumber,
+                Topic: topic,
+                Marks: marks,
+                Grade: grade,
+                Remarks: remarks,
+                IsDelete: isDelete
+            };
+
+            const token = form.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
+
+            fetch('/Student/EvaluateLecture', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="bi bi-check2-circle me-1"></i> <span id="lecModalSaveBtnText">Save & Complete Lecture</span>';
+
+                if (data.success) {
+                    // 1. Update overall card donut chart and overall text
+                    const sData = studentDataMap[studentId];
+                    if (sData) {
+                        sData.overall = data.overallProgress;
+                        if (sData.completed && sData.completed[sIdx] !== undefined) {
+                            sData.completed[sIdx] = data.completedLectures;
+                        }
+                        if (sData.percentages && sData.percentages[sIdx] !== undefined) {
+                            sData.percentages[sIdx] = data.subjectProgress;
+                        }
+
+                        if (studentCharts['donut_' + studentId]) {
+                            studentCharts['donut_' + studentId].data.datasets[0].data = [data.overallProgress, Math.max(0, 100 - data.overallProgress)];
+                            studentCharts['donut_' + studentId].update();
+                        }
+                        if (studentCharts['bar_' + studentId]) {
+                            studentCharts['bar_' + studentId].data.datasets[0].data = sData.percentages;
+                            studentCharts['bar_' + studentId].update();
+                        }
+                    }
+
+                    const overallPctText = document.getElementById('overallPercentText_' + studentId);
+                    if (overallPctText) {
+                        overallPctText.textContent = data.overallProgress.toFixed(1) + '%';
+                    }
+
+                    // 2. Update overall Academic Grade badge and GPA text
+                    const badgeWrap = document.getElementById('overallGradeBadgeWrap_' + studentId);
+                    if (badgeWrap) {
+                        if (data.overallGrade && data.overallGrade !== 'Not Evaluated') {
+                            badgeWrap.innerHTML = '<span class="badge ' + data.gradeBadgeClass + ' px-2.5 py-1 fw-bold rounded-pill" style="font-size: 0.82rem;" id="overallGradeBadge_' + studentId + '">Grade: ' + data.overallGrade + '</span>';
+                        } else {
+                            badgeWrap.innerHTML = '<span class="badge bg-light text-muted border px-2 py-1 rounded-pill small" id="overallGradeBadge_' + studentId + '">Not Evaluated</span>';
+                        }
+                    }
+
+                    const gpaText = document.getElementById('overallGpaText_' + studentId);
+                    if (gpaText) {
+                        gpaText.textContent = data.overallGPA || 'N/A';
+                    }
+
+                    // 3. Update Subject row detail & progress bar
+                    const subDetail = document.getElementById('cardSubDetail_' + studentId + '_' + sIdx);
+                    if (subDetail) {
+                        subDetail.innerHTML = '<strong>' + data.completedLectures + '</strong>/' + data.totalLectures + ' (<span class="cardSubPct_' + studentId + '_' + sIdx + '">' + data.subjectProgress.toFixed(1) + '</span>%)';
+                    }
+
+                    const subBar = document.getElementById('cardSubBar_' + studentId + '_' + sIdx);
+                    if (subBar) {
+                        subBar.style.width = data.subjectProgress.toFixed(1) + '%';
+                        subBar.setAttribute('aria-valuenow', data.subjectProgress.toFixed(1));
+                        if (data.subjectProgress >= 100) {
+                            subBar.className = 'progress-bar rounded-pill bg-success';
+                        } else if (data.subjectProgress > 0) {
+                            subBar.className = 'progress-bar rounded-pill bg-primary';
+                        } else {
+                            subBar.className = 'progress-bar rounded-pill bg-light';
+                        }
+                    }
+
+                    // 4. Update Subject Grade badge & syllabus snippet
+                    const subGradeBadge = document.querySelector('.cardSubGradeBadge_' + studentId + '_' + sIdx);
+                    if (subGradeBadge) {
+                        subGradeBadge.textContent = data.subjectGrade || '—';
+                        subGradeBadge.className = 'badge ' + data.subjectGradeBadgeClass + ' px-1.5 py-0.5 rounded-1 cardSubGradeBadge_' + studentId + '_' + sIdx;
+                    }
+
+                    const subSyllabusEl = document.querySelector('.cardSubSyllabus_' + studentId + '_' + sIdx);
+                    if (subSyllabusEl) {
+                        if (data.subjectSyllabus && data.subjectSyllabus.trim() !== '') {
+                            subSyllabusEl.classList.remove('d-none');
+                            const span = subSyllabusEl.querySelector('span');
+                            if (span) span.textContent = data.subjectSyllabus;
+                        } else {
+                            subSyllabusEl.classList.add('d-none');
+                        }
+                    }
+
+                    // 5. Regenerate Lecture Milestone Badges (Approach A)
+                    const badgesContainer = document.getElementById(`lectureBadges_${studentId}_${sIdx}`);
+                    if (badgesContainer) {
+                        const stName = badgesContainer.getAttribute('data-student-name') || '';
+                        const cLvl = badgesContainer.getAttribute('data-class-level') || '1';
+                        const sName = badgesContainer.getAttribute('data-subject-name') || subjectName;
+                        const totalL = parseInt(badgesContainer.getAttribute('data-total-lectures')) || data.totalLectures;
+                        const evals = data.evaluatedLectures || [];
+
+                        let html = '';
+                        for (let l = 1; l <= totalL; l++) {
+                            const ev = evals.find(e => e.lectureNumber === l);
+                            if (ev) {
+                                const bg = getGradeBadgeBg(ev.grade);
+                                const escapedTop = escapeJsString(ev.topic);
+                                const escapedRem = escapeJsString(ev.remarks || '');
+                                const marksVal = ev.marks !== null && ev.marks !== undefined ? ev.marks : 'null';
+                                html += `<button type="button" 
+                                                 class="btn btn-xs rounded-pill px-2 py-0.5 d-inline-flex align-items-center gap-1 border-0 shadow-2xs" 
+                                                 style="${bg} font-size: 0.68rem; line-height: 1.1;" 
+                                                 onclick="openLectureEvalModal(${studentId}, '${escapeJsString(stName)}', '${cLvl}', '${escapeJsString(sName)}', ${l}, '${escapedTop}', ${marksVal}, '${ev.grade}', '${escapedRem}', true, ${sIdx})" 
+                                                 title="Lecture ${l} Completed: ${ev.topic} | Grade: ${ev.grade} | Marks: ${ev.marks !== null ? ev.marks : 'N/A'} (Click to edit)">
+                                            <span>L${l}: ${ev.grade}</span>
+                                            <i class="bi bi-check2"></i>
+                                         </button> `;
+                            } else if (l === data.completedLectures + 1) {
+                                html += `<button type="button" 
+                                                 class="btn btn-xs rounded-pill px-2 py-0.5 btn-outline-primary fw-semibold d-inline-flex align-items-center gap-1" 
+                                                 style="font-size: 0.68rem; line-height: 1.1; border-style: dashed;" 
+                                                 onclick="openLectureEvalModal(${studentId}, '${escapeJsString(stName)}', '${cLvl}', '${escapeJsString(sName)}', ${l}, '', null, 'A+', '', false, ${sIdx})" 
+                                                 title="Click to evaluate exam & complete Lecture ${l}">
+                                            <i class="bi bi-plus-circle-fill text-primary" style="font-size: 0.72rem;"></i>
+                                            <span>L${l}</span>
+                                         </button> `;
+                            } else {
+                                html += `<span class="badge bg-light text-muted border rounded-pill px-1.5 py-0.5" 
+                                               style="font-size: 0.65rem; font-weight: normal; opacity: 0.7;" 
+                                               title="Lecture ${l} (Complete previous lecture first)">L${l}</span> `;
+                            }
+                        }
+                        badgesContainer.innerHTML = html;
+                    }
+
+                    // 6. Update Lecture History Drawer
+                    const historyToggle = document.getElementById(`lecHistoryToggleText_${studentId}_${sIdx}`);
+                    if (historyToggle) {
+                        historyToggle.textContent = `${data.completedLectures} lectures evaluated (History)`;
+                    }
+
+                    const historyTbody = document.getElementById(`lecHistoryTableBody_${studentId}_${sIdx}`);
+                    if (historyTbody) {
+                        if (data.evaluatedLectures && data.evaluatedLectures.length > 0) {
+                            historyTbody.innerHTML = data.evaluatedLectures.map(ev => `
+                                <tr>
+                                    <td><span class="badge bg-secondary-subtle text-secondary rounded-pill">L${ev.lectureNumber}</span></td>
+                                    <td class="text-truncate" style="max-width: 100px;" title="${ev.topic}">${ev.topic}</td>
+                                    <td>${ev.marks !== null ? ev.marks : '—'}</td>
+                                    <td><span class="badge ${getGradeBadgeClass(ev.grade)} px-1 py-0.5 rounded-1">${ev.grade}</span></td>
+                                </tr>
+                            `).join('');
+                        } else {
+                            historyTbody.innerHTML = '<tr><td colspan="4" class="text-muted text-center fst-italic py-1">No lectures evaluated yet.</td></tr>';
+                        }
+                    }
+
+                    // 7. Hide modal
+                    const modalEl = document.getElementById('singleLectureEvalModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    // 8. If promotion unlocked
+                    if (data.canPromote) {
+                        window.location.reload();
+                    }
+                } else {
+                    alert(data.message || 'Failed to update lecture evaluation.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Save & Complete Lecture';
+                alert('An error occurred while saving lecture evaluation.');
+            });
+        }
+
+        function getGradeBadgeBg(grade) {
+            switch ((grade || '').trim().toUpperCase()) {
+                case 'A+': return 'background-color: #15803d; color: #fff;';
+                case 'A': return 'background-color: #16a34a; color: #fff;';
+                case 'A-': return 'background-color: #0284c7; color: #fff;';
+                case 'B': return 'background-color: #0d9488; color: #fff;';
+                case 'C': return 'background-color: #eab308; color: #000;';
+                case 'D': return 'background-color: #f97316; color: #fff;';
+                case 'F': return 'background-color: #ef4444; color: #fff;';
+                default: return 'background-color: #64748b; color: #fff;';
+            }
+        }
+
+        function getGradeBadgeClass(grade) {
+            switch ((grade || '').trim().toUpperCase()) {
+                case 'A+': return 'bg-success text-white';
+                case 'A': return 'bg-success-subtle text-success';
+                case 'A-': return 'bg-primary-subtle text-primary';
+                case 'B': return 'bg-info-subtle text-info-emphasis';
+                case 'C': return 'bg-warning-subtle text-warning-emphasis';
+                case 'D': return 'bg-secondary-subtle text-secondary';
+                case 'F': return 'bg-danger text-white';
+                default: return 'bg-light text-muted';
+            }
+        }
+
+        function escapeJsString(str) {
+            if (!str) return '';
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
         }
     </script>
 }
