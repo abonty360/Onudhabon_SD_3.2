@@ -4,8 +4,21 @@ namespace Onudhabon.Models
 {
     public class SubjectProgressItem
     {
+        private string _subjectName = string.Empty;
+
         [JsonPropertyName("subjectName")]
-        public string SubjectName { get; set; } = string.Empty;
+        public string SubjectName
+        {
+            get => _subjectName;
+            set => _subjectName = value ?? string.Empty;
+        }
+
+        [JsonPropertyName("name")]
+        public string? NameAlias
+        {
+            get => _subjectName;
+            set { if (!string.IsNullOrWhiteSpace(value)) _subjectName = value; }
+        }
 
         [JsonPropertyName("totalLectures")]
         public int TotalLectures { get; set; } = 12;
@@ -38,7 +51,11 @@ namespace Onudhabon.Models
             }
         }
 
-        public bool CanPromote => OverallProgressPercent >= 100.0;
+        public bool IsDeclined => Student.Status?.Trim().Equals("declined", StringComparison.OrdinalIgnoreCase) == true;
+
+        public bool CanUpdateProgress => !IsDeclined;
+
+        public bool CanPromote => OverallProgressPercent >= 100.0 && !IsDeclined;
 
         public string? NextClassLevel
         {
@@ -86,7 +103,20 @@ namespace Onudhabon.Models
 
     public class SubjectLectureProgressInput
     {
-        public string SubjectName { get; set; } = string.Empty;
+        private string _subjectName = string.Empty;
+
+        public string SubjectName
+        {
+            get => _subjectName;
+            set => _subjectName = value ?? string.Empty;
+        }
+
+        public string? Name
+        {
+            get => _subjectName;
+            set { if (!string.IsNullOrWhiteSpace(value)) _subjectName = value; }
+        }
+
         public int TotalLectures { get; set; } = 12;
         public int CompletedLectures { get; set; } = 0;
     }

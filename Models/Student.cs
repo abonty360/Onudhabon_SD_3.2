@@ -135,8 +135,21 @@ namespace Onudhabon.Models
 
     public class StudentSubjectProgress
     {
+        private string _subjectName = string.Empty;
+
         [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string SubjectName { get; set; } = string.Empty;
+        public string SubjectName
+        {
+            get => _subjectName;
+            set => _subjectName = value ?? string.Empty;
+        }
+
+        [System.Text.Json.Serialization.JsonPropertyName("subjectName")]
+        public string? SubjectNameAlias
+        {
+            get => _subjectName;
+            set { if (!string.IsNullOrWhiteSpace(value)) _subjectName = value; }
+        }
 
         [System.Text.Json.Serialization.JsonPropertyName("totalLectures")]
         public int TotalLectures { get; set; } = 12;

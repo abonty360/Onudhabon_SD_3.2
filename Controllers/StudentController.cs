@@ -102,8 +102,15 @@ namespace Onudhabon.Controllers
                 return new List<string>();
 
             var cleanLevel = classLevel.Replace("Class", "", StringComparison.OrdinalIgnoreCase).Trim();
+            int classNum = 1;
+            var match = System.Text.RegularExpressions.Regex.Match(classLevel, @"\d+");
+            if (match.Success && int.TryParse(match.Value, out int parsedNum))
+            {
+                classNum = parsedNum;
+            }
+
             var plan = await _context.ClassPlans
-                .FirstOrDefaultAsync(p => p.ClassLevel == cleanLevel || p.ClassLevel == classLevel);
+                .FirstOrDefaultAsync(p => p.ClassLevel == cleanLevel || p.ClassLevel == classLevel || p.ClassLevel == classNum.ToString() || p.ClassLevel == $"Class {classNum}");
 
             if (plan?.Subjects != null && plan.Subjects.Any())
             {
@@ -117,19 +124,16 @@ namespace Onudhabon.Controllers
             }
 
             // Standard Bangladesh NCTB curriculum fallback by class level
-            if (int.TryParse(cleanLevel, out int lvl))
-            {
-                if (lvl >= 1 && lvl <= 3)
-                    return new List<string> { "Bangla", "English", "Math" };
-                if (lvl >= 4 && lvl <= 8)
-                    return new List<string> { "Bangla 1st paper", "Bangla 2nd paper", "English 1st paper", "English 2nd paper", "Math", "Social Science", "General Science" };
-                if (lvl >= 9 && lvl <= 10)
-                    return new List<string> { "Bangla 1st paper", "Bangla 2nd paper", "English 1st paper", "English 2nd paper", "Math", "Social Science", "General Science", "Physics", "Chemistry", "Higher Math", "Biology" };
-                if (lvl >= 11 && lvl <= 12)
-                    return new List<string> { "Bangla 1st paper", "Bangla 2nd paper", "English 1st paper", "English 2nd paper", "Physics 1st paper", "Physics 2nd paper", "Chemistry 1st paper", "Chemistry 2nd paper", "Higher Math 1st paper", "Higher Math 2nd paper", "Biology 1st paper", "Biology 2nd paper" };
-            }
+            if (classNum >= 1 && classNum <= 3)
+                return new List<string> { "Bangla", "English", "Math" };
+            if (classNum >= 4 && classNum <= 8)
+                return new List<string> { "Bangla 1st paper", "Bangla 2nd paper", "English 1st paper", "English 2nd paper", "Math", "Social Science", "General Science" };
+            if (classNum >= 9 && classNum <= 10)
+                return new List<string> { "Bangla 1st paper", "Bangla 2nd paper", "English 1st paper", "English 2nd paper", "Math", "Social Science", "General Science", "Physics", "Chemistry", "Higher Math", "Biology" };
+            if (classNum >= 11 && classNum <= 12)
+                return new List<string> { "Bangla 1st paper", "Bangla 2nd paper", "English 1st paper", "English 2nd paper", "Physics 1st paper", "Physics 2nd paper", "Chemistry 1st paper", "Chemistry 2nd paper", "Higher Math 1st paper", "Higher Math 2nd paper", "Biology 1st paper", "Biology 2nd paper" };
 
-            return new List<string>();
+            return new List<string> { "Bangla", "English", "Math" };
         }
 
         // GET: /Student/GetClassPlanSubjects?classLevel=5
@@ -263,79 +267,101 @@ namespace Onudhabon.Controllers
 
         private List<SubjectProgressItem> GetSubjectProgressForStudent(Student student, List<ClassPlan> classPlans)
         {
-            var cleanLevel = (student.ClassLevel ?? "1").Replace("Class", "", StringComparison.OrdinalIgnoreCase).Trim();
+            var rawLevel = student.ClassLevel?.Trim() ?? "1";
+            var cleanLevel = rawLevel.Replace("Class", "", StringComparison.OrdinalIgnoreCase).Trim();
+            
+            int classNum = 1;
+            var numMatch = System.Text.RegularExpressions.Regex.Match(rawLevel, @"\d+");
+            if (numMatch.Success && int.TryParse(numMatch.Value, out int parsedNum))
+            {
+                classNum = parsedNum;
+            }
+
             var plan = classPlans.FirstOrDefault(p => 
                 p.ClassLevel.Trim().Equals(cleanLevel, StringComparison.OrdinalIgnoreCase) || 
-                p.ClassLevel.Trim().Equals(student.ClassLevel?.Trim(), StringComparison.OrdinalIgnoreCase) ||
-                p.ClassLevel.Trim().Equals($"Class {cleanLevel}", StringComparison.OrdinalIgnoreCase));
+                p.ClassLevel.Trim().Equals(rawLevel, StringComparison.OrdinalIgnoreCase) ||
+                p.ClassLevel.Trim().Equals(classNum.ToString(), StringComparison.OrdinalIgnoreCase) ||
+                p.ClassLevel.Trim().Equals($"Class {classNum}", StringComparison.OrdinalIgnoreCase));
 
             var classSubjects = new List<SubjectDetail>();
             if (plan?.Subjects != null && plan.Subjects.Any())
             {
                 classSubjects = plan.Subjects.Where(s => !string.IsNullOrWhiteSpace(s.Name)).ToList();
             }
-            else
+
+            // If no subjects found from ClassPlan, extract from student.Subjects column if available
+            if (!classSubjects.Any() && !string.IsNullOrWhiteSpace(student.Subjects))
             {
-                // Fallback default subjects and lectures by class level
-                if (int.TryParse(cleanLevel, out int lvl))
+                var names = student.Subjects.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                int defaultTotal = classNum >= 11 ? 20 : (classNum <= 3 ? 10 : 12);
+                foreach (var name in names)
                 {
-                    if (lvl >= 1 && lvl <= 3)
+                    if (!string.IsNullOrWhiteSpace(name))
                     {
-                        classSubjects = new List<SubjectDetail>
-                        {
-                            new() { Name = "Bangla", TotalLectures = 10 },
-                            new() { Name = "English", TotalLectures = 10 },
-                            new() { Name = "Math", TotalLectures = 10 }
-                        };
+                        classSubjects.Add(new SubjectDetail { Name = name.Trim(), TotalLectures = defaultTotal });
                     }
-                    else if (lvl >= 4 && lvl <= 8)
+                }
+            }
+
+            // Fallback default subjects and lectures by Bangladesh NCTB curriculum class level
+            if (!classSubjects.Any())
+            {
+                if (classNum >= 1 && classNum <= 3)
+                {
+                    classSubjects = new List<SubjectDetail>
                     {
-                        classSubjects = new List<SubjectDetail>
-                        {
-                            new() { Name = "Bangla 1st paper", TotalLectures = 12 },
-                            new() { Name = "Bangla 2nd paper", TotalLectures = 12 },
-                            new() { Name = "English 1st paper", TotalLectures = 12 },
-                            new() { Name = "English 2nd paper", TotalLectures = 12 },
-                            new() { Name = "Math", TotalLectures = 12 },
-                            new() { Name = "Social Science", TotalLectures = 12 },
-                            new() { Name = "General Science", TotalLectures = 12 }
-                        };
-                    }
-                    else if (lvl >= 9 && lvl <= 10)
+                        new() { Name = "Bangla", TotalLectures = 10 },
+                        new() { Name = "English", TotalLectures = 10 },
+                        new() { Name = "Math", TotalLectures = 10 }
+                    };
+                }
+                else if (classNum >= 4 && classNum <= 8)
+                {
+                    classSubjects = new List<SubjectDetail>
                     {
-                        classSubjects = new List<SubjectDetail>
-                        {
-                            new() { Name = "Bangla 1st paper", TotalLectures = 12 },
-                            new() { Name = "Bangla 2nd paper", TotalLectures = 12 },
-                            new() { Name = "English 1st paper", TotalLectures = 12 },
-                            new() { Name = "English 2nd paper", TotalLectures = 12 },
-                            new() { Name = "Math", TotalLectures = 12 },
-                            new() { Name = "Social Science", TotalLectures = 12 },
-                            new() { Name = "General Science", TotalLectures = 12 },
-                            new() { Name = "Physics", TotalLectures = 12 },
-                            new() { Name = "Chemistry", TotalLectures = 12 },
-                            new() { Name = "Higher Math", TotalLectures = 12 },
-                            new() { Name = "Biology", TotalLectures = 12 }
-                        };
-                    }
-                    else
+                        new() { Name = "Bangla 1st paper", TotalLectures = 12 },
+                        new() { Name = "Bangla 2nd paper", TotalLectures = 12 },
+                        new() { Name = "English 1st paper", TotalLectures = 12 },
+                        new() { Name = "English 2nd paper", TotalLectures = 12 },
+                        new() { Name = "Math", TotalLectures = 12 },
+                        new() { Name = "Social Science", TotalLectures = 12 },
+                        new() { Name = "General Science", TotalLectures = 12 }
+                    };
+                }
+                else if (classNum >= 9 && classNum <= 10)
+                {
+                    classSubjects = new List<SubjectDetail>
                     {
-                        classSubjects = new List<SubjectDetail>
-                        {
-                            new() { Name = "Bangla 1st paper", TotalLectures = 20 },
-                            new() { Name = "Bangla 2nd paper", TotalLectures = 20 },
-                            new() { Name = "English 1st paper", TotalLectures = 20 },
-                            new() { Name = "English 2nd paper", TotalLectures = 20 },
-                            new() { Name = "Physics 1st paper", TotalLectures = 20 },
-                            new() { Name = "Physics 2nd paper", TotalLectures = 20 },
-                            new() { Name = "Chemistry 1st paper", TotalLectures = 20 },
-                            new() { Name = "Chemistry 2nd paper", TotalLectures = 20 },
-                            new() { Name = "Higher Math 1st paper", TotalLectures = 20 },
-                            new() { Name = "Higher Math 2nd paper", TotalLectures = 20 },
-                            new() { Name = "Biology 1st paper", TotalLectures = 20 },
-                            new() { Name = "Biology 2nd paper", TotalLectures = 20 }
-                        };
-                    }
+                        new() { Name = "Bangla 1st paper", TotalLectures = 12 },
+                        new() { Name = "Bangla 2nd paper", TotalLectures = 12 },
+                        new() { Name = "English 1st paper", TotalLectures = 12 },
+                        new() { Name = "English 2nd paper", TotalLectures = 12 },
+                        new() { Name = "Math", TotalLectures = 12 },
+                        new() { Name = "Social Science", TotalLectures = 12 },
+                        new() { Name = "General Science", TotalLectures = 12 },
+                        new() { Name = "Physics", TotalLectures = 12 },
+                        new() { Name = "Chemistry", TotalLectures = 12 },
+                        new() { Name = "Higher Math", TotalLectures = 12 },
+                        new() { Name = "Biology", TotalLectures = 12 }
+                    };
+                }
+                else
+                {
+                    classSubjects = new List<SubjectDetail>
+                    {
+                        new() { Name = "Bangla 1st paper", TotalLectures = 20 },
+                        new() { Name = "Bangla 2nd paper", TotalLectures = 20 },
+                        new() { Name = "English 1st paper", TotalLectures = 20 },
+                        new() { Name = "English 2nd paper", TotalLectures = 20 },
+                        new() { Name = "Physics 1st paper", TotalLectures = 20 },
+                        new() { Name = "Physics 2nd paper", TotalLectures = 20 },
+                        new() { Name = "Chemistry 1st paper", TotalLectures = 20 },
+                        new() { Name = "Chemistry 2nd paper", TotalLectures = 20 },
+                        new() { Name = "Higher Math 1st paper", TotalLectures = 20 },
+                        new() { Name = "Higher Math 2nd paper", TotalLectures = 20 },
+                        new() { Name = "Biology 1st paper", TotalLectures = 20 },
+                        new() { Name = "Biology 2nd paper", TotalLectures = 20 }
+                    };
                 }
             }
 
@@ -373,6 +399,24 @@ namespace Onudhabon.Controllers
                         TotalLectures = sub.TotalLectures > 0 ? sub.TotalLectures : 12,
                         CompletedLectures = 0
                     });
+                }
+            }
+
+            // Include any saved items from student.SubjectProgressJson that were not in classSubjects
+            if (savedItems != null)
+            {
+                foreach (var saved in savedItems)
+                {
+                    if (!string.IsNullOrWhiteSpace(saved.SubjectName) &&
+                        !result.Any(r => r.SubjectName.Equals(saved.SubjectName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        result.Add(new SubjectProgressItem
+                        {
+                            SubjectName = saved.SubjectName,
+                            TotalLectures = saved.TotalLectures > 0 ? saved.TotalLectures : 12,
+                            CompletedLectures = Math.Clamp(saved.CompletedLectures, 0, saved.TotalLectures > 0 ? saved.TotalLectures : 12)
+                        });
+                    }
                 }
             }
 
@@ -517,6 +561,11 @@ namespace Onudhabon.Controllers
                 return Json(new { success = false, message = "Unauthorized to update this student's progress." });
             }
 
+            if (student.Status != null && student.Status.Trim().Equals("declined", StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new { success = false, message = "Progress cannot be updated for declined student enrollments." });
+            }
+
             var classPlans = await _context.ClassPlans.ToListAsync();
             var basePlanSubjects = GetSubjectProgressForStudent(student, classPlans);
 
@@ -576,6 +625,12 @@ namespace Onudhabon.Controllers
             if (!isAdmin && !isOwner)
             {
                 TempData["ErrorMessage"] = "Unauthorized to promote this student.";
+                return RedirectToAction(nameof(Progress));
+            }
+
+            if (student.Status != null && student.Status.Trim().Equals("declined", StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["ErrorMessage"] = "Cannot promote a student whose enrollment has been declined.";
                 return RedirectToAction(nameof(Progress));
             }
 
