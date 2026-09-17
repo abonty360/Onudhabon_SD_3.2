@@ -49,6 +49,26 @@ namespace Onudhabon.Controllers
             return identifiers.Distinct().ToList();
         }
 
+        private async Task<bool> IsCurrentGuardianApprovedAsync()
+        {
+            if (User.IsInRole("Admin")) return true;
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdClaim, out int uid))
+            {
+                var dbUser = await _context.Users.FindAsync(uid);
+                if (dbUser != null && !dbUser.IsRestricted &&
+                    (dbUser.IsVerified ||
+                     string.Equals(dbUser.VerificationStatus, "Active", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(dbUser.VerificationStatus, "Approved", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         // GET: /Student or /Student/Index
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -67,6 +87,12 @@ namespace Onudhabon.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            if (!await IsCurrentGuardianApprovedAsync())
+            {
+                TempData["ErrorMessage"] = "Your account is pending administrator approval. You can only visit pages until an administrator approves your account.";
+                return RedirectToAction("Index", "Home");
+            }
+
             var identifiers = await GetCurrentUserIdentifiersAsync();
 
             var students = await _context.Students
@@ -81,8 +107,14 @@ namespace Onudhabon.Controllers
         // GET: /Student/Enroll
         [HttpGet]
         [Authorize(Roles = "Local Guardian")]
-        public IActionResult Enroll()
+        public async Task<IActionResult> Enroll()
         {
+            if (!await IsCurrentGuardianApprovedAsync())
+            {
+                TempData["ErrorMessage"] = "Your account is pending administrator approval. You can only visit pages until an administrator approves your account.";
+                return RedirectToAction("Index", "Home");
+            }
+
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userName = User.Identity?.Name ?? "Local Guardian";
 
@@ -173,6 +205,12 @@ namespace Onudhabon.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Enroll(StudentEnrollmentViewModel model)
         {
+            if (!await IsCurrentGuardianApprovedAsync())
+            {
+                TempData["ErrorMessage"] = "Your account is pending administrator approval. You can only visit pages until an administrator approves your account.";
+                return RedirectToAction("Index", "Home");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -460,6 +498,12 @@ namespace Onudhabon.Controllers
             if (!isAdmin && !isLocalGuardian)
             {
                 TempData["ErrorMessage"] = "Student progress tracking is available to registered Local Guardians and Administrators.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (!await IsCurrentGuardianApprovedAsync())
+            {
+                TempData["ErrorMessage"] = "Your account is pending administrator approval. You can only visit pages until an administrator approves your account.";
                 return RedirectToAction("Index", "Home");
             }
 

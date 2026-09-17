@@ -131,17 +131,26 @@
         </div>
     </div>
 
-    <!-- Status Notification Modal (Pop-up for Declined / Restricted Volunteers) -->
+    <!-- Status Notification Modal (Pop-up for Declined / Restricted / Pending Volunteers) -->
     @if (ViewBag.ModalMessage != null)
     {
         <div class="modal fade" id="statusNotificationModal" tabindex="-1" aria-labelledby="statusNotificationModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content rounded-4 border-0 shadow-lg p-3">
                     <div class="modal-header border-bottom-0 pb-0">
-                        <div class="rounded-circle p-2.5 @(ViewBag.RestrictedModal == true ? "bg-danger-subtle text-danger" : "bg-warning-subtle text-warning") me-2 d-inline-flex align-items-center justify-content-center">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
+                        <div class="rounded-circle p-2.5 @(ViewBag.RestrictedModal == true ? "bg-danger-subtle text-danger" : (ViewBag.PendingModal == true ? "bg-warning-subtle text-warning" : "bg-danger-subtle text-danger")) me-2 d-inline-flex align-items-center justify-content-center">
+                            @if (ViewBag.PendingModal == true)
+                            {
+                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            }
+                            else
+                            {
+                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            }
                         </div>
                         <h5 class="modal-title fw-bold text-dark" id="statusNotificationModalLabel">@(ViewBag.ModalTitle ?? "Account Status Notice")</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -149,7 +158,13 @@
                     <div class="modal-body py-3">
                         <p class="text-secondary mb-0" style="font-size: 0.98rem; line-height: 1.6;">@ViewBag.ModalMessage</p>
                     </div>
-                    <div class="modal-footer border-top-0 pt-0">
+                    <div class="modal-footer border-top-0 pt-0 d-flex justify-content-between align-items-center">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary rounded-pill px-3 py-2 text-decoration-none d-inline-flex align-items-center gap-1.5 font-weight-medium">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>Browse Pages as Guest</span>
+                        </a>
                         <button type="button" class="btn btn-primary rounded-pill px-4 py-2" data-bs-dismiss="modal">Acknowledge & Close</button>
                     </div>
                 </div>

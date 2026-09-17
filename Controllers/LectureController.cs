@@ -138,7 +138,14 @@ namespace Onudhabon.Controllers
             if (int.TryParse(userIdClaim, out int uid))
             {
                 var dbUser = await _context.Users.FindAsync(uid);
-                if (dbUser != null && !string.IsNullOrWhiteSpace(dbUser.FullName))
+                if (dbUser == null || dbUser.IsRestricted || 
+                    (!dbUser.IsVerified && !string.Equals(dbUser.VerificationStatus, "Active", StringComparison.OrdinalIgnoreCase) && !string.Equals(dbUser.VerificationStatus, "Approved", StringComparison.OrdinalIgnoreCase)))
+                {
+                    TempData["ErrorMessage"] = "Your account is pending administrator approval. You can only visit pages until an administrator approves your account.";
+                    return RedirectToAction("Index", "Lecture");
+                }
+
+                if (!string.IsNullOrWhiteSpace(dbUser.FullName))
                 {
                     userFullName = dbUser.FullName;
                 }
@@ -161,7 +168,14 @@ namespace Onudhabon.Controllers
             if (int.TryParse(userIdClaim, out int uid))
             {
                 var dbUser = await _context.Users.FindAsync(uid);
-                if (dbUser != null && !string.IsNullOrWhiteSpace(dbUser.FullName))
+                if (dbUser == null || dbUser.IsRestricted || 
+                    (!dbUser.IsVerified && !string.Equals(dbUser.VerificationStatus, "Active", StringComparison.OrdinalIgnoreCase) && !string.Equals(dbUser.VerificationStatus, "Approved", StringComparison.OrdinalIgnoreCase)))
+                {
+                    TempData["ErrorMessage"] = "Your account is pending administrator approval. You can only visit pages until an administrator approves your account.";
+                    return RedirectToAction("Index", "Lecture");
+                }
+
+                if (!string.IsNullOrWhiteSpace(dbUser.FullName))
                 {
                     userFullName = dbUser.FullName;
                 }

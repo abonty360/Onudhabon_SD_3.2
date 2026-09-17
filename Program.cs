@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +56,41 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;                 // Resets expiration window on user activity
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied";
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnValidatePrincipal = async context =>
+            {
+                var userPrincipal = context.Principal;
+                var userIdStr = userPrincipal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdStr, out int userId))
+                {
+                    return;
+                }
+
+                var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+                var user = await dbContext.Users.FindAsync(userId);
+                if (user == null || user.IsRestricted || string.Equals(user.VerificationStatus, "Declined", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.RejectPrincipal();
+                    await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    return;
+                }
+
+                if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+                {
+                    bool isApproved = user.IsVerified ||
+                        string.Equals(user.VerificationStatus, "Active", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(user.VerificationStatus, "Approved", StringComparison.OrdinalIgnoreCase);
+
+                    if (!isApproved)
+                    {
+                        context.RejectPrincipal();
+                        await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                        return;
+                    }
+                }
+            }
+        };
     });
 
 // Session State Services (for HttpContext.Session)

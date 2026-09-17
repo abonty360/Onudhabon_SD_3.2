@@ -104,6 +104,23 @@ namespace Onudhabon.Controllers
                 return View(model);
             }
 
+            // Check if registered user account is pending approval by Admin
+            if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                bool isApproved = user.IsVerified ||
+                    string.Equals(user.VerificationStatus, "Active", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(user.VerificationStatus, "Approved", StringComparison.OrdinalIgnoreCase);
+
+                if (!isApproved)
+                {
+                    ViewBag.PendingModal = true;
+                    ViewBag.ModalTitle = "Account Pending Approval";
+                    ViewBag.ModalMessage = "Your account registration has been received and is currently pending approval by an administrator. Until an administrator approves your registered account, you can only browse and visit pages as a guest.";
+                    ModelState.AddModelError(string.Empty, "Your account is pending administrator approval. You can only visit pages as a guest until your account is approved.");
+                    return View(model);
+                }
+            }
+
             // Create Claims for authenticated session
             var claims = new List<Claim>
             {
@@ -279,7 +296,7 @@ namespace Onudhabon.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Account registered successfully! Please sign in with your credentials.";
+            TempData["SuccessMessage"] = "Account registered successfully! Your account is currently pending administrator approval. Until approved, you can explore and visit pages as a guest.";
             return RedirectToAction("Login", new { returnUrl });
         }
 
