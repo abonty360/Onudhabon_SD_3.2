@@ -1,0 +1,308 @@
+@model Onudhabon.Models.VerifyResetOtpViewModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Verify Password Reset OTP - Onudhabon";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+    <style>
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 24px 0;
+        }
+
+        .otp-box {
+            width: 50px;
+            height: 58px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e3a8a;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .otp-box:focus {
+            border-color: #2563eb;
+            background: #ffffff;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .otp-box.filled {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .icon-badge {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1d4ed8;
+            margin-bottom: 16px;
+        }
+
+        .timer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .timer-badge.expiring {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-page-container">
+        <div class="login-card" style="max-width: 480px;">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <a asp-controller="Home" asp-action="Index" class="logo-link">
+                    <img src="~/images/login_logo.png" asp-append-version="true" alt="Onudhabon Logo" class="logo-icon" />
+                </a>
+                <h1 class="app-title">Onudhabon</h1>
+                <div class="subtitle">Exploring Education</div>
+            </div>
+
+            <div class="px-4 pt-1 pb-4 text-center">
+                <div class="icon-badge shadow-sm">
+                    <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                </div>
+
+                <h3 class="fw-bold text-dark mb-1">Verify Your Identity</h3>
+                <p class="text-secondary small mb-2">
+                    Enter the 6-digit OTP sent to:
+                </p>
+                <div class="fw-bold text-primary mb-3 text-break" style="font-size: 0.98rem;">
+                    @Model.Email
+                </div>
+
+                <!-- Feedback Alerts -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success d-flex align-items-center gap-2 text-start rounded-3 py-2 px-3 small mb-3" role="alert">
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                        <span>@TempData["SuccessMessage"]</span>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger d-flex align-items-center gap-2 text-start rounded-3 py-2 px-3 small mb-3" role="alert">
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                        </svg>
+                        <span>@TempData["ErrorMessage"]</span>
+                    </div>
+                }
+
+                @if (!ViewData.ModelState.IsValid && (ViewData.ModelState[string.Empty]?.Errors.Count > 0 || ViewData.ModelState[nameof(Model.Otp)]?.Errors.Count > 0))
+                {
+                    <div class="alert alert-danger text-start rounded-3 py-2 px-3 small mb-3" role="alert">
+                        <div asp-validation-summary="All" class="mb-0"></div>
+                    </div>
+                }
+
+                <!-- OTP Form -->
+                <form asp-controller="Account" asp-action="VerifyResetOtp" method="post" id="otpForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Email" />
+                    <input type="hidden" asp-for="Otp" id="hiddenOtpInput" />
+
+                    <div class="otp-container">
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autofocus />
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+                        <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+                    </div>
+
+                    <div class="mb-4">
+                        <span class="timer-badge" id="countdownContainer">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span id="countdownTimer">Expires in 15:00</span>
+                        </span>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn btn-primary w-100 py-2.5 rounded-pill fw-semibold shadow-sm mb-3" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
+                        Verify OTP & Continue
+                    </button>
+                </form>
+
+                <!-- Resend OTP Form -->
+                <div class="border-top pt-3 mt-3">
+                    <p class="text-muted small mb-2">Didn't receive the OTP in your inbox or spam?</p>
+                    <form asp-controller="Account" asp-action="ResendResetOtp" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="email" value="@Model.Email" />
+                        <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Resend 6-Digit OTP</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="mt-4 pt-2">
+                    <a asp-controller="Account" asp-action="ForgotPassword" class="text-decoration-none small text-secondary me-3">
+                        &larr; Try a different email
+                    </a>
+                    <a asp-controller="Account" asp-action="Login" class="text-decoration-none small text-muted">
+                        Return to Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="fixed-bottom-copyright">
+            &copy; @DateTime.Now.Year Onudhabon. All rights reserved.
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const boxes = Array.from(document.querySelectorAll('.otp-box'));
+            const hiddenInput = document.getElementById('hiddenOtpInput');
+            const form = document.getElementById('otpForm');
+
+            // Handle pre-filled value if any
+            if (hiddenInput.value && hiddenInput.value.length === 6) {
+                hiddenInput.value.split('').forEach((ch, idx) => {
+                    if (boxes[idx]) {
+                        boxes[idx].value = ch;
+                        boxes[idx].classList.add('filled');
+                    }
+                });
+            }
+
+            boxes.forEach((box, index) => {
+                box.addEventListener('input', (e) => {
+                    const val = e.target.value;
+
+                    // Accept only digits
+                    if (!/^\d*$/.test(val)) {
+                        e.target.value = '';
+                        return;
+                    }
+
+                    if (val.length > 0) {
+                        e.target.value = val[val.length - 1]; // keep last digit
+                        box.classList.add('filled');
+                        if (index < boxes.length - 1) {
+                            boxes[index + 1].focus();
+                        }
+                    } else {
+                        box.classList.remove('filled');
+                    }
+                    syncOtp();
+                });
+
+                box.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !box.value && index > 0) {
+                        boxes[index - 1].focus();
+                    } else if (e.key === 'ArrowLeft' && index > 0) {
+                        boxes[index - 1].focus();
+                    } else if (e.key === 'ArrowRight' && index < boxes.length - 1) {
+                        boxes[index + 1].focus();
+                    }
+                });
+
+                // Paste support: paste complete 6 digits
+                box.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData('text').trim();
+                    const digits = text.replace(/\D/g, '').slice(0, 6);
+                    if (digits.length > 0) {
+                        digits.split('').forEach((digit, i) => {
+                            if (boxes[i]) {
+                                boxes[i].value = digit;
+                                boxes[i].classList.add('filled');
+                            }
+                        });
+                        const nextFocus = Math.min(digits.length, boxes.length - 1);
+                        boxes[nextFocus].focus();
+                        syncOtp();
+                    }
+                });
+            });
+
+            function syncOtp() {
+                const otp = boxes.map(b => b.value).join('');
+                hiddenInput.value = otp;
+            }
+
+            form.addEventListener('submit', function (e) {
+                syncOtp();
+                if (hiddenInput.value.length !== 6) {
+                    e.preventDefault();
+                    alert('Please enter all 6 digits of the verification code.');
+                    const emptyIndex = boxes.findIndex(b => !b.value);
+                    if (emptyIndex !== -1) boxes[emptyIndex].focus();
+                }
+            });
+
+            // 15-minute countdown timer
+            let timeLeft = 15 * 60;
+            const timerEl = document.getElementById('countdownTimer');
+            const timerContainer = document.getElementById('countdownContainer');
+
+            const timerInterval = setInterval(function () {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerEl.textContent = "Code expired. Please request a new OTP.";
+                    timerContainer.classList.add('expiring');
+                    return;
+                }
+
+                if (timeLeft < 120) {
+                    timerContainer.classList.add('expiring');
+                }
+
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerEl.textContent = `Expires in ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -103,7 +103,7 @@
                             <input type="checkbox" asp-for="RememberMe" />
                             <span>Remember me</span>
                         </label>
-                        <a href="javascript:void(0)" class="forgot-password-link">Forgot password?</a>
+                        <a asp-controller="Account" asp-action="ForgotPassword" class="forgot-password-link">Forgot password?</a>
                     </div>
 
                     <button type="submit" class="btn-submit">

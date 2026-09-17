@@ -579,6 +579,254 @@ namespace Onudhabon.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult ForgotPassword()
+        {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
+            return View(new ForgotPasswordViewModel());
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var cleanEmail = model.Email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+
+            if (user != null)
+            {
+                // Generate 6-digit OTP (valid for 15 minutes)
+                var otp = System.Security.Cryptography.RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+                user.PasswordResetOtp = otp;
+                user.PasswordResetOtpExpiry = DateTime.UtcNow.AddMinutes(15);
+                // Clear any previous reset token
+                user.PasswordResetToken = null;
+                user.PasswordResetTokenExpiry = null;
+                await _context.SaveChangesAsync();
+
+                await _emailService.SendPasswordResetOtpEmailAsync(user.Email, user.FullName, otp);
+            }
+
+            // Always redirect to OTP page (even if user doesn't exist, to prevent email enumeration)
+            TempData["SuccessMessage"] = $"If an account with that email exists, a 6-digit OTP has been sent. Please check your inbox and spam folder.";
+            return RedirectToAction(nameof(VerifyResetOtp), new { email = cleanEmail });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult VerifyResetOtp(string? email)
+        {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            var model = new VerifyResetOtpViewModel
+            {
+                Email = email.Trim().ToLowerInvariant()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> VerifyResetOtp(VerifyResetOtpViewModel model)
+        {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var cleanEmail = model.Email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "No account was found matching this email address.");
+                return View(model);
+            }
+
+            if (user.PasswordResetOtpExpiry.HasValue && user.PasswordResetOtpExpiry.Value < DateTime.UtcNow)
+            {
+                ModelState.AddModelError(nameof(model.Otp), "This OTP has expired. Please click 'Resend OTP' to receive a new code.");
+                return View(model);
+            }
+
+            var enteredOtp = model.Otp?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(user.PasswordResetOtp) || !string.Equals(user.PasswordResetOtp.Trim(), enteredOtp, StringComparison.Ordinal))
+            {
+                ModelState.AddModelError(nameof(model.Otp), "Invalid OTP code. Please enter the correct 6-digit code sent to your email.");
+                return View(model);
+            }
+
+            // OTP verified — generate a secure reset token for the password form
+            var token = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+            user.PasswordResetToken = token;
+            user.PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+            user.PasswordResetOtp = null;
+            user.PasswordResetOtpExpiry = null;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "OTP verified successfully! Please set your new password.";
+            return RedirectToAction(nameof(ResetPassword), new { token, email = user.Email });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendResetOtp(string? email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                TempData["ErrorMessage"] = "Please provide an email address.";
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            var cleanEmail = email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+
+            if (user != null)
+            {
+                // Generate fresh OTP
+                var otp = System.Security.Cryptography.RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+                user.PasswordResetOtp = otp;
+                user.PasswordResetOtpExpiry = DateTime.UtcNow.AddMinutes(15);
+                await _context.SaveChangesAsync();
+
+                await _emailService.SendPasswordResetOtpEmailAsync(user.Email, user.FullName, otp);
+            }
+
+            TempData["SuccessMessage"] = "A fresh 6-digit OTP has been sent. Please check your inbox and spam folder.";
+            return RedirectToAction(nameof(VerifyResetOtp), new { email = cleanEmail });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> ResetPassword(string? token, string? email)
+        {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
+            if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(email))
+            {
+                TempData["ErrorMessage"] = "Invalid password reset link. Please request a new one.";
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            var cleanEmail = email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+
+            if (user == null || user.PasswordResetToken != token)
+            {
+                TempData["ErrorMessage"] = "Invalid password reset link. Please request a new one.";
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            if (user.PasswordResetTokenExpiry.HasValue && user.PasswordResetTokenExpiry.Value < DateTime.UtcNow)
+            {
+                TempData["ErrorMessage"] = "This password reset link has expired. Please request a new one.";
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            var model = new ResetPasswordViewModel
+            {
+                Token = token,
+                Email = user.Email
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var cleanEmail = model.Email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+
+            if (user == null || user.PasswordResetToken != model.Token)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid password reset token. Please request a new reset link.");
+                return View(model);
+            }
+
+            if (user.PasswordResetTokenExpiry.HasValue && user.PasswordResetTokenExpiry.Value < DateTime.UtcNow)
+            {
+                ModelState.AddModelError(string.Empty, "This password reset link has expired. Please request a new one.");
+                return View(model);
+            }
+
+            // Update password
+            user.PasswordHash = _passwordHasher.HashPassword(user, model.Password);
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpiry = null;
+            user.PasswordResetOtp = null;
+            user.PasswordResetOtpExpiry = null;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Your password has been reset successfully! You can now sign in with your new password.";
+            return RedirectToAction(nameof(Login));
+        }
+
+        [HttpGet]
         [Authorize]
         public async Task<IActionResult> Profile()
         {

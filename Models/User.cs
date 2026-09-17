@@ -90,6 +90,20 @@ namespace Onudhabon.Models
         [Display(Name = "Email OTP Expiry")]
         public DateTime? EmailOtpExpiry { get; set; }
 
+        [MaxLength(100)]
+        [Display(Name = "Password Reset Token")]
+        public string? PasswordResetToken { get; set; }
+
+        [Display(Name = "Password Reset Token Expiry")]
+        public DateTime? PasswordResetTokenExpiry { get; set; }
+
+        [MaxLength(10)]
+        [Display(Name = "Password Reset OTP")]
+        public string? PasswordResetOtp { get; set; }
+
+        [Display(Name = "Password Reset OTP Expiry")]
+        public DateTime? PasswordResetOtpExpiry { get; set; }
+
         [MaxLength(50)]
         [Display(Name = "NID Number")]
         public string? NidNumber { get; set; }
