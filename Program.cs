@@ -28,6 +28,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IVolunteerRankingService, VolunteerRankingService>();
 
+// Payment Gateway Services (Sandbox & Production)
+builder.Services.AddScoped<ISSLCommerzService, SSLCommerzService>();
+
 // HttpClient and Memory Cache
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
@@ -67,6 +70,17 @@ builder.Services.AddSession(options =>
 // Add MVC Services
 builder.Services.AddControllersWithViews();
 
+// Add CORS for Gateway Callbacks
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -77,6 +91,18 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 app.UseRouting();
+
+app.UseCors();
+
+// Private Network Access (PNA) header support for gateway callbacks from public HTTPS to localhost
+app.Use(async (context, next) =>
+{
+    if (context.Request.Headers.ContainsKey("Access-Control-Request-Private-Network"))
+    {
+        context.Response.Headers["Access-Control-Allow-Private-Network"] = "true";
+    }
+    await next();
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

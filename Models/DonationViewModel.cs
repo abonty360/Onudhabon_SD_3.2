@@ -59,16 +59,21 @@ namespace Onudhabon.Models
 
         public bool IsAnonymous { get; set; }
 
-        [Required(ErrorMessage = "bKash Account Number is required")]
-        [RegularExpression(@"^(?:\+?880|0)1[3-9]\d{8}$", ErrorMessage = "Please enter a valid 11-digit bKash wallet number (01XXXXXXXXX)")]
-        public string BkashWalletNumber { get; set; } = string.Empty;
+        public string PaymentMethod { get; set; } = "bKash";
 
-        [Required(ErrorMessage = "OTP / Verification Code is required")]
-        public string OtpCode { get; set; } = string.Empty;
+        public string? BkashWalletNumber { get; set; }
 
-        [Required(ErrorMessage = "bKash PIN is required")]
-        [StringLength(5, MinimumLength = 5, ErrorMessage = "bKash PIN must be 5 digits")]
-        public string Pin { get; set; } = string.Empty;
+        public string? CardNumber { get; set; }
+
+        public string? CardExpiry { get; set; }
+
+        public string? CardCvv { get; set; }
+
+        public string? CardHolderName { get; set; }
+
+        public string? OtpCode { get; set; }
+
+        public string? Pin { get; set; }
     }
 
     public class DonationReceiptViewModel

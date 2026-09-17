@@ -46,7 +46,7 @@
                         <div class="text-end">
                             <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1">
                                 <i class="bi bi-shield-check"></i>
-                                <span>Settled via bKash Merchant</span>
+                                <span>Settled via @(d.PaymentMethod ?? "Verified Gateway")</span>
                             </span>
                             <div class="text-muted small mt-1 font-monospace" style="font-size: 0.75rem;">@d.CreatedAt.ToString("MMMM dd, yyyy • hh:mm tt") UTC</div>
                         </div>
@@ -105,7 +105,7 @@
                                 <div class="text-muted mb-2 fw-semibold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Payment Gateway Verification Log</div>
                                 <div class="row g-2 font-monospace" style="font-size: 0.8rem;">
                                     <div class="col-sm-6">
-                                        <div class="text-muted" style="font-size: 0.72rem;">bKash Transaction ID (TRXID)</div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">@(d.PaymentMethod ?? "Gateway") Transaction ID (TRXID)</div>
                                         <div class="fw-bold text-dark">@(d.BkashTransactionId ?? "N/A")</div>
                                     </div>
                                     <div class="col-sm-6">
