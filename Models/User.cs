@@ -73,6 +73,23 @@ namespace Onudhabon.Models
         [Display(Name = "Verification Status")]
         public string? VerificationStatus { get; set; } = "Pending";
 
+        [Display(Name = "Is Email Verified")]
+        public bool IsEmailVerified { get; set; } = false;
+
+        [MaxLength(100)]
+        [Display(Name = "Email Verification Token")]
+        public string? EmailVerificationToken { get; set; }
+
+        [Display(Name = "Email Verification Token Expiry")]
+        public DateTime? EmailVerificationTokenExpiry { get; set; }
+
+        [MaxLength(10)]
+        [Display(Name = "Email OTP")]
+        public string? EmailOtp { get; set; }
+
+        [Display(Name = "Email OTP Expiry")]
+        public DateTime? EmailOtpExpiry { get; set; }
+
         [MaxLength(50)]
         [Display(Name = "NID Number")]
         public string? NidNumber { get; set; }

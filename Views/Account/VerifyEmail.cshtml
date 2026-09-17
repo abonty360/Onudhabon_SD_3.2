@@ -1,0 +1,107 @@
+@{
+    ViewData["Title"] = ViewBag.Title ?? "Email Verification - Onudhabon";
+    bool isSuccess = ViewBag.Success == true;
+    bool isExpired = ViewBag.Expired == true;
+    bool isAlreadyVerified = ViewBag.AlreadyVerified == true;
+    string? userEmail = ViewBag.Email as string;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 text-center" style="background-color: #ffffff;">
+                <div class="mb-4">
+                    @if (isSuccess)
+                    {
+                        <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center bg-success-subtle text-success shadow-sm" style="width: 84px; height: 84px;">
+                            <svg width="44" height="44" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    }
+                    else if (isExpired)
+                    {
+                        <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center bg-warning-subtle text-warning shadow-sm" style="width: 84px; height: 84px;">
+                            <svg width="44" height="44" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center bg-danger-subtle text-danger shadow-sm" style="width: 84px; height: 84px;">
+                            <svg width="44" height="44" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                    }
+                </div>
+
+                <h3 class="fw-bold text-dark mb-2">@(ViewBag.Title ?? "Email Verification")</h3>
+                <p class="text-secondary mb-4" style="line-height: 1.6; font-size: 1.05rem;">
+                    @(ViewBag.Message ?? "Thank you for confirming your email.")
+                </p>
+
+                @if (isSuccess)
+                {
+                    <div class="alert alert-info border-0 rounded-3 py-3 px-4 text-start mb-4" style="background-color: #f0f9ff; border-left: 4px solid #0284c7 !important;">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-info-circle-fill text-info mt-0.5 fs-5"></i>
+                            <div>
+                                <strong class="text-dark">What's next?</strong>
+                                <p class="mb-0 text-secondary small mt-1">
+                                    Our administrative team will review your volunteer / educator credentials. In the meantime, you can explore courses, read study materials, and browse public pages.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center mt-2">
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary rounded-pill px-4 py-2.5 fw-semibold" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Proceed to Login
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2.5">
+                            <i class="bi bi-compass me-1"></i> Explore as Guest
+                        </a>
+                    </div>
+                }
+                else if (isExpired)
+                {
+                    <div class="card border-0 rounded-4 p-4 mb-4" style="background-color: #f8fafc; border: 1px dashed #cbd5e1 !important;">
+                        <h6 class="fw-bold text-dark mb-2">Need a new verification link?</h6>
+                        <p class="text-muted small mb-3">Enter your registered email address below to receive a fresh verification link.</p>
+                        <form asp-controller="Account" asp-action="ResendVerificationEmail" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="input-group mb-3">
+                                <input type="email" name="email" class="form-control rounded-start-pill px-3 py-2" placeholder="name@example.com" value="@userEmail" required />
+                                <button type="submit" class="btn btn-primary rounded-end-pill px-4 fw-semibold" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
+                                    Resend Email
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-2">
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                            Return to Login
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                            Browse Pages
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary rounded-pill px-4 py-2.5" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
+                            Return to Sign In
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2.5">
+                            Continue as Guest
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

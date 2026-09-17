@@ -442,24 +442,40 @@
                                             <div class="text-muted small">@user.Area</div>
                                         </td>
                                         <td>
-                                            @if (user.VerificationStatus == "Active" || user.VerificationStatus == "Approved")
-                                            {
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">
-                                                    Active
-                                                </span>
-                                            }
-                                            else if (user.VerificationStatus == "Declined")
-                                            {
-                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1">
-                                                    Declined
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1">
-                                                    Pending
-                                                </span>
-                                            }
+                                            <div>
+                                                @if (user.VerificationStatus == "Active" || user.VerificationStatus == "Approved")
+                                                {
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">
+                                                        Active
+                                                    </span>
+                                                }
+                                                else if (user.VerificationStatus == "Declined")
+                                                {
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1">
+                                                        Declined
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1">
+                                                        Pending
+                                                    </span>
+                                                }
+                                            </div>
+                                            <div class="mt-1">
+                                                @if (user.IsEmailVerified)
+                                                {
+                                                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill" style="font-size: 0.72rem;">
+                                                        <i class="bi bi-envelope-check-fill me-0.5"></i> Email Verified
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill" style="font-size: 0.72rem;">
+                                                        <i class="bi bi-envelope-x me-0.5"></i> Email Unverified
+                                                    </span>
+                                                }
+                                            </div>
                                         </td>
                                         <td>
                                             @if (user.IsRestricted)
@@ -534,9 +550,12 @@
                                                             <h5 class="modal-title fw-bold text-dark mb-0" id="userModalLabel-@user.Id">@user.FullName</h5>
                                                             <span class="badge bg-secondary-subtle text-secondary rounded-pill me-1">@user.Role</span>
                                                             <span class="badge @(user.VerificationStatus == "Active" ? "bg-success-subtle text-success" : "bg-warning-subtle text-warning") rounded-pill">Status: @(user.VerificationStatus ?? "Pending")</span>
+                                                            <span class="badge @(user.IsEmailVerified ? "bg-info-subtle text-info border border-info-subtle" : "bg-secondary-subtle text-secondary border") rounded-pill ms-1">
+                                                                <i class="bi @(user.IsEmailVerified ? "bi-envelope-check-fill" : "bi-envelope-x") me-0.5"></i> @(user.IsEmailVerified ? "Email Verified" : "Email Unverified")
+                                                            </span>
                                                             @if (user.IsRestricted)
                                                             {
-                                                                <span class="badge bg-danger rounded-pill">RESTRICTED</span>
+                                                                <span class="badge bg-danger rounded-pill ms-1">RESTRICTED</span>
                                                             }
                                                         </div>
                                                     </div>
@@ -546,7 +565,17 @@
                                                     <div class="row g-3 small">
                                                         <div class="col-sm-6">
                                                             <div class="text-muted">Email:</div>
-                                                            <div class="fw-semibold text-dark">@user.Email</div>
+                                                            <div class="fw-semibold text-dark">
+                                                                @user.Email
+                                                                @if (user.IsEmailVerified)
+                                                                {
+                                                                    <span class="text-success ms-1"><i class="bi bi-check-circle-fill"></i> Verified</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="text-warning ms-1"><i class="bi bi-clock"></i> Unverified</span>
+                                                                }
+                                                            </div>
                                                         </div>
                                                         <div class="col-sm-6">
                                                             <div class="text-muted">Phone:</div>

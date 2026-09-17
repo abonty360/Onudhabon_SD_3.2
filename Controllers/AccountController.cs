@@ -16,15 +16,24 @@ namespace Onudhabon.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly IEmailService _emailService;
+        private readonly IEmailValidationService _emailValidationService;
+        private readonly ILogger<AccountController> _logger;
 
         public AccountController(
             ApplicationDbContext context,
             IPasswordHasher<User> passwordHasher,
-            ICloudinaryService cloudinaryService)
+            ICloudinaryService cloudinaryService,
+            IEmailService emailService,
+            IEmailValidationService emailValidationService,
+            ILogger<AccountController> logger)
         {
             _context = context;
             _passwordHasher = passwordHasher;
             _cloudinaryService = cloudinaryService;
+            _emailService = emailService;
+            _emailValidationService = emailValidationService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -101,6 +110,17 @@ namespace Onudhabon.Controllers
                 ViewBag.ModalTitle = "Verification Status Declined";
                 ViewBag.ModalMessage = "Your volunteer verification status has been declined by the administrator. Please contact support or the administrator for further inquiries.";
                 ModelState.AddModelError(string.Empty, "Your verification status has been declined. You cannot log in.");
+                return View(model);
+            }
+
+            // Check if email address has been verified
+            if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase) && !user.IsEmailVerified)
+            {
+                ViewBag.UnverifiedEmailModal = true;
+                ViewBag.UnverifiedEmail = user.Email;
+                ViewBag.ModalTitle = "Email Verification Required";
+                ViewBag.ModalMessage = $"Your email address ({user.Email}) has not been verified yet. Please check your inbox for the verification link. If you didn't receive the email, you can request a new one below.";
+                ModelState.AddModelError(string.Empty, "Your email address is not verified. Please verify your email before logging in.");
                 return View(model);
             }
 
@@ -222,6 +242,14 @@ namespace Onudhabon.Controllers
                 return View(model);
             }
 
+            // Real-time verification: check whether the email actually exists before sending OTP or registering
+            var (emailExists, emailError) = await _emailValidationService.ValidateEmailExistsAsync(emailNormalized);
+            if (!emailExists)
+            {
+                ModelState.AddModelError(nameof(model.Email), emailError ?? "The email address does not appear to exist. Please provide an active, existing email address to receive your OTP.");
+                return View(model);
+            }
+
             // Process uploaded files with Cloudinary
             string? picturePath = null;
             if (model.PictureFile != null && model.PictureFile.Length > 0)
@@ -256,6 +284,10 @@ namespace Onudhabon.Controllers
                 model.HscPassingYear = null;
             }
 
+            // Generate 6-digit OTP and secure verification token
+            var otp = System.Security.Cryptography.RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+            var token = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+
             // Create new User entity with all submitted registration information
             var user = new User
             {
@@ -286,6 +318,11 @@ namespace Onudhabon.Controllers
                 IsRestricted = false,
                 IsVerified = false,
                 VerificationStatus = "Pending",
+                IsEmailVerified = false,
+                EmailVerificationToken = token,
+                EmailVerificationTokenExpiry = DateTime.UtcNow.AddHours(24),
+                EmailOtp = otp,
+                EmailOtpExpiry = DateTime.UtcNow.AddMinutes(15),
                 CreatedAt = DateTime.UtcNow,
                 __v = 0
             };
@@ -296,8 +333,249 @@ namespace Onudhabon.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Account registered successfully! Your account is currently pending administrator approval. Until approved, you can explore and visit pages as a guest.";
-            return RedirectToAction("Login", new { returnUrl });
+            var verifyUrl = Url.Action("VerifyEmail", "Account", new { token = user.EmailVerificationToken, email = user.Email }, Request.Scheme);
+            await _emailService.SendOtpEmailAsync(user.Email, user.FullName, otp, verifyUrl ?? string.Empty);
+
+            TempData["SuccessMessage"] = $"Registration submitted successfully! We have sent a 6-digit OTP to {user.Email}. Please enter the OTP to verify your email address.";
+            return RedirectToAction(nameof(VerifyOtp), new { email = user.Email, returnUrl });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> VerifyOtp(string? email, string? returnUrl = null)
+        {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return RedirectToAction(nameof(Login), new { returnUrl });
+            }
+
+            var cleanEmail = email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "No account found matching this email address.";
+                return RedirectToAction(nameof(Login), new { returnUrl });
+            }
+
+            if (user.IsEmailVerified)
+            {
+                TempData["SuccessMessage"] = "Your email address is already verified! Your account is currently pending administrator approval.";
+                return RedirectToAction(nameof(Login), new { returnUrl });
+            }
+
+            var model = new VerifyOtpViewModel
+            {
+                Email = user.Email,
+                ReturnUrl = returnUrl
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
+        {
+            SetNoCacheHeaders();
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectAuthenticatedUser();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var cleanEmail = model.Email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "No account was found matching this email address.");
+                return View(model);
+            }
+
+            if (user.IsEmailVerified)
+            {
+                TempData["SuccessMessage"] = "Your email address is already verified! Your account is currently pending administrator approval.";
+                return RedirectToAction(nameof(Login), new { returnUrl = model.ReturnUrl });
+            }
+
+            if (user.EmailOtpExpiry.HasValue && user.EmailOtpExpiry.Value < DateTime.UtcNow)
+            {
+                ModelState.AddModelError(nameof(model.Otp), "This verification OTP has expired. Please click 'Resend OTP' to receive a new code.");
+                return View(model);
+            }
+
+            var enteredOtp = model.Otp?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(user.EmailOtp) || !string.Equals(user.EmailOtp.Trim(), enteredOtp, StringComparison.Ordinal))
+            {
+                ModelState.AddModelError(nameof(model.Otp), "Invalid OTP code. Please enter the correct 6-digit code sent to your email.");
+                return View(model);
+            }
+
+            // Successfully verified via OTP
+            user.IsEmailVerified = true;
+            user.EmailOtp = null;
+            user.EmailOtpExpiry = null;
+            user.EmailVerificationToken = null;
+            user.EmailVerificationTokenExpiry = null;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Email verified successfully! Your account application has been submitted for administrator review. Once approved, you will be able to sign in.";
+            return RedirectToAction(nameof(Login), new { returnUrl = model.ReturnUrl });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendOtp(string? email, string? returnUrl = null)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                TempData["ErrorMessage"] = "Please provide an email address.";
+                return RedirectToAction(nameof(Login), new { returnUrl });
+            }
+
+            var cleanEmail = email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+
+            if (user == null)
+            {
+                TempData["SuccessMessage"] = "If an account with that email exists, a fresh verification OTP has been sent.";
+                return RedirectToAction(nameof(VerifyOtp), new { email, returnUrl });
+            }
+
+            if (user.IsEmailVerified)
+            {
+                TempData["SuccessMessage"] = "Your email address is already verified! Your account is currently awaiting administrator review.";
+                return RedirectToAction(nameof(Login), new { returnUrl });
+            }
+
+            // Generate fresh OTP & verification token
+            var otp = System.Security.Cryptography.RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+            var token = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+
+            user.EmailOtp = otp;
+            user.EmailOtpExpiry = DateTime.UtcNow.AddMinutes(15);
+            user.EmailVerificationToken = token;
+            user.EmailVerificationTokenExpiry = DateTime.UtcNow.AddHours(24);
+            await _context.SaveChangesAsync();
+
+            var verifyUrl = Url.Action("VerifyEmail", "Account", new { token = user.EmailVerificationToken, email = user.Email }, Request.Scheme);
+            await _emailService.SendOtpEmailAsync(user.Email, user.FullName, otp, verifyUrl ?? string.Empty);
+
+            TempData["SuccessMessage"] = $"A fresh 6-digit OTP has been sent to {user.Email}. Please check your inbox (and spam folder).";
+            return RedirectToAction(nameof(VerifyOtp), new { email = user.Email, returnUrl });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyEmail(string? token, string? email)
+        {
+            if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(email))
+            {
+                ViewBag.Success = false;
+                ViewBag.Title = "Invalid Verification Link";
+                ViewBag.Message = "The verification link is missing required verification parameters. Please use the complete link sent to your email.";
+                return View();
+            }
+
+            var cleanEmail = email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+
+            if (user == null)
+            {
+                ViewBag.Success = false;
+                ViewBag.Title = "Account Not Found";
+                ViewBag.Message = "No account was found matching this email address.";
+                return View();
+            }
+
+            if (user.IsEmailVerified)
+            {
+                ViewBag.Success = true;
+                ViewBag.AlreadyVerified = true;
+                ViewBag.Title = "Email Already Verified";
+                ViewBag.Message = "Your email address has already been verified. Your account is currently pending administrator approval.";
+                return View();
+            }
+
+            if (user.EmailVerificationToken != token || (user.EmailVerificationTokenExpiry.HasValue && user.EmailVerificationTokenExpiry.Value < DateTime.UtcNow))
+            {
+                ViewBag.Success = false;
+                ViewBag.Expired = true;
+                ViewBag.Email = user.Email;
+                ViewBag.Title = "Verification Link Expired or Invalid";
+                ViewBag.Message = "This email verification link has expired or is invalid. Verification links are valid for 24 hours. You can request a fresh code or link below.";
+                return View();
+            }
+
+            // Successfully verified!
+            user.IsEmailVerified = true;
+            user.EmailVerificationToken = null;
+            user.EmailVerificationTokenExpiry = null;
+            user.EmailOtp = null;
+            user.EmailOtpExpiry = null;
+            await _context.SaveChangesAsync();
+
+            ViewBag.Success = true;
+            ViewBag.Title = "Email Verified Successfully!";
+            ViewBag.Message = "Your email address has been successfully verified! An administrator will now review your account application. Once approved, you will be able to log in.";
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendVerificationEmail(string? email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                TempData["ErrorMessage"] = "Please provide a valid email address.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var cleanEmail = email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+
+            if (user == null)
+            {
+                TempData["SuccessMessage"] = "If an account with that email exists and is unverified, a fresh verification OTP has been sent.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            if (user.IsEmailVerified)
+            {
+                TempData["SuccessMessage"] = "Your email address is already verified! Your account is currently awaiting administrator review.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Generate fresh token & OTP
+            var otp = System.Security.Cryptography.RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+            user.EmailOtp = otp;
+            user.EmailOtpExpiry = DateTime.UtcNow.AddMinutes(15);
+            user.EmailVerificationToken = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+            user.EmailVerificationTokenExpiry = DateTime.UtcNow.AddHours(24);
+            await _context.SaveChangesAsync();
+
+            var verifyUrl = Url.Action("VerifyEmail", "Account", new { token = user.EmailVerificationToken, email = user.Email }, Request.Scheme);
+            await _emailService.SendOtpEmailAsync(user.Email, user.FullName, otp, verifyUrl ?? string.Empty);
+
+            TempData["SuccessMessage"] = $"A fresh verification email and OTP have been sent to {user.Email}. Please check your inbox (and spam folder).";
+            return RedirectToAction(nameof(VerifyOtp), new { email = user.Email });
         }
 
         [HttpGet]

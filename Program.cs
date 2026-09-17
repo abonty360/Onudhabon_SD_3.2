@@ -33,6 +33,10 @@ builder.Services.AddScoped<IVolunteerRankingService, VolunteerRankingService>();
 // Payment Gateway Services (Sandbox & Production)
 builder.Services.AddScoped<ISSLCommerzService, SSLCommerzService>();
 
+// Email Services (Gmail SMTP & Real-time Validation)
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEmailValidationService, EmailValidationService>();
+
 // HttpClient and Memory Cache
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
@@ -78,6 +82,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
                 if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
                 {
+                    if (!user.IsEmailVerified)
+                    {
+                        context.RejectPrincipal();
+                        await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                        return;
+                    }
+
                     bool isApproved = user.IsVerified ||
                         string.Equals(user.VerificationStatus, "Active", StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(user.VerificationStatus, "Approved", StringComparison.OrdinalIgnoreCase);

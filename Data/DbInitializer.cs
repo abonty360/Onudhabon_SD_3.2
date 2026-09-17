@@ -26,6 +26,7 @@ namespace Onudhabon.Data
                     IsRestricted = false,
                     IsVerified = true,
                     VerificationStatus = "Active",
+                    IsEmailVerified = true,
                     AgreeToTerms = true,
                     CreatedAt = DateTime.UtcNow,
                     __v = 0
@@ -34,6 +35,11 @@ namespace Onudhabon.Data
                 admin.PasswordHash = passwordHasher.HashPassword(admin, "Admin@12345");
 
                 context.Users.Add(admin);
+                context.SaveChanges();
+            }
+            else if (!existingAdmin.IsEmailVerified)
+            {
+                existingAdmin.IsEmailVerified = true;
                 context.SaveChanges();
             }
         }

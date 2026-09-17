@@ -47,6 +47,11 @@ namespace Onudhabon.Data
                 entity.Property(e => e.IsRestricted).HasDefaultValue(false);
                 entity.Property(e => e.IsVerified).HasDefaultValue(false);
                 entity.Property(e => e.VerificationStatus).HasMaxLength(50).HasDefaultValue("Pending");
+                entity.Property(e => e.IsEmailVerified).HasDefaultValue(false);
+                entity.Property(e => e.EmailVerificationToken).HasMaxLength(100);
+                entity.Property(e => e.EmailVerificationTokenExpiry);
+                entity.Property(e => e.EmailOtp).HasMaxLength(10);
+                entity.Property(e => e.EmailOtpExpiry);
                 entity.Property(e => e.NidNumber).HasMaxLength(50);
                 entity.Property(e => e.CertificatePicture).HasMaxLength(500);
                 entity.Property(e => e.EducationLevel).HasMaxLength(100);
