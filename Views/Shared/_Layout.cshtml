@@ -158,20 +158,22 @@
 
                             <li class="nav-item dropdown">
                                 <a class="nav-link d-flex align-items-center gap-2 user-profile-link dropdown-toggle py-1 px-2.5 rounded-pill" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    @if (!string.IsNullOrWhiteSpace(userPicture))
-                                    {
-                                        <img src="@CloudinaryService.GetAvatarUrl(userPicture, 70)" 
-                                             alt="@User.Identity.Name" 
-                                             class="rounded-circle border border-2 border-white" 
-                                             style="width: 32px; height: 32px; object-fit: cover;" />
-                                    }
-                                    else
-                                    {
-                                        <div class="rounded-circle bg-white text-primary fw-bold d-flex align-items-center justify-content-center shadow-sm" 
-                                             style="width: 32px; height: 32px; font-size: 0.85rem;">
-                                            @(string.IsNullOrEmpty(User.Identity.Name) ? "U" : User.Identity.Name.Substring(0, 1).ToUpper())
-                                        </div>
-                                    }
+                                    <span id="navbarAvatarContainer" class="d-inline-flex align-items-center justify-content-center">
+                                        @if (!string.IsNullOrWhiteSpace(userPicture))
+                                        {
+                                            <img src="@CloudinaryService.GetAvatarUrl(userPicture, 70)" 
+                                                 alt="@User.Identity.Name" 
+                                                 class="rounded-circle border border-2 border-white" 
+                                                 style="width: 32px; height: 32px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded-circle bg-white text-primary fw-bold d-flex align-items-center justify-content-center shadow-sm" 
+                                                 style="width: 32px; height: 32px; font-size: 0.85rem;">
+                                                @(string.IsNullOrEmpty(User.Identity.Name) ? "U" : User.Identity.Name.Substring(0, 1).ToUpper())
+                                            </div>
+                                        }
+                                    </span>
                                     <span class="fw-semibold user-name-text">@(User.Identity.Name)</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2" style="min-width: 220px;">

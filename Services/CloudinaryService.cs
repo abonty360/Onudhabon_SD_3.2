@@ -158,15 +158,18 @@ namespace Onudhabon.Services
             try
             {
                 await using var stream = file.OpenReadStream();
-                var publicId = Path.GetFileNameWithoutExtension(file.FileName);
+                var rawName = Path.GetFileNameWithoutExtension(file.FileName);
+                var safeName = string.Concat(rawName.Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_')).Trim();
+                if (string.IsNullOrEmpty(safeName)) safeName = "avatar";
+                var publicId = $"{safeName}_{DateTime.UtcNow.Ticks}_{Guid.NewGuid():N}";
 
                 var uploadParams = new ImageUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
                     Folder = FOLDER_PROFILES,
                     PublicId = publicId,
-                    UseFilename = true,
-                    UniqueFilename = false,
+                    UseFilename = false,
+                    UniqueFilename = true,
                     Overwrite = true
                 };
 

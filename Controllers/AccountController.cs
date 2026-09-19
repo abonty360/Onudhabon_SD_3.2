@@ -19,6 +19,7 @@ namespace Onudhabon.Controllers
         private readonly IEmailService _emailService;
         private readonly IEmailValidationService _emailValidationService;
         private readonly ILogger<AccountController> _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public AccountController(
             ApplicationDbContext context,
@@ -26,7 +27,8 @@ namespace Onudhabon.Controllers
             ICloudinaryService cloudinaryService,
             IEmailService emailService,
             IEmailValidationService emailValidationService,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _passwordHasher = passwordHasher;
@@ -34,6 +36,7 @@ namespace Onudhabon.Controllers
             _emailService = emailService;
             _emailValidationService = emailValidationService;
             _logger = logger;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet]
@@ -850,6 +853,252 @@ namespace Onudhabon.Controllers
             }
 
             return View(user);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfilePicture(IFormFile? profilePicture)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+
+            User? user = null;
+            if (int.TryParse(userIdStr, out int userId))
+            {
+                user = await _context.Users.FindAsync(userId);
+            }
+
+            if (user == null && !string.IsNullOrEmpty(email))
+            {
+                user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            }
+
+            if (user == null)
+            {
+                if (IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "User not found or session has expired. Please log in again." });
+                }
+                return RedirectToAction(nameof(Login));
+            }
+
+            if (profilePicture == null || profilePicture.Length == 0)
+            {
+                var msg = "Please select an image file to upload.";
+                if (IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = msg });
+                }
+                TempData["ErrorMessage"] = msg;
+                return RedirectToAction(nameof(Profile));
+            }
+
+            // Validate file size (max 5 MB)
+            const long maxFileSize = 5 * 1024 * 1024;
+            if (profilePicture.Length > maxFileSize)
+            {
+                var msg = "Image file size exceeds the 5 MB limit. Please choose a smaller photo.";
+                if (IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = msg });
+                }
+                TempData["ErrorMessage"] = msg;
+                return RedirectToAction(nameof(Profile));
+            }
+
+            // Validate file extension
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+            var extension = Path.GetExtension(profilePicture.FileName)?.ToLowerInvariant();
+            if (string.IsNullOrEmpty(extension) || !allowedExtensions.Contains(extension))
+            {
+                var msg = "Invalid file type. Only JPG, JPEG, PNG, WEBP, and GIF images are permitted.";
+                if (IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = msg });
+                }
+                TempData["ErrorMessage"] = msg;
+                return RedirectToAction(nameof(Profile));
+            }
+
+            // Validate content type
+            if (!profilePicture.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            {
+                var msg = "The uploaded file does not appear to be a valid image format.";
+                if (IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = msg });
+                }
+                TempData["ErrorMessage"] = msg;
+                return RedirectToAction(nameof(Profile));
+            }
+
+            string? newPictureUrl = null;
+
+            // Attempt Cloudinary upload first
+            try
+            {
+                var uploadResult = await _cloudinaryService.UploadProfilePictureAsync(profilePicture);
+                if (uploadResult != null && uploadResult.Success && !string.IsNullOrWhiteSpace(uploadResult.SecureUrl))
+                {
+                    newPictureUrl = uploadResult.SecureUrl;
+                }
+                else
+                {
+                    _logger.LogWarning("Cloudinary profile upload returned non-success: {Error}. Falling back to local storage.", uploadResult?.ErrorMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Exception during Cloudinary profile upload. Falling back to local storage.");
+            }
+
+            // Local storage fallback if Cloudinary credentials missing or upload failed
+            if (string.IsNullOrWhiteSpace(newPictureUrl))
+            {
+                try
+                {
+                    var webRoot = _webHostEnvironment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                    var uploadsDir = Path.Combine(webRoot, "uploads", "profiles");
+                    if (!Directory.Exists(uploadsDir))
+                    {
+                        Directory.CreateDirectory(uploadsDir);
+                    }
+
+                    var uniqueFileName = $"profile_{user.Id}_{DateTime.UtcNow.Ticks}_{Guid.NewGuid():N}{extension}";
+                    var filePath = Path.Combine(uploadsDir, uniqueFileName);
+
+                    await using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await profilePicture.CopyToAsync(fileStream);
+                    }
+
+                    newPictureUrl = $"/uploads/profiles/{uniqueFileName}";
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to store profile picture locally.");
+                    var msg = "Failed to upload profile picture. Please try again.";
+                    if (IsAjaxRequest())
+                    {
+                        return Json(new { success = false, message = msg });
+                    }
+                    TempData["ErrorMessage"] = msg;
+                    return RedirectToAction(nameof(Profile));
+                }
+            }
+
+            // Update user record
+            user.Picture = newPictureUrl;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            // Refresh cookie claims so navbar & session immediately display new picture
+            await RefreshUserClaimsAsync(user);
+
+            var avatarDisplayUrl = _cloudinaryService.GetAvatarUrl(user.Picture, 220);
+
+            if (IsAjaxRequest())
+            {
+                return Json(new
+                {
+                    success = true,
+                    message = "Profile picture updated successfully!",
+                    pictureUrl = avatarDisplayUrl,
+                    rawUrl = user.Picture
+                });
+            }
+
+            TempData["SuccessMessage"] = "Profile picture updated successfully!";
+            return RedirectToAction(nameof(Profile));
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveProfilePicture()
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+
+            User? user = null;
+            if (int.TryParse(userIdStr, out int userId))
+            {
+                user = await _context.Users.FindAsync(userId);
+            }
+
+            if (user == null && !string.IsNullOrEmpty(email))
+            {
+                user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            }
+
+            if (user == null)
+            {
+                if (IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "User not found or session has expired." });
+                }
+                return RedirectToAction(nameof(Login));
+            }
+
+            user.Picture = null;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            await RefreshUserClaimsAsync(user);
+
+            var fallbackInitial = string.IsNullOrEmpty(user.FullName) ? "U" : user.FullName.Substring(0, 1).ToUpper();
+
+            if (IsAjaxRequest())
+            {
+                return Json(new
+                {
+                    success = true,
+                    message = "Profile picture removed successfully.",
+                    fallbackInitial
+                });
+            }
+
+            TempData["SuccessMessage"] = "Profile picture removed successfully.";
+            return RedirectToAction(nameof(Profile));
+        }
+
+        private async Task RefreshUserClaimsAsync(User user)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("PhoneNumber", user.PhoneNumber ?? ""),
+                new Claim("City", user.City ?? ""),
+                new Claim("Area", user.Area ?? "")
+            };
+
+            if (!string.IsNullOrEmpty(user.Picture))
+            {
+                claims.Add(new Claim("Picture", user.Picture));
+            }
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30),
+                AllowRefresh = true
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+        }
+
+        private bool IsAjaxRequest()
+        {
+            return Request.Headers["X-Requested-With"] == "XMLHttpRequest"
+                || Request.Headers.Accept.ToString().Contains("application/json", StringComparison.OrdinalIgnoreCase);
         }
 
         [HttpPost]
