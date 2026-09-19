@@ -333,6 +333,22 @@ namespace Onudhabon.Services
 
         public async Task<bool> SendEmailAsync(string toEmail, string subject, string htmlBody)
         {
+            // 1. Try Google Apps Script HTTPS Relay (Sends real emails from Gmail to ANY recipient via HTTPS port 443)
+            var googleScriptUrl = Environment.GetEnvironmentVariable("GOOGLE_SCRIPT_URL")
+                ?? _configuration["GoogleScript:Url"];
+
+            if (!string.IsNullOrWhiteSpace(googleScriptUrl))
+            {
+                _logger.LogInformation("Attempting to deliver email to {ToEmail} via Google Apps Script Relay...", toEmail);
+                var scriptSuccess = await SendViaGoogleScriptAsync(googleScriptUrl.Trim(), toEmail, subject, htmlBody);
+                if (scriptSuccess)
+                {
+                    return true;
+                }
+                _logger.LogWarning("Google Apps Script Relay delivery failed. Falling back to Resend API for {ToEmail}...", toEmail);
+            }
+
+            // 2. Try Resend HTTPS API (Port 443)
             var resendApiKey = Environment.GetEnvironmentVariable("RESEND_API_KEY")
                 ?? _configuration["Resend:ApiKey"];
 
@@ -347,7 +363,51 @@ namespace Onudhabon.Services
                 _logger.LogWarning("Resend delivery failed. Falling back to Gmail SMTP for {ToEmail}...", toEmail);
             }
 
+            // 3. Fallback to direct Gmail SMTP (for local development or unblocked port 587)
             return await SendViaSmtpAsync(toEmail, subject, htmlBody);
+        }
+
+        private async Task<bool> SendViaGoogleScriptAsync(string scriptUrl, string toEmail, string subject, string htmlBody)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                client.Timeout = TimeSpan.FromSeconds(25);
+
+                var payload = new
+                {
+                    to = toEmail,
+                    subject = subject,
+                    html = htmlBody
+                };
+
+                var json = JsonSerializer.Serialize(payload);
+                using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync(scriptUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    _logger.LogInformation("Email successfully sent via Google Apps Script Relay to: {ToEmail} (Response: {Response})", toEmail, responseBody);
+                    return true;
+                }
+
+                if (response.StatusCode == HttpStatusCode.Redirect || response.StatusCode == HttpStatusCode.Found || response.StatusCode == HttpStatusCode.MovedPermanently)
+                {
+                    _logger.LogInformation("Email accepted by Google Apps Script Relay for: {ToEmail} (Redirected {StatusCode})", toEmail, response.StatusCode);
+                    return true;
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Google Apps Script Relay returned status {StatusCode}: {Error}", response.StatusCode, errorContent);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception while sending email via Google Apps Script Relay to {ToEmail}: {Message}", toEmail, ex.Message);
+                return false;
+            }
         }
 
         private async Task<bool> SendViaResendAsync(string apiKey, string toEmail, string subject, string htmlBody)
