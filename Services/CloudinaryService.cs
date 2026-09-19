@@ -426,8 +426,8 @@ namespace Onudhabon.Services
                 originalUrl,
                 width: size,
                 height: size,
-                crop: "thumb",
-                gravityFace: true);
+                crop: "fill",
+                gravityFace: false);
         }
 
         public string GetOptimizedVideoUrl(string? originalUrl, int? maxWidth = null)

@@ -29,7 +29,7 @@ namespace Onudhabon.Controllers
 
         // GET: /Admin or /Admin/Dashboard
         [HttpGet]
-        public async Task<IActionResult> Index() => await Dashboard();
+        public IActionResult Index() => RedirectToAction(nameof(Dashboard));
 
         [HttpGet]
         public async Task<IActionResult> Dashboard(string? tab = "volunteers", int? month = null, int? year = null)
@@ -81,7 +81,7 @@ namespace Onudhabon.Controllers
             };
 
             ViewBag.ActiveTab = tab ?? "volunteers";
-            return View(viewModel);
+            return View("Dashboard", viewModel);
         }
 
         // POST: /Admin/ApproveUser/5

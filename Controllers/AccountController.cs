@@ -40,6 +40,16 @@ namespace Onudhabon.Controllers
         }
 
         [HttpGet]
+        public IActionResult Index()
+        {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction(nameof(Profile));
+            }
+            return RedirectToAction(nameof(Login));
+        }
+
+        [HttpGet]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Login(string? returnUrl = null)
         {
@@ -996,7 +1006,8 @@ namespace Onudhabon.Controllers
             // Refresh cookie claims so navbar & session immediately display new picture
             await RefreshUserClaimsAsync(user);
 
-            var avatarDisplayUrl = _cloudinaryService.GetAvatarUrl(user.Picture, 220);
+            // Use the original image URL directly so original size/framing is shown without face-zoom
+            var pictureUrl = user.Picture;
 
             if (IsAjaxRequest())
             {
@@ -1004,7 +1015,7 @@ namespace Onudhabon.Controllers
                 {
                     success = true,
                     message = "Profile picture updated successfully!",
-                    pictureUrl = avatarDisplayUrl,
+                    pictureUrl = pictureUrl,
                     rawUrl = user.Picture
                 });
             }
