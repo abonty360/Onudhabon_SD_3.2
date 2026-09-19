@@ -33,3 +33,7 @@ services:
         sync: false
       - key: SSLC_STORE_PASSWORD
         sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        value: "Onudhabon <onboarding@resend.dev>"
