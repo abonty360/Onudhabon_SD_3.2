@@ -1,0 +1,15 @@
+**/.git
+**/.github
+**/.vs
+**/bin
+**/obj
+**/.vscode
+**/.idea
+**/*.user
+**/*.suo
+**/.env
+**/.env.*
+Dockerfile*
+docker-compose*
+README*
+*.md

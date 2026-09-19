@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Onudhabon.Data;
@@ -10,10 +11,28 @@ using Onudhabon.Services;
 // Enable legacy timestamp behavior for Npgsql to handle DateTime conversions smoothly
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-// Load environment variables from .env file
-DotNetEnv.Env.Load();
+// Load environment variables from .env file if present
+if (File.Exists(".env"))
+{
+    DotNetEnv.Env.Load();
+}
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Dynamically bind port if provided by container/cloud hosting (e.g., Render, Railway, Docker)
+var envPort = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(envPort))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{envPort}");
+}
+
+// Support reverse-proxy forwarded headers (Render, Cloudflare, AWS)
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // Add Database Context (PostgreSQL via DATABASE_URL from .env or configuration)
 var rawConnectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
@@ -130,6 +149,8 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
