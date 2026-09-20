@@ -68,8 +68,8 @@
                         <span class="sender-badge">Assistant</span>
                     </div>
                     <div class="chat-bubble bot-bubble">
-                        <div class="mb-1"><strong>Hello! I'm your AI Academic Companion.</strong> 👋</div>
-                        <div>I can answer your questions, help you navigate courses and materials, or guide you through the Onudhabon platform.</div>
+                        <div class="mb-1"><strong>Hello! I'm your Onudhabon AI Assistant.</strong> 👋</div>
+                        <div>I am here exclusively to assist you with the <strong>Onudhabon</strong> platform (lectures, materials, forum, donations, student tracking) and answer questions from any <strong>PDF document</strong> you upload.</div>
                     </div>
                 </div>
             </div>
@@ -84,8 +84,8 @@
                     <button type="button" class="suggestion-chip" data-prompt="Where can I find study materials?">
                         <span class="chip-icon">📄</span> Study Materials
                     </button>
-                    <button type="button" class="suggestion-chip" data-prompt="How do I view my profile?">
-                        <span class="chip-icon">👤</span> My Profile
+                    <button type="button" class="suggestion-chip" data-prompt="How can I donate to Onudhabon?">
+                        <span class="chip-icon">💖</span> Support / Donate
                     </button>
                     <button type="button" class="suggestion-chip" data-prompt="What features does Onudhabon offer?">
                         <span class="chip-icon">💡</span> Platform Guide
@@ -115,7 +115,7 @@
                         </svg>
                     </button>
                     <input type="text" id="chat-input" class="chat-input-field" 
-                           placeholder="Ask a question or upload a PDF to learn from..." 
+                           placeholder="Ask about Onudhabon or attach a PDF to ask questions..." 
                            autocomplete="off" maxlength="1000" />
                     <button type="button" id="chat-send-btn" class="chat-send-btn" title="Send message" aria-label="Send message">
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -126,7 +126,7 @@
                 </div>
             </form>
             <div class="chat-footer-note">
-                ⚡ Powered by Gemini AI • Supports PDF Document Learning
+                🔒 Dedicated to Onudhabon & Uploaded PDF Documents
             </div>
         </div>
     </div>
@@ -1154,7 +1154,7 @@
             removePdfBtn.addEventListener('click', () => {
                 const oldName = currentPdfName;
                 detachPdf();
-                renderBubble('bot', `📄 Detached **${oldName || 'PDF'}**. I am back to general academic assistance and platform navigation.`);
+                renderBubble('bot', `📄 Detached **${oldName || 'PDF'}**. I am ready to answer questions about the Onudhabon platform or any new PDF you attach.`);
             });
         }
 
