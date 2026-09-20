@@ -60,12 +60,12 @@
                 </a>
 
                 <!-- Mobile toggler -->
-                <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                <button class="navbar-toggler border-0 text-white shadow-none px-2 py-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between" id="navbarSupportedContent">
                     <!-- Center/Left Navigation -->
                     <ul class="navbar-nav flex-grow-1 align-items-lg-center">
                         <li class="nav-item">
@@ -145,7 +145,7 @@
                                         0
                                     </span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2" aria-labelledby="notificationDropdown" style="width: 320px; max-height: 380px; overflow-y: auto;">
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2 notification-dropdown-menu" aria-labelledby="notificationDropdown" style="max-height: 380px; overflow-y: auto;">
                                     <li class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
                                         <span class="fw-bold text-dark">Notifications</span>
                                         <button id="markReadBtn" class="btn btn-link btn-sm text-primary p-0 text-decoration-none small">Mark all read</button>
@@ -176,7 +176,7 @@
                                     </span>
                                     <span class="fw-semibold user-name-text">@(User.Identity.Name)</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2" style="min-width: 220px;">
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 mt-2 user-dropdown-menu">
                                     <li class="px-3 py-2 border-bottom mb-1">
                                         <div class="text-muted small">
                                              Role: <span class="badge @(userRole == "Admin" ? "bg-danger" : "bg-secondary") rounded-pill">@(userRole ?? "User")</span>

@@ -91,8 +91,8 @@
                 bool isLiked = hasReaction && isLike;
                 bool isDisliked = hasReaction && !isLike;
 
-                <div id="post-@post.Id" class="card border border-light-subtle rounded-3 shadow-sm p-4 bg-white hover-shadow transition">
-                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <div id="post-@post.Id" class="card border border-light-subtle rounded-3 shadow-sm p-3 p-sm-4 bg-white hover-shadow transition">
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2 flex-wrap">
                         <h4 class="fw-bold text-dark mb-0">@post.Title</h4>
                         @if (post.Status == "Pending" || post.Status == "pending" || string.IsNullOrEmpty(post.Status))
                         {
@@ -167,13 +167,13 @@
 
                     <p class="text-dark fs-6 mb-4" style="line-height: 1.6; white-space: pre-line;">@post.Content</p>
 
-                    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                    <div class="d-flex justify-content-between align-items-center border-top pt-3 flex-wrap gap-2">
                         <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 fw-semibold toggle-details-btn d-inline-flex align-items-center gap-1.5" data-post-id="@post.Id">
                             <i class="bi bi-chat-dots"></i>
                             <span>View Details (<span id="reply-count-@post.Id">@post.Replies</span> replies)</span>
                         </button>
 
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 ms-auto">
                             <button type="button" 
                                     class="btn @(isLiked ? "btn-success text-white" : "btn-outline-success") btn-sm rounded-3 px-3 py-1 fw-medium like-btn d-inline-flex align-items-center gap-1" 
                                     id="like-btn-@post.Id"
