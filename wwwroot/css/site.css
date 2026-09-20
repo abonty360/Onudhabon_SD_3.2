@@ -2974,3 +2974,37 @@ svg {
     min-width: 220px;
     max-width: calc(100vw - 32px);
 }
+
+/* --------------------------------------------------------------------------
+   10. FORUM POST ACTIONS ROW (COMPACT SINGLE LINE ON MOBILE)
+   -------------------------------------------------------------------------- */
+
+.forum-actions-row {
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    padding-top: 8px !important;
+}
+
+@media (max-width: 576px) {
+    .forum-actions-row {
+        gap: 4px !important;
+        padding-top: 6px !important;
+    }
+
+    .forum-actions-row .btn {
+        padding: 3.5px 7px !important;
+        font-size: 0.75rem !important;
+        white-space: nowrap !important;
+        line-height: 1.25 !important;
+    }
+
+    .forum-actions-row .toggle-details-btn {
+        padding: 3.5px 8px !important;
+    }
+
+    .forum-actions-row .toggle-details-btn i,
+    .forum-actions-row .like-btn i,
+    .forum-actions-row .dislike-btn i {
+        font-size: 0.8rem !important;
+    }
+}
