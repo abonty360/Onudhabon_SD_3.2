@@ -44,8 +44,8 @@
     <div class="row g-4 justify-content-center">
         <!-- Donation Form -->
         <div class="col-lg-7">
-            <div class="card border shadow-sm rounded-4 p-4 p-md-5 bg-white">
-                <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+            <div class="card border shadow-sm rounded-4 p-3 p-sm-4 p-md-5 bg-white">
+                <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom flex-wrap gap-2">
                     <div>
                         <h4 class="fw-bold text-dark mb-1">Contribution Form</h4>
                         <p class="text-muted small mb-0">Select your contribution amount and allocate funds.</p>
@@ -63,22 +63,22 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold text-dark small text-uppercase" style="letter-spacing: 0.04em;">Select Amount (BDT)</label>
                         <div class="row g-2 mb-3" id="presetAmountsContainer">
-                            <div class="col-3">
+                            <div class="col-6 col-sm-3">
                                 <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="200">
                                     ৳200
                                 </button>
                             </div>
-                            <div class="col-3">
+                            <div class="col-6 col-sm-3">
                                 <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn active btn-primary text-white border-primary font-monospace" data-amount="500">
                                     ৳500
                                 </button>
                             </div>
-                            <div class="col-3">
+                            <div class="col-6 col-sm-3">
                                 <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="1000">
                                     ৳1,000
                                 </button>
                             </div>
-                            <div class="col-3">
+                            <div class="col-6 col-sm-3">
                                 <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="2500">
                                     ৳2,500
                                 </button>
@@ -143,29 +143,14 @@
                             <span>Donate ৳<span id="btnAmountDisplay">500</span> via SSLCommerz</span>
                         </button>
 
-                        <div class="d-flex align-items-center justify-content-center gap-3 text-muted small mt-2.5" style="font-size: 0.8rem;">
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-muted small mt-2.5 flex-wrap text-center" style="font-size: 0.8rem;">
                             <span><i class="bi bi-shield-check text-success me-1"></i>SSLCommerz Gateway</span>
-                            <span>•</span>
+                            <span class="d-none d-sm-inline">•</span>
                             <span>Visa • Mastercard • bKash • Nagad</span>
-                            <span>•</span>
+                            <span class="d-none d-sm-inline">•</span>
                             <span>Instant Receipt</span>
                         </div>
 
-                        <!-- Sandbox Test Card Details -->
-                        <div class="card border-0 bg-primary bg-opacity-10 rounded-3 p-3 mt-3 text-dark small">
-                            <div class="d-flex align-items-center gap-2 mb-1.5 fw-bold text-primary">
-                                <i class="bi bi-credit-card-2-front-fill"></i>
-                                <span>SSLCommerz Sandbox Test Card:</span>
-                            </div>
-                            <div class="font-monospace text-dark mb-1" style="font-size: 0.82rem;">
-                                <strong>Card:</strong> <code>4111 1111 1111 1111</code>
-                            </div>
-                            <div class="d-flex gap-3 font-monospace text-muted" style="font-size: 0.78rem;">
-                                <span><strong>Exp:</strong> 12/28</span>
-                                <span><strong>CVV:</strong> 111</span>
-                                <span><strong>OTP:</strong> 123456</span>
-                            </div>
-                        </div>
                     </div>
                 </form>
             </div>

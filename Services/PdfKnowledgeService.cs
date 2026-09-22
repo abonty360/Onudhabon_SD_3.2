@@ -69,7 +69,7 @@ namespace Onudhabon.Services
             try
             {
                 var client = _httpClientFactory.CreateClient();
-                client.Timeout = TimeSpan.FromSeconds(25);
+                client.Timeout = TimeSpan.FromSeconds(5);
 
                 using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                 if (!response.IsSuccessStatusCode)
@@ -96,7 +96,7 @@ namespace Onudhabon.Services
             }
         }
 
-        public string ExtractRelevantExcerpt(string fullText, string query, int maxChars = 4000)
+        public string ExtractRelevantExcerpt(string fullText, string query, int maxChars = 35000)
         {
             if (string.IsNullOrWhiteSpace(fullText))
                 return string.Empty;
@@ -149,7 +149,7 @@ namespace Onudhabon.Services
             var bestParagraphs = scoredParagraphs
                 .OrderByDescending(sp => sp.score)
                 .ThenBy(sp => sp.index)
-                .Take(6)
+                .Take(20)
                 .OrderBy(sp => sp.index)
                 .Select(sp => sp.text);
 
@@ -166,11 +166,11 @@ namespace Onudhabon.Services
         {
             var sb = new StringBuilder();
 
-            // 1. Attached PDF from User Chat Session
+            // 1. Attached PDF from User Chat Session (in-memory, fast)
             if (!string.IsNullOrWhiteSpace(attachedPdfText))
             {
                 sb.AppendLine("=== CURRENTLY ATTACHED PDF DOCUMENT ===");
-                var relevantDocExcerpt = ExtractRelevantExcerpt(attachedPdfText, userQuery, 5000);
+                var relevantDocExcerpt = ExtractRelevantExcerpt(attachedPdfText, userQuery, 35000);
                 sb.AppendLine(relevantDocExcerpt);
                 sb.AppendLine("======================================");
                 sb.AppendLine();
@@ -179,46 +179,72 @@ namespace Onudhabon.Services
             // 2. Search Relevant Platform Study Material PDFs
             try
             {
-                using var scope = _serviceProvider.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-                var materials = await dbContext.Materials
-                    .Where(m => m.Status == "Active" && !string.IsNullOrEmpty(m.FileUrl))
-                    .OrderByDescending(m => m.Date)
-                    .Take(10)
-                    .ToListAsync();
-
-                // Check which materials match query keywords
-                var queryLower = userQuery.ToLowerInvariant();
-                var matchingMaterials = materials
-                    .Where(m =>
-                        (!string.IsNullOrEmpty(m.Subject) && queryLower.Contains(m.Subject.ToLowerInvariant())) ||
-                        (!string.IsNullOrEmpty(m.Topic) && queryLower.Contains(m.Topic.ToLowerInvariant())) ||
-                        (!string.IsNullOrEmpty(m.Title) && queryLower.Contains(m.Title.ToLowerInvariant())) ||
-                        (!string.IsNullOrEmpty(m.ClassLevel) && queryLower.Contains(m.ClassLevel.ToLowerInvariant())) ||
-                        queryLower.Contains("pdf") || queryLower.Contains("material") || queryLower.Contains("note") || queryLower.Contains("study"))
-                    .Take(3)
-                    .ToList();
-
-                if (matchingMaterials.Any())
+                // Cache active materials metadata for 10 minutes to avoid repeated DB queries during chat
+                var materials = await _cache.GetOrCreateAsync("active_platform_materials_cache", async entry =>
                 {
-                    sb.AppendLine("=== RELEVANT PLATFORM STUDY MATERIALS (PDFs) ===");
-                    foreach (var mat in matchingMaterials)
-                    {
-                        sb.AppendLine($"Document: {mat.Title} | Subject: {mat.Subject} | Topic: {mat.Topic} | Class: {mat.ClassLevel}");
-                        if (!string.IsNullOrEmpty(mat.FileUrl) && mat.FileUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                    using var scope = _serviceProvider.CreateScope();
+                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                    return await dbContext.Materials
+                        .Where(m => m.Status == "Active" && !string.IsNullOrEmpty(m.FileUrl))
+                        .OrderByDescending(m => m.Date)
+                        .Take(15)
+                        .Select(m => new
                         {
-                            var pdfText = await ExtractTextFromUrlAsync(mat.FileUrl, 15);
-                            if (!string.IsNullOrWhiteSpace(pdfText))
+                            m.Title,
+                            m.Subject,
+                            m.Topic,
+                            m.ClassLevel,
+                            m.FileUrl
+                        })
+                        .ToListAsync();
+                });
+
+                if (materials != null && materials.Any())
+                {
+                    var queryLower = userQuery.ToLowerInvariant();
+                    var matchingMaterials = materials
+                        .Where(m =>
+                            (!string.IsNullOrEmpty(m.Subject) && queryLower.Contains(m.Subject.ToLowerInvariant())) ||
+                            (!string.IsNullOrEmpty(m.Topic) && queryLower.Contains(m.Topic.ToLowerInvariant())) ||
+                            (!string.IsNullOrEmpty(m.Title) && queryLower.Contains(m.Title.ToLowerInvariant())) ||
+                            (!string.IsNullOrEmpty(m.ClassLevel) && queryLower.Contains(m.ClassLevel.ToLowerInvariant())) ||
+                            queryLower.Contains("pdf") || queryLower.Contains("material") || queryLower.Contains("note") || queryLower.Contains("study"))
+                        .Take(3)
+                        .ToList();
+
+                    if (matchingMaterials.Any())
+                    {
+                        sb.AppendLine("=== RELEVANT PLATFORM STUDY MATERIALS ===");
+                        foreach (var mat in matchingMaterials)
+                        {
+                            sb.AppendLine($"- Document: {mat.Title} | Subject: {mat.Subject} | Topic: {mat.Topic} | Class: {mat.ClassLevel}");
+                        }
+
+                        // Only download and extract PDF text if the user specifically requests deep content/explanation/summary
+                        bool wantsDeepContent = queryLower.Contains("summarize") ||
+                                               queryLower.Contains("summary") ||
+                                               queryLower.Contains("explain") ||
+                                               queryLower.Contains("content") ||
+                                               queryLower.Contains("what does");
+
+                        if (wantsDeepContent)
+                        {
+                            var bestMatch = matchingMaterials.FirstOrDefault(m => !string.IsNullOrEmpty(m.FileUrl) && m.FileUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase));
+                            if (bestMatch != null && !string.IsNullOrEmpty(bestMatch.FileUrl))
                             {
-                                var excerpt = ExtractRelevantExcerpt(pdfText, userQuery, 2500);
-                                sb.AppendLine($"Content from {mat.Title}:");
-                                sb.AppendLine(excerpt);
+                                var pdfText = await ExtractTextFromUrlAsync(bestMatch.FileUrl, 8);
+                                if (!string.IsNullOrWhiteSpace(pdfText))
+                                {
+                                    var excerpt = ExtractRelevantExcerpt(pdfText, userQuery, 2000);
+                                    sb.AppendLine($"\nDetailed content from '{bestMatch.Title}':\n{excerpt}");
+                                }
                             }
                         }
-                        sb.AppendLine();
+
+                        sb.AppendLine("=========================================");
                     }
-                    sb.AppendLine("================================================");
                 }
             }
             catch (Exception ex)

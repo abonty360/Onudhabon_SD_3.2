@@ -5,18 +5,25 @@
 html {
     position: relative;
     min-height: 100%;
+    width: 100%;
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
     min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    overflow-x: clip;
     display: flex;
     flex-direction: column;
     margin: 0;
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: #0f172a;
     background-color: #f8fafc;
+    -webkit-tap-highlight-color: transparent;
 }
 
 main[role="main"],
@@ -310,8 +317,29 @@ body:not(.has-hero) main {
     color: #ffffff !important;
 }
 
+.site-header .navbar-toggler {
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border-radius: 10px;
+    padding: 6px 10px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.site-header .navbar-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25) !important;
+}
+
 .site-header.header-scrolled .navbar-toggler {
-    filter: invert(1) grayscale(100%);
+    filter: none;
+    border: 1px solid #cbd5e1 !important;
+    background-color: #f8fafc;
+}
+
+.site-header.header-scrolled .navbar-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+.site-header.header-scrolled .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%230f172a' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
 
 /* Override any potential Bootstrap text-white utility classes on scrolled navbar except for white-text buttons */
@@ -2412,7 +2440,8 @@ body:not(.has-hero) main {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: gap-3;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .profile-statement-box {
@@ -2503,4 +2532,479 @@ body:not(.has-hero) main {
     border-color: #e2e8f0;
     color: #94a3b8;
     pointer-events: none;
+}
+
+/* ==========================================================================
+   COMPREHENSIVE MOBILE & TABLET RESPONSIVE SYSTEM
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. GLOBAL TOUCH, INPUT & CONTAINER FOUNDATIONS
+   -------------------------------------------------------------------------- */
+
+/* Prevent iOS Safari zooming on form inputs */
+@media (max-width: 768px) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Fluid Media Resizing */
+img,
+video,
+iframe,
+canvas,
+svg {
+    max-width: 100%;
+}
+
+/* Table momentum scrolling */
+.table-responsive {
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+}
+
+/* Fluid responsive containers */
+@media (max-width: 576px) {
+    .container,
+    .container-fluid {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+
+    /* Prevent excessive nested padding on mobile cards */
+    .card.p-4,
+    .card.p-md-5,
+    .card.p-5 {
+        padding: 1.15rem !important;
+    }
+
+    /* Modal padding on mobile */
+    .modal-dialog {
+        margin: 0.65rem !important;
+    }
+
+    .modal-content {
+        border-radius: 18px !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   2. MOBILE HEADER & NAVIGATION DRAWER (Screen width < 992px)
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 991.98px) {
+    .site-header {
+        padding: 4px 0;
+    }
+
+    /* Mobile Brand Logo Size */
+    .site-header .navbar-brand img {
+        height: 32px !important;
+    }
+
+    /* Collapsible Navigation Container */
+    .site-header .navbar-collapse {
+        margin-top: 0.75rem;
+        padding: 1rem 1.15rem 1.25rem;
+        border-radius: 16px;
+        max-height: calc(100vh - 82px);
+        max-height: calc(100dvh - 82px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        transition: all 0.25s ease;
+    }
+
+    /* Default / Hero Mode (Dark Nav Drawer) */
+    .site-header:not(.header-scrolled) .navbar-collapse {
+        background-color: #0c152e;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6), 0 8px 16px -4px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Scrolled Mode (Light Nav Drawer) */
+    .site-header.header-scrolled .navbar-collapse {
+        background-color: #ffffff;
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.14), 0 6px 14px -3px rgba(15, 23, 42, 0.05);
+    }
+
+    /* Mobile Navigation Links */
+    .main-navbar .navbar-nav .nav-link {
+        padding: 0.65rem 0.85rem !important;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        margin-bottom: 3px;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    /* Hover & Active in Dark Nav Drawer */
+    .site-header:not(.header-scrolled) .main-navbar .navbar-nav .nav-link:hover,
+    .site-header:not(.header-scrolled) .main-navbar .navbar-nav .nav-link:focus {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: #ffffff !important;
+    }
+
+    .site-header:not(.header-scrolled) .main-navbar .navbar-nav .nav-link.active {
+        background-color: rgba(37, 99, 235, 0.25);
+        color: #60a5fa !important;
+        font-weight: 700;
+    }
+
+    /* Hover & Active in Light Nav Drawer */
+    .site-header.header-scrolled .main-navbar .navbar-nav .nav-link:hover,
+    .site-header.header-scrolled .main-navbar .navbar-nav .nav-link:focus {
+        background-color: #f1f5f9;
+        color: #1d4ed8 !important;
+    }
+
+    .site-header.header-scrolled .main-navbar .navbar-nav .nav-link.active {
+        background-color: #eff6ff;
+        color: #1d4ed8 !important;
+        font-weight: 700;
+    }
+
+    /* Auth & Action Section on Mobile */
+    .site-header:not(.header-scrolled) .navbar-collapse .navbar-nav:last-child {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 0.85rem;
+        margin-top: 0.65rem !important;
+    }
+
+    .site-header.header-scrolled .navbar-collapse .navbar-nav:last-child {
+        border-top: 1px solid #e2e8f0;
+        padding-top: 0.85rem;
+        margin-top: 0.65rem !important;
+    }
+
+    /* Mobile Buttons */
+    .navbar-collapse .btn-nav-login,
+    .navbar-collapse .btn-nav-register,
+    .navbar-collapse .btn-logout,
+    .navbar-collapse .btn-nav-action {
+        width: 100%;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0.6rem 1rem !important;
+        font-size: 0.9rem;
+        border-radius: 12px !important;
+        margin-bottom: 4px;
+    }
+
+    .navbar-collapse form {
+        width: 100%;
+        display: block;
+    }
+
+    /* Notification & User Dropdowns inside Mobile Navbar */
+    .navbar-collapse .dropdown-menu {
+        position: static !important;
+        float: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        margin-top: 6px !important;
+        border-radius: 12px !important;
+    }
+
+    .site-header:not(.header-scrolled) .navbar-collapse .dropdown-menu {
+        background-color: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+    .site-header:not(.header-scrolled) .navbar-collapse .dropdown-menu .dropdown-item {
+        color: #e2e8f0;
+        border-radius: 8px;
+    }
+
+    .site-header:not(.header-scrolled) .navbar-collapse .dropdown-menu .dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+    }
+
+    .site-header:not(.header-scrolled) .navbar-collapse .dropdown-menu .fw-bold.text-dark {
+        color: #f8fafc !important;
+    }
+
+    .site-header:not(.header-scrolled) .navbar-collapse .dropdown-menu .notification-item {
+        background-color: transparent !important;
+        color: #cbd5e1 !important;
+        border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .site-header:not(.header-scrolled) .navbar-collapse .dropdown-menu .notification-item:hover {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .site-header.header-scrolled .navbar-collapse .dropdown-menu {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    .user-profile-link {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 0.55rem 0.85rem !important;
+        border-radius: 12px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   3. HERO SECTIONS ACROSS ALL PAGES
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+    .home-hero,
+    .lecture-hero,
+    .material-hero,
+    .donation-hero,
+    .forum-hero,
+    .about-hero {
+        min-height: 260px !important;
+        padding-top: 88px !important;
+        padding-bottom: 36px !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .hero-content,
+    .lecture-hero-content,
+    .material-hero-content,
+    .donation-hero-content,
+    .forum-hero-content,
+    .about-hero-content {
+        width: 100% !important;
+        padding: 10px 0 !important;
+    }
+
+    .hero-content h1,
+    .lecture-hero-content h1,
+    .material-hero-content h1,
+    .donation-hero-content h1,
+    .forum-hero-content h1,
+    .about-hero-content h1 {
+        font-size: clamp(1.6rem, 5.5vw, 2.2rem) !important;
+        line-height: 1.2 !important;
+        margin-bottom: 12px !important;
+    }
+
+    .hero-content p,
+    .lecture-hero-content p,
+    .material-hero-content p,
+    .donation-hero-content p,
+    .forum-hero-content p,
+    .about-hero-content p {
+        font-size: 0.9rem !important;
+        line-height: 1.55 !important;
+        margin-bottom: 18px !important;
+    }
+
+    .hero-label,
+    .donation-hero-badge,
+    .forum-hero-badge,
+    .about-hero-badge {
+        font-size: 0.78rem !important;
+        padding: 4px 12px !important;
+        margin-bottom: 10px !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   4. IMPACT STATS & SAAS METRIC CARDS
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 576px) {
+    .saas-metric-card {
+        padding: 0.9rem 1rem !important;
+        border-radius: 14px !important;
+    }
+
+    .saas-metric-card .metric-header {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .saas-metric-card .metric-title {
+        font-size: 0.72rem !important;
+    }
+
+    .saas-metric-card .metric-icon-badge {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 1.05rem !important;
+        border-radius: 10px !important;
+    }
+
+    .saas-metric-card .metric-value {
+        font-size: 1.45rem !important;
+        margin-bottom: 0.2rem !important;
+    }
+
+    .saas-metric-card .metric-subtext {
+        font-size: 0.72rem !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .home-stats .stat-value {
+        font-size: 1.75rem !important;
+    }
+
+    .home-stats .stat-plus {
+        font-size: 1.35rem !important;
+    }
+
+    .home-stats .stat-icon {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 1.2rem !important;
+    }
+
+    .home-stats .stat-label {
+        font-size: 0.78rem !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   5. ADMIN DASHBOARD & TABS
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+    #adminTab {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px !important;
+        gap: 6px !important;
+    }
+
+    #adminTab .nav-item {
+        flex-shrink: 0 !important;
+    }
+
+    #adminTab .nav-link {
+        white-space: nowrap !important;
+        padding: 0.5rem 0.9rem !important;
+        font-size: 0.84rem !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   6. USER PROFILE & FORMAL CARDS
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 576px) {
+    .profile-section-card {
+        padding: 1.15rem !important;
+        border-radius: 16px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .profile-section-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
+
+    .profile-data-tile {
+        padding: 10px 14px !important;
+    }
+
+    .profile-sidebar-banner {
+        height: 70px !important;
+    }
+
+    .profile-avatar-wrapper {
+        margin-top: -40px !important;
+    }
+
+    .profile-avatar-img,
+    .profile-avatar-fallback,
+    .profile-avatar-overlay {
+        width: 95px !important;
+        height: 95px !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   7. STUDENT PROGRESS & MILESTONES
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 576px) {
+    .student-progress-card {
+        padding: 1.15rem !important;
+    }
+
+    .lecture-badges-container {
+        gap: 4px !important;
+    }
+
+    .lecture-badges-container .btn {
+        padding: 3px 7px !important;
+        font-size: 0.65rem !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   8. DONATION PAGE & PRESET AMOUNTS
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 576px) {
+    .preset-btn {
+        padding: 8px 6px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   9. NOTIFICATION & USER DROPDOWN MENUS
+   -------------------------------------------------------------------------- */
+
+.notification-dropdown-menu {
+    width: 320px;
+    max-width: calc(100vw - 32px);
+}
+
+.user-dropdown-menu {
+    min-width: 220px;
+    max-width: calc(100vw - 32px);
+}
+
+/* --------------------------------------------------------------------------
+   10. FORUM POST ACTIONS ROW (COMPACT SINGLE LINE ON MOBILE)
+   -------------------------------------------------------------------------- */
+
+.forum-actions-row {
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    padding-top: 8px !important;
+}
+
+@media (max-width: 576px) {
+    .forum-actions-row {
+        gap: 4px !important;
+        padding-top: 6px !important;
+    }
+
+    .forum-actions-row .btn {
+        padding: 3.5px 7px !important;
+        font-size: 0.75rem !important;
+        white-space: nowrap !important;
+        line-height: 1.25 !important;
+    }
+
+    .forum-actions-row .toggle-details-btn {
+        padding: 3.5px 8px !important;
+    }
+
+    .forum-actions-row .toggle-details-btn i,
+    .forum-actions-row .like-btn i,
+    .forum-actions-row .dislike-btn i {
+        font-size: 0.8rem !important;
+    }
 }
