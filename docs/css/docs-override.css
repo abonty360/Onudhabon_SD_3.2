@@ -1,14 +1,12 @@
 /* =========================================
-   GitHub Pages Static Showcase - Path Overrides
-   =========================================
-   The original site.css uses absolute paths like /images/home.jpeg.
-   On GitHub Pages these would break because the project is hosted at
-   https://<username>.github.io/<repo>/, so we override the key
-   background images and any other root-slashed references to use
-   relative paths instead.
+   GitHub Pages Overrides — ONLY two things:
+   1. Repoint absolute background-image URLs to relative paths
+   2. Style the small top banner linking to the live Render app
+   All other styling is left exactly as-is from site.css / login.css
 ========================================= */
 
-/* Hero background overrides */
+/* Hero background image path fixes (site.css uses /images/... absolute paths
+   which would break on https://<user>.github.io/<repo>/). */
 .home-hero,
 .lecture-hero {
     background-image: url('../images/home.jpeg') !important;
@@ -30,19 +28,20 @@
     background-image: url('../images/materials.jpeg') !important;
 }
 
-/* Static Showcase Banner (Notice at top of every static page) */
-.ghpages-notice {
+/* ----- Small banner (the ONLY added UI element) ----- */
+.ghpages-banner {
     position: relative;
     z-index: 1100;
     background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
     color: #ffffff;
-    padding: 10px 20px;
+    padding: 9px 18px;
     text-align: center;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.ghpages-notice .ghpages-notice-link {
+.ghpages-banner a {
     color: #fde047 !important;
     font-weight: 700;
     text-decoration: none;
@@ -50,14 +49,15 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 16px;
+    padding: 5px 14px;
     border-radius: 999px;
     border: 1.5px solid rgba(255, 255, 255, 0.45);
     transition: all 0.2s ease;
     background: rgba(255, 255, 255, 0.08);
+    font-size: 0.88rem;
 }
 
-.ghpages-notice .ghpages-notice-link:hover {
+.ghpages-banner a:hover {
     background: #fde047;
     color: #1e3a8a !important;
     border-color: #fde047;
@@ -65,311 +65,17 @@
     transform: translateY(-1px);
 }
 
-.ghpages-notice .ghpages-notice-link i {
-    font-size: 1rem;
+.ghpages-banner a i {
+    font-size: 0.95rem;
 }
 
-/* Hero CTA Button */
-.hero-cta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 14px 32px;
-    margin-top: 22px;
-    background: linear-gradient(135deg, #fde047 0%, #fbbf24 100%);
-    color: #0f172a !important;
-    font-size: 1.05rem;
-    font-weight: 700;
-    text-decoration: none;
-    border-radius: 999px;
-    box-shadow: 0 8px 24px rgba(251, 191, 36, 0.45), 0 4px 12px rgba(15, 23, 42, 0.25);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 2px solid rgba(255, 255, 255, 0.25);
-}
-
-.hero-cta:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 12px 32px rgba(251, 191, 36, 0.6), 0 6px 16px rgba(15, 23, 42, 0.3);
-    color: #0f172a !important;
-    text-decoration: none;
-}
-
-.hero-cta i {
-    font-size: 1.2rem;
-    transition: transform 0.2s ease;
-}
-
-.hero-cta:hover i {
-    transform: translateX(4px);
-}
-
-/* Subtle CTA on body pages */
-.body-cta {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
-    color: #ffffff !important;
-    padding: 10px 22px;
-    border-radius: 999px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
-}
-
-.body-cta:hover {
-    color: #ffffff !important;
-    text-decoration: none;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(29, 78, 216, 0.45);
-}
-
-/* Page nav (top-of-page simple nav for static site) */
-.static-page-nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px 14px;
-    padding: 14px 16px;
-    background: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
-    text-align: center;
-}
-
-.static-page-nav a {
-    color: #1e293b;
-    font-weight: 600;
-    text-decoration: none;
-    font-size: 0.92rem;
-    padding: 6px 12px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.static-page-nav a:hover {
-    background: #f1f5f9;
-    color: #1d4ed8;
-}
-
-.static-page-nav a.active {
-    color: #1d4ed8;
-    background: #eff6ff;
-}
-
-/* Static showcase features cards */
-.showcase-features {
-    max-width: 1100px;
-    margin: 60px auto;
-    padding: 0 20px;
-}
-
-.showcase-features .section-header {
-    text-align: center;
-    justify-content: center;
-    margin-bottom: 32px;
-}
-
-.showcase-features .section-header h2 {
-    font-size: clamp(1.6rem, 2.4vw, 2.1rem);
-    font-weight: 800;
-    color: #1f2937;
-}
-
-.showcase-features .section-header p {
-    color: #64748b;
-    margin-top: 8px;
-    font-size: 1rem;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 18px;
-}
-
-.feature-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 28px 22px;
-    text-align: center;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.12);
-    border-color: #bfdbfe;
-}
-
-.feature-card .feature-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.7rem;
-    margin-bottom: 16px;
-}
-
-.feature-card h3 {
-    margin: 0 0 8px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.feature-card p {
-    margin: 0;
-    color: #64748b;
-    font-size: 0.92rem;
-    line-height: 1.55;
-}
-
-/* Big CTA section near bottom of pages */
-.big-cta {
-    margin: 60px auto;
-    max-width: 980px;
-    padding: 48px 28px;
-    background: linear-gradient(135deg, #0b1329 0%, #1e3a8a 100%);
-    border-radius: 24px;
-    text-align: center;
-    color: #ffffff;
-    box-shadow: 0 16px 40px -12px rgba(15, 23, 42, 0.35);
-}
-
-.big-cta h2 {
-    margin: 0 0 14px;
-    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
-    font-weight: 800;
-    color: #ffffff;
-}
-
-.big-cta p {
-    margin: 0 auto 28px;
-    max-width: 660px;
-    color: rgba(255, 255, 255, 0.88);
-    font-size: 1.02rem;
-    line-height: 1.6;
-}
-
-.big-cta .big-cta-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, #fde047 0%, #fbbf24 100%);
-    color: #0f172a !important;
-    padding: 16px 36px;
-    font-size: 1.08rem;
-    font-weight: 700;
-    border-radius: 999px;
-    text-decoration: none;
-    box-shadow: 0 10px 28px rgba(251, 191, 36, 0.45);
-    transition: all 0.25s ease;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.big-cta .big-cta-btn:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 14px 36px rgba(251, 191, 36, 0.6);
-    color: #0f172a !important;
-    text-decoration: none;
-}
-
-.big-cta .small-note {
-    margin-top: 18px;
-    display: block;
-    font-size: 0.86rem;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-/* Showcase preview tiles */
-.preview-tile {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.08);
-    transition: all 0.25s ease;
-    display: block;
-    color: inherit;
-    text-decoration: none;
-}
-
-.preview-tile:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.15);
-    color: inherit;
-    text-decoration: none;
-    border-color: #bfdbfe;
-}
-
-.preview-tile-img {
-    height: 170px;
-    background-size: cover;
-    background-position: center;
-    background-color: #1e293b;
-    position: relative;
-}
-
-.preview-tile-img::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, transparent 50%, rgba(15, 23, 42, 0.5) 100%);
-}
-
-.preview-tile-body {
-    padding: 18px 18px 20px;
-}
-
-.preview-tile-body h3 {
-    margin: 0 0 6px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.preview-tile-body p {
-    margin: 0 0 10px;
-    color: #64748b;
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.preview-tile-body .preview-link {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #1d4ed8;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.preview-tile-body .preview-link i {
-    transition: transform 0.2s ease;
-}
-
-.preview-tile:hover .preview-link i {
-    transform: translateX(4px);
-}
-
-/* Responsive */
 @media (max-width: 600px) {
-    .ghpages-notice {
-        font-size: 0.82rem;
-        padding: 10px 14px;
+    .ghpages-banner {
+        font-size: 0.78rem;
+        padding: 8px 12px;
     }
-
-    .hero-cta {
-        font-size: 0.95rem;
-        padding: 12px 24px;
-    }
-
-    .big-cta {
-        padding: 36px 20px;
+    .ghpages-banner a {
+        padding: 4px 10px;
+        font-size: 0.78rem;
     }
 }

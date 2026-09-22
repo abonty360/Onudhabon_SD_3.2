@@ -3,179 +3,137 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Study Materials - Onudhabon | SD 3.2 Project</title>
+    <title>Study Materials &amp; Notes - Onudhabon</title>
     <link rel="icon" type="image/png" href="images/tab_logo.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="shortcut icon" type="image/png" href="images/tab_logo.png" />
+    <link rel="apple-touch-icon" href="images/tab_logo.png" />
+    <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/docs-override.css" />
 </head>
-<body class="d-flex flex-column min-vh-100 has-hero material-page">
+<body class="d-flex flex-column min-vh-100 has-hero">
 
-    <div class="ghpages-notice">
+    <div class="ghpages-banner">
         <i class="bi bi-info-circle-fill me-1"></i>
-        Static UI showcase — real PDFs are served via Cloudinary from the live app.
-        <a class="ghpages-notice-link" href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">
+        This is a static GitHub Pages copy of the UI.
+        <a href="https://onudhabon-sd-3-2.onrender.com/Material" target="_blank" rel="noopener noreferrer">
             <i class="bi bi-rocket-takeoff-fill"></i> Launch Full Dynamic App
         </a>
     </div>
 
-    <nav class="static-page-nav" aria-label="Showcase navigation">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="lectures.html">Lectures</a>
-        <a href="materials.html" class="active">Materials</a>
-        <a href="donate.html">Donate</a>
-        <a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer"><i class="bi bi-box-arrow-up-right"></i> Live App</a>
-    </nav>
+    <header class="site-header header-transparent" id="siteHeader">
+        <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
+            <div class="container-fluid px-lg-4 px-3">
+                <a class="navbar-brand d-flex align-items-center me-lg-4 me-2" href="index.html">
+                    <img src="images/navbar_logo.png" alt="Onudhabon" class="navbar-logo-default" style="height: 38px; width: auto;" />
+                    <img src="images/navbar_logo_scrolled.png" alt="Onudhabon" class="navbar-logo-scrolled" style="height: 38px; width: auto;" />
+                </a>
+                <button class="navbar-toggler border-0 text-white shadow-none px-2 py-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between" id="navbarSupportedContent">
+                    <ul class="navbar-nav flex-grow-1 align-items-lg-center">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="lectures.html">Lectures</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="materials.html">Materials</a></li>
+                        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="https://onudhabon-sd-3-2.onrender.com/Forum" target="_blank" rel="noopener noreferrer">Forum</a></li>
+                        <li class="nav-item"><a class="nav-link nav-donate-link" href="donate.html"><i class="bi bi-shield-heart me-1 text-warning"></i> Donate</a></li>
+                    </ul>
+                    <ul class="navbar-nav align-items-lg-center mt-3 mt-lg-0 gap-2">
+                        <li class="nav-item"><a class="nav-link btn-nav-login btn-sm px-3.5 py-1 rounded-pill" href="login.html">Login</a></li>
+                        <li class="nav-item"><a class="nav-link btn-nav-register btn-sm px-3.5 py-1 fw-semibold rounded-pill" href="register.html">Register</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-    <section class="material-hero">
-        <div class="material-hero-overlay"></div>
-        <div class="material-hero-content">
-            <div class="material-breadcrumb">Home / Materials</div>
-            <h1>Learning Resources for Every Journey</h1>
-            <p>Access a growing library of study materials, guides, and tools created by our dedicated community. From foundational concepts to advanced topics, these resources are here to support every learner's path toward success.</p>
-            <a class="hero-cta" href="https://onudhabon-sd-3-2.onrender.com/Material" target="_blank" rel="noopener noreferrer">
-                <i class="bi bi-rocket-takeoff-fill"></i> Open Materials Library
-            </a>
-        </div>
-    </section>
+    <main role="main" class="flex-grow-1">
+        <!-- EXACT copy of Views/Material/Index.cshtml body (no model data, so empty-state shown) -->
+        <div class="material-page">
+            <section class="material-hero">
+                <div class="material-hero-overlay"></div>
+                <div class="material-hero-content">
+                    <div class="material-breadcrumb">Home/Materials</div>
+                    <h1>Learning Resources for Every Journey</h1>
+                    <p>Access a growing library of study materials, guides, and tools created by our dedicated community. From foundational concepts to advanced topics, these resources are here to support every learner's path toward success.</p>
+                </div>
+            </section>
 
-    <main class="material-content">
-        <div class="material-heading-row">
-            <h2>Study Materials</h2>
-            <a class="material-upload-btn" href="https://onudhabon-sd-3-2.onrender.com/Material" target="_blank" rel="noopener noreferrer">Open Full Library</a>
-        </div>
+            <main class="material-content">
+                <div class="material-heading-row">
+                    <h2>Study Materials</h2>
+                    <a href="https://onudhabon-sd-3-2.onrender.com/Material" target="_blank" rel="noopener noreferrer" class="material-upload-btn">Open Live Library</a>
+                </div>
 
-        <form class="material-filters" onsubmit="return false;">
-            <div class="material-filter-field material-search-field">
-                <label for="material-search">Search</label>
-                <input id="material-search" type="text" placeholder="Search lectures, instructors, or topics" />
-            </div>
-            <div class="material-filter-field">
-                <label for="classLevel">Class</label>
-                <select id="classLevel">
-                    <option value="">All Classes</option>
-                    <option>Class 6</option>
-                    <option>Class 7</option>
-                    <option>Class 8</option>
-                    <option>Class 9</option>
-                    <option>Class 10</option>
-                    <option>Class 11</option>
-                    <option>Class 12</option>
-                </select>
-            </div>
-            <div class="material-filter-field">
-                <label for="subject">Subject</label>
-                <select id="subject">
-                    <option value="">All Subjects</option>
-                    <option>Mathematics</option>
-                    <option>Physics</option>
-                    <option>Chemistry</option>
-                    <option>Biology</option>
-                    <option>Bangla</option>
-                    <option>English</option>
-                </select>
-            </div>
-            <div class="material-filter-field">
-                <label for="topic">Topic</label>
-                <select id="topic">
-                    <option value="">Select subject</option>
-                    <option>Algebra</option>
-                    <option>Trigonometry</option>
-                </select>
-            </div>
-            <div class="material-filter-field">
-                <label for="version">Version</label>
-                <select id="version">
-                    <option value="">Both Versions</option>
-                    <option>Bangla</option>
-                    <option>English</option>
-                </select>
-            </div>
-        </form>
-
-        <div class="material-grid">
-            <article class="material-card">
-                <div class="material-card-body">
-                    <div class="material-card-top">
-                        <div class="material-file-icon"><i class="bi bi-file-earmark-pdf-fill"></i></div>
-                        <span class="material-status active">Active</span>
+                <form method="get" action="https://onudhabon-sd-3-2.onrender.com/Material" class="material-filters">
+                    <div class="material-filter-field material-search-field">
+                        <label for="material-search">Search</label>
+                        <input id="material-search" name="search" type="text" placeholder="Search lectures, instructors, or topics" />
                     </div>
-                    <div class="material-meta">
-                        <span>Class 9</span>
-                        <span>Mathematics</span>
-                        <span>Bangla</span>
+                    <div class="material-filter-field">
+                        <label for="classLevel">Class</label>
+                        <select id="classLevel" name="classLevel">
+                            <option value="">All Classes</option>
+                        </select>
                     </div>
-                    <h3>Algebra — Chapter 1 Worksheet</h3>
-                    <p>Practice problems covering linear equations, factoring, and quadratic expressions.</p>
-                    <div class="material-card-footer">
-                        <div class="material-stats">
-                            <strong>2.4 MB</strong> · PDF · 18 pages · 312 downloads
+                    <div class="material-filter-field">
+                        <label for="subject">Subject</label>
+                        <select id="subject" name="subject">
+                            <option value="">All Subjects</option>
+                        </select>
+                    </div>
+                    <div class="material-filter-field">
+                        <label for="topic">Topic</label>
+                        <select id="topic" name="topic">
+                            <option value="">Select subject</option>
+                        </select>
+                    </div>
+                    <div class="material-filter-field">
+                        <label for="version">Version</label>
+                        <select id="version" name="version">
+                            <option value="">Both Versions</option>
+                            <option value="Bangla">Bangla</option>
+                            <option value="English">English</option>
+                        </select>
+                    </div>
+                </form>
+
+                <div class="material-empty-state">
+                    <div>
+                        <div class="mb-3 text-muted">
+                            <svg width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
                         </div>
-                        <div class="material-actions">
-                            <a class="material-view-btn" href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">View</a>
-                            <a class="material-download-btn" href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">Download</a>
-                        </div>
+                        <h5 class="fw-bold text-dark">No study materials uploaded yet</h5>
+                        <p class="text-muted">Educational documents and study guides will appear here for learners.</p>
+                        <p class="text-muted small">
+                            <a href="https://onudhabon-sd-3-2.onrender.com/Material" target="_blank" rel="noopener noreferrer"><strong>Open the full materials library on the live app →</strong></a>
+                        </p>
                     </div>
                 </div>
-            </article>
-            <article class="material-card">
-                <div class="material-card-body">
-                    <div class="material-card-top">
-                        <div class="material-file-icon"><i class="bi bi-file-earmark-pdf-fill"></i></div>
-                        <span class="material-status active">Active</span>
-                    </div>
-                    <div class="material-meta">
-                        <span>Class 10</span>
-                        <span>Physics</span>
-                        <span>English</span>
-                    </div>
-                    <h3>Mechanics — Lecture Notes</h3>
-                    <p>Comprehensive notes on Newton's laws, work-energy theorem, and rotational motion.</p>
-                    <div class="material-card-footer">
-                        <div class="material-stats">
-                            <strong>3.1 MB</strong> · PDF · 24 pages · 487 downloads
-                        </div>
-                        <div class="material-actions">
-                            <a class="material-view-btn" href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">View</a>
-                            <a class="material-download-btn" href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">Download</a>
-                        </div>
-                    </div>
-                </div>
-            </article>
-            <article class="material-card">
-                <div class="material-card-body">
-                    <div class="material-card-top">
-                        <div class="material-file-icon"><i class="bi bi-file-earmark-pdf-fill"></i></div>
-                        <span class="material-status pending">Pending</span>
-                    </div>
-                    <div class="material-meta">
-                        <span>Class 8</span>
-                        <span>Science</span>
-                        <span>Bangla</span>
-                    </div>
-                    <h3>Cell Biology — Past Paper Solutions</h3>
-                    <p>Detailed answers and marking schemes from the 2024 board examination.</p>
-                    <div class="material-card-footer">
-                        <div class="material-stats">
-                            <strong>1.8 MB</strong> · PDF · 14 pages · 156 downloads
-                        </div>
-                        <div class="material-actions">
-                            <a class="material-view-btn" href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">View</a>
-                            <a class="material-download-btn" href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">Download</a>
-                        </div>
-                    </div>
-                </div>
-            </article>
-        </div>
 
-        <div style="margin-top: 28px; text-align: center;">
-            <a class="body-cta" href="https://onudhabon-sd-3-2.onrender.com/Material" target="_blank" rel="noopener noreferrer">
-                <i class="bi bi-rocket-takeoff-fill"></i> Launch Full Material Library
-            </a>
+                <!-- Pagination Container (hidden since empty) -->
+                <div class="custom-pagination-wrapper" id="materialPagination" style="display: none;">
+                    <div class="pagination-summary" id="materialPaginationSummary">
+                        Showing 1–6 of 0 materials
+                    </div>
+                    <ul class="pagination-controls" id="materialPaginationControls"></ul>
+                </div>
+
+                <!-- Empty Filter Search Result Message -->
+                <div class="no-materials text-center py-5 d-none" id="noMaterialFilterResultsMessage">
+                    <div class="text-muted mb-2"><i class="bi bi-search fs-1"></i></div>
+                    <h5 class="fw-bold text-dark">No matching materials found</h5>
+                    <p class="text-muted small">Try adjusting your search criteria or category filters.</p>
+                </div>
+            </main>
         </div>
     </main>
 
@@ -183,7 +141,7 @@
         <div class="footer-inner">
             <div class="footer-column about-column">
                 <h3>About Onudhabon</h3>
-                <p>Onudhabon is a community-driven initiative focused on providing access to quality education for children in Bangladesh.</p>
+                <p>Onudhabon is a community-driven initiative focused on providing access to quality education for children in Bangladesh. We collaborate with local educators, volunteers, and organizations to create sustainable change.</p>
             </div>
             <div class="footer-column navigation-column">
                 <h3>Navigation</h3>
@@ -192,20 +150,43 @@
                     <li><a href="lectures.html">Lectures</a></li>
                     <li><a href="materials.html">Materials</a></li>
                     <li><a href="about.html">About Us</a></li>
-                    <li><a href="donate.html">Donate</a></li>
-                    <li><a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">Live App <i class="bi bi-box-arrow-up-right"></i></a></li>
+                    <li><a href="https://onudhabon-sd-3-2.onrender.com/Forum" target="_blank" rel="noopener noreferrer">Forum</a></li>
+                    <li><a href="donate.html" class="fw-semibold text-primary"><i class="bi bi-shield-heart me-1 text-primary"></i> Donate to Onudhabon</a></li>
                 </ul>
             </div>
             <div class="footer-column connect-column">
-                <h3>Project Info</h3>
+                <h3>Connect</h3>
                 <ul>
-                    <li><i class="bi bi-github me-1"></i> <a href="https://github.com/abonty360/Onudhabon_SD_3.2" target="_blank" rel="noopener noreferrer">Source on GitHub</a></li>
-                    <li><i class="bi bi-cloud-arrow-up-fill me-1"></i> <a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">Live on Render</a></li>
-                    <li><i class="bi bi-mortarboard me-1"></i> SD 3.2 Lab Project</li>
+                    <li><a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><i class="bi bi-facebook me-1"></i> Facebook</a></li>
+                    <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram me-1"></i> Instagram</a></li>
+                    <li><a href="mailto:support@onudhabon.com"><i class="bi bi-envelope me-1"></i> Contact Us</a></li>
                 </ul>
             </div>
         </div>
-        <div class="footer-bottom">&copy; 2026 Onudhabon. Static UI showcase via GitHub Pages.</div>
+        <div class="footer-bottom">
+            &copy; 2026 Onudhabon. All rights reserved.
+        </div>
     </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/site.js"></script>
+    <script>
+        (function () {
+            const siteHeader = document.getElementById('siteHeader');
+            if (!siteHeader) return;
+            function checkScroll() {
+                const scrollPos = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                if (scrollPos > 15) siteHeader.classList.add('header-scrolled');
+                else siteHeader.classList.remove('header-scrolled');
+            }
+            window.addEventListener('scroll', checkScroll, { passive: true });
+            document.addEventListener('scroll', checkScroll, { passive: true });
+            window.addEventListener('resize', checkScroll, { passive: true });
+            window.addEventListener('load', checkScroll);
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', checkScroll);
+            else checkScroll();
+        })();
+    </script>
 </body>
 </html>

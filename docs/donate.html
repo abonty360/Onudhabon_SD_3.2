@@ -3,175 +3,272 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Donate - Onudhabon | SD 3.2 Project</title>
+    <title>Donate - Onudhabon Foundation</title>
     <link rel="icon" type="image/png" href="images/tab_logo.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="shortcut icon" type="image/png" href="images/tab_logo.png" />
+    <link rel="apple-touch-icon" href="images/tab_logo.png" />
+    <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/docs-override.css" />
 </head>
-<body class="d-flex flex-column min-vh-100 has-hero donation-page">
+<body class="d-flex flex-column min-vh-100 has-hero">
 
-    <div class="ghpages-notice">
+    <div class="ghpages-banner">
         <i class="bi bi-info-circle-fill me-1"></i>
-        Static UI showcase — secure payments run on the live deployment.
-        <a class="ghpages-notice-link" href="https://onudhabon-sd-3-2.onrender.com/Donation" target="_blank" rel="noopener noreferrer">
-            <i class="bi bi-rocket-takeoff-fill"></i> Open Live Donation Page
+        This is a static GitHub Pages copy of the UI. Secure payments run on the live deployment.
+        <a href="https://onudhabon-sd-3-2.onrender.com/Donation" target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-rocket-takeoff-fill"></i> Launch Live Donation Page
         </a>
     </div>
 
-    <nav class="static-page-nav" aria-label="Showcase navigation">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="lectures.html">Lectures</a>
-        <a href="materials.html">Materials</a>
-        <a href="donate.html" class="active">Donate</a>
-        <a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer"><i class="bi bi-box-arrow-up-right"></i> Live App</a>
-    </nav>
-
-    <section class="donation-hero">
-        <div class="donation-hero-overlay"></div>
-        <div class="donation-hero-content">
-            <div class="donation-hero-badge">
-                <i class="bi bi-shield-heart text-warning"></i>
-                <span>Educational Welfare Initiative</span>
-            </div>
-            <h1>Support Educational Equity</h1>
-            <p>Your contribution directly funds textbooks, volunteer educator stipends, and learning materials for underprivileged students across Bangladesh.</p>
-
-            <div class="d-flex justify-content-center flex-wrap gap-2 gap-sm-3 text-white small">
-                <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15">
-                    <span class="text-white-50">Total Contributed:</span>
-                    <strong class="text-white font-monospace ms-1">৳ 142,500 BDT</strong>
-                </div>
-                <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15">
-                    <span class="text-white-50">Verified Donors:</span>
-                    <strong class="text-white font-monospace ms-1">87</strong>
-                </div>
-                <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15 d-none d-sm-inline-block">
-                    <i class="bi bi-shield-lock text-info me-1"></i>
-                    <span class="text-white">256-Bit SSL Encrypted</span>
-                </div>
-            </div>
-
-            <a class="hero-cta" href="https://onudhabon-sd-3-2.onrender.com/Donation" target="_blank" rel="noopener noreferrer">
-                <i class="bi bi-rocket-takeoff-fill"></i> Donate on Live App
-            </a>
-        </div>
-    </section>
-
-    <div class="container py-5" style="max-width: 1040px;">
-        <div class="row g-4 justify-content-center">
-            <!-- Donation Form -->
-            <div class="col-lg-7">
-                <div class="card border shadow-sm rounded-4 p-3 p-sm-4 p-md-5 bg-white">
-                    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom flex-wrap gap-2">
-                        <div>
-                            <h4 class="fw-bold text-dark mb-1">Contribution Form</h4>
-                            <p class="text-muted small mb-0">Select your contribution amount and allocate funds.</p>
-                        </div>
-                        <span class="badge bg-light text-secondary border px-3 py-1.5 rounded-pill small">
-                            <i class="bi bi-lock-fill me-1 text-primary"></i> Secure Gateway
-                        </span>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-dark small text-uppercase" style="letter-spacing: 0.04em;">Select Amount (BDT)</label>
-                        <div class="row g-2 mb-3">
-                            <div class="col-6 col-sm-3"><button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace">৳200</button></div>
-                            <div class="col-6 col-sm-3"><button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace">৳500</button></div>
-                            <div class="col-6 col-sm-3"><button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace">৳1,000</button></div>
-                            <div class="col-6 col-sm-3"><button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace">৳5,000</button></div>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <input type="number" class="form-control rounded-3" placeholder="Custom amount (BDT)" />
-                            <select class="form-select rounded-3" style="max-width: 130px;">
-                                <option>BDT</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-dark small text-uppercase" style="letter-spacing: 0.04em;">Allocate To</label>
-                        <select class="form-select rounded-3">
-                            <option>General Welfare Pool</option>
-                            <option>Student Scholarships</option>
-                            <option>Volunteer Honorarium</option>
-                            <option>Books & Materials</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-dark small text-uppercase" style="letter-spacing: 0.04em;">Donor Information</label>
-                        <input type="text" class="form-control rounded-3 mb-2" placeholder="Full name" />
-                        <input type="email" class="form-control rounded-3 mb-2" placeholder="Email address" />
-                        <input type="tel" class="form-control rounded-3" placeholder="Phone (optional)" />
-                    </div>
-
-                    <div class="form-check mb-4">
-                        <input class="form-check-input" type="checkbox" id="anonymous" />
-                        <label class="form-check-label small" for="anonymous">Display me as anonymous on public supporter feed</label>
-                    </div>
-
-                    <a class="body-cta w-100 justify-content-center py-3" href="https://onudhabon-sd-3-2.onrender.com/Donation" target="_blank" rel="noopener noreferrer" style="font-size: 1.05rem;">
-                        <i class="bi bi-rocket-takeoff-fill"></i> Continue to Secure Checkout (Live App)
-                    </a>
-                </div>
-            </div>
-
-            <!-- Sidebar info -->
-            <div class="col-lg-5">
-                <div class="card border shadow-sm rounded-4 p-4 bg-white mb-3">
-                    <h5 class="fw-bold text-dark mb-3">
-                        <i class="bi bi-info-circle-fill text-primary me-1"></i>
-                        How your donation is used
-                    </h5>
-                    <ul class="list-unstyled mb-0">
-                        <li class="d-flex align-items-start mb-3">
-                            <i class="bi bi-check2-circle text-success me-2 mt-1"></i>
-                            <span class="small text-secondary">Direct funding for textbooks and learning kits</span>
-                        </li>
-                        <li class="d-flex align-items-start mb-3">
-                            <i class="bi bi-check2-circle text-success me-2 mt-1"></i>
-                            <span class="small text-secondary">Monthly honorarium for top-ranked volunteer educators and guardians</span>
-                        </li>
-                        <li class="d-flex align-items-start mb-3">
-                            <i class="bi bi-check2-circle text-success me-2 mt-1"></i>
-                            <span class="small text-secondary">Cloud hosting, AI tutor API, and CDN delivery</span>
-                        </li>
-                        <li class="d-flex align-items-start">
-                            <i class="bi bi-check2-circle text-success me-2 mt-1"></i>
-                            <span class="small text-secondary">Verified digital receipts with unique transaction IDs</span>
-                        </li>
+    <header class="site-header header-transparent" id="siteHeader">
+        <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
+            <div class="container-fluid px-lg-4 px-3">
+                <a class="navbar-brand d-flex align-items-center me-lg-4 me-2" href="index.html">
+                    <img src="images/navbar_logo.png" alt="Onudhabon" class="navbar-logo-default" style="height: 38px; width: auto;" />
+                    <img src="images/navbar_logo_scrolled.png" alt="Onudhabon" class="navbar-logo-scrolled" style="height: 38px; width: auto;" />
+                </a>
+                <button class="navbar-toggler border-0 text-white shadow-none px-2 py-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between" id="navbarSupportedContent">
+                    <ul class="navbar-nav flex-grow-1 align-items-lg-center">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="lectures.html">Lectures</a></li>
+                        <li class="nav-item"><a class="nav-link" href="materials.html">Materials</a></li>
+                        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="https://onudhabon-sd-3-2.onrender.com/Forum" target="_blank" rel="noopener noreferrer">Forum</a></li>
+                        <li class="nav-item"><a class="nav-link nav-donate-link active" href="donate.html"><i class="bi bi-shield-heart me-1 text-warning"></i> Donate</a></li>
+                    </ul>
+                    <ul class="navbar-nav align-items-lg-center mt-3 mt-lg-0 gap-2">
+                        <li class="nav-item"><a class="nav-link btn-nav-login btn-sm px-3.5 py-1 rounded-pill" href="login.html">Login</a></li>
+                        <li class="nav-item"><a class="nav-link btn-nav-register btn-sm px-3.5 py-1 fw-semibold rounded-pill" href="register.html">Register</a></li>
                     </ul>
                 </div>
+            </div>
+        </nav>
+    </header>
 
-                <div class="card border shadow-sm rounded-4 p-4 bg-white">
-                    <h5 class="fw-bold text-dark mb-3">
-                        <i class="bi bi-shield-lock-fill text-primary me-1"></i>
-                        Secure Payments
-                    </h5>
-                    <p class="small text-secondary mb-3">All transactions are processed via SSLCommerz — supporting bKash, Nagad, Rocket, Upay, Visa, and Mastercard.</p>
-                    <div class="d-flex flex-wrap gap-2 small text-muted">
-                        <span class="badge bg-light text-secondary border">bKash</span>
-                        <span class="badge bg-light text-secondary border">Nagad</span>
-                        <span class="badge bg-light text-secondary border">Rocket</span>
-                        <span class="badge bg-light text-secondary border">Upay</span>
-                        <span class="badge bg-light text-secondary border">Visa</span>
-                        <span class="badge bg-light text-secondary border">Mastercard</span>
+    <main role="main" class="flex-grow-1">
+        <!-- EXACT copy of Views/Donation/Index.cshtml body -->
+        <div class="donation-page">
+            <!-- Hero Section with Background Image -->
+            <section class="donation-hero">
+                <div class="donation-hero-overlay"></div>
+                <div class="donation-hero-content">
+                    <div class="donation-hero-badge">
+                        <i class="bi bi-shield-heart text-warning"></i>
+                        <span>Educational Welfare Initiative</span>
+                    </div>
+                    <h1>Support Educational Equity</h1>
+                    <p>
+                        Your contribution directly funds textbooks, volunteer educator stipends, and learning materials for underprivileged students across Bangladesh.
+                    </p>
+
+                    <!-- Subtle Stats Badges -->
+                    <div class="d-flex justify-content-center flex-wrap gap-2 gap-sm-3 text-white small">
+                        <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15">
+                            <span class="text-white-50">Total Contributed:</span>
+                            <strong class="text-white font-monospace ms-1">৳0 BDT</strong>
+                        </div>
+                        <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15">
+                            <span class="text-white-50">Verified Donors:</span>
+                            <strong class="text-white font-monospace ms-1">0</strong>
+                        </div>
+                        <div class="px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15 d-none d-sm-inline-block">
+                            <i class="bi bi-shield-lock text-info me-1"></i>
+                            <span class="text-white">256-Bit SSL Encrypted</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Container -->
+            <div class="container py-5" style="max-width: 1040px;">
+            <div class="row g-4 justify-content-center">
+                <!-- Donation Form -->
+                <div class="col-lg-7">
+                    <div class="card border shadow-sm rounded-4 p-3 p-sm-4 p-md-5 bg-white">
+                        <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom flex-wrap gap-2">
+                            <div>
+                                <h4 class="fw-bold text-dark mb-1">Contribution Form</h4>
+                                <p class="text-muted small mb-0">Select your contribution amount and allocate funds.</p>
+                            </div>
+                            <span class="badge bg-light text-secondary border px-3 py-1.5 rounded-pill small">
+                                <i class="bi bi-lock-fill me-1 text-primary"></i> Secure Gateway
+                            </span>
+                        </div>
+
+                        <form id="donationForm" action="https://onudhabon-sd-3-2.onrender.com/Donation" method="post">
+                            <div id="formErrorMessage" class="alert alert-danger rounded-3 mb-3 d-none"></div>
+
+                            <!-- Amount Selection -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-dark small text-uppercase" style="letter-spacing: 0.04em;">Select Amount (BDT)</label>
+                                <div class="row g-2 mb-3" id="presetAmountsContainer">
+                                    <div class="col-6 col-sm-3">
+                                        <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="200">
+                                            ৳200
+                                        </button>
+                                    </div>
+                                    <div class="col-6 col-sm-3">
+                                        <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn active btn-primary text-white border-primary font-monospace" data-amount="500">
+                                            ৳500
+                                        </button>
+                                    </div>
+                                    <div class="col-6 col-sm-3">
+                                        <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="1000">
+                                            ৳1,000
+                                        </button>
+                                    </div>
+                                    <div class="col-6 col-sm-3">
+                                        <button type="button" class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold preset-btn font-monospace" data-amount="2500">
+                                            ৳2,500
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-dark fw-bold border-end-0 rounded-start-3">BDT (৳)</span>
+                                    <input name="Amount" type="number" id="customAmountInput" class="form-control border-start-0 rounded-end-3 fw-bold text-dark font-monospace py-2" min="10" max="500000" placeholder="Custom amount (Min ৳10)" value="500" required />
+                                </div>
+                            </div>
+
+                            <!-- Program Allocation -->
+                            <div class="mb-4">
+                                <label for="Purpose" class="form-label fw-bold text-dark small text-uppercase" style="letter-spacing: 0.04em;">Program Allocation</label>
+                                <select name="Purpose" id="purposeSelect" class="form-select rounded-3 py-2">
+                                    <option value="General Education & Child Support Fund">General Education & Student Welfare Fund</option>
+                                    <option value="Student Learning Materials & Textbooks">Core Textbooks, Stationery & Learning Kits</option>
+                                    <option value="Community Classrooms & Educator Support">Community Classrooms & Educator Support</option>
+                                    <option value="Digital Learning & Video Lecture Hardware">Digital Learning & Video Lecture Hardware</option>
+                                </select>
+                            </div>
+
+                            <!-- Donor Details -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-dark small text-uppercase mb-2" style="letter-spacing: 0.04em;">Donor Information</label>
+                                <div class="row g-3">
+                                    <div class="col-sm-6">
+                                        <input name="DonorName" id="donorNameInput" class="form-control rounded-3 py-2" placeholder="Full Name *" required />
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input name="DonorPhone" id="donorPhoneInput" class="form-control rounded-3 py-2" placeholder="Mobile Number (e.g. 017XXXXXXXX) *" required />
+                                    </div>
+                                    <div class="col-12">
+                                        <input name="DonorEmail" id="donorEmailInput" class="form-control rounded-3 py-2" placeholder="Email Address (Optional, for tax receipt)" />
+                                    </div>
+                                    <div class="col-12">
+                                        <input name="Message" id="donorMessageInput" class="form-control rounded-3 py-2" placeholder="Dedication or Note (Optional)" />
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check form-switch">
+                                            <input name="IsAnonymous" class="form-check-input" type="checkbox" id="isAnonymousSwitch" />
+                                            <label class="form-check-label text-secondary small" for="isAnonymousSwitch">
+                                                Make contribution anonymous on public list
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Single SSLCommerz Gateway Button -->
+                            <div class="mt-4">
+                                <button type="button"
+                                        id="btnLaunchSandboxPGW"
+                                        class="btn btn-primary w-100 rounded-pill text-white fw-bold shadow-sm py-3 px-4 d-flex align-items-center justify-content-center gap-2"
+                                        style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none; font-size: 1.05rem; min-height: 50px;">
+                                    <i class="bi bi-shield-lock-fill"></i>
+                                    <span>Donate ৳<span id="btnAmountDisplay">500</span> via SSLCommerz</span>
+                                </button>
+
+                                <div class="d-flex align-items-center justify-content-center gap-2 text-muted small mt-2.5 flex-wrap text-center" style="font-size: 0.8rem;">
+                                    <span><i class="bi bi-shield-check text-success me-1"></i>SSLCommerz Gateway</span>
+                                    <span class="d-none d-sm-inline">•</span>
+                                    <span>Visa • Mastercard • bKash • Nagad</span>
+                                    <span class="d-none d-sm-inline">•</span>
+                                    <span>Instant Receipt</span>
+                                </div>
+
+                                <p class="text-center text-muted small mt-3 mb-0">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Form submission runs on the deployed app.
+                                    <a href="https://onudhabon-sd-3-2.onrender.com/Donation" target="_blank" rel="noopener noreferrer"><strong>Open the live donation page →</strong></a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Side: Impact & Recent Donors -->
+                <div class="col-lg-5">
+                    <!-- Impact Summary -->
+                    <div class="card border shadow-sm rounded-4 p-4 mb-4 bg-white">
+                        <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 1rem;">
+                            <i class="bi bi-heart-pulse text-primary"></i>
+                            <span>Your Impact</span>
+                        </h5>
+                        <div class="d-flex flex-column gap-3 small text-muted">
+                            <div class="d-flex gap-3 align-items-start">
+                                <div class="about-icon-badge badge-blue flex-shrink-0" style="width: 42px; height: 42px; font-size: 1.1rem; margin-bottom: 0;">
+                                    <i class="bi bi-journal-bookmark-fill"></i>
+                                </div>
+                                <div>
+                                    <strong class="text-dark d-block">৳200 — Learning Materials</strong>
+                                    <span>Supplies textbooks and notebooks for one student.</span>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-3 align-items-start">
+                                <div class="about-icon-badge badge-green flex-shrink-0" style="width: 42px; height: 42px; font-size: 1.1rem; margin-bottom: 0;">
+                                    <i class="bi bi-mortarboard-fill"></i>
+                                </div>
+                                <div>
+                                    <strong class="text-dark d-block">৳500 — Monthly Sponsorship</strong>
+                                    <span>Covers monthly study materials and educator mentoring.</span>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-3 align-items-start">
+                                <div class="about-icon-badge badge-teal flex-shrink-0" style="width: 42px; height: 42px; font-size: 1.1rem; margin-bottom: 0;">
+                                    <i class="bi bi-display-fill"></i>
+                                </div>
+                                <div>
+                                    <strong class="text-dark d-block">৳2,500 — Community Study Hub</strong>
+                                    <span>Supports classroom supplies and digital learning devices.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Contributions -->
+                    <div class="card border shadow-sm rounded-4 p-4 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" style="font-size: 1rem;">
+                                <i class="bi bi-people-fill text-primary"></i>
+                                <span>Recent Contributions</span>
+                            </h5>
+                            <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 small">Verified</span>
+                        </div>
+
+                        <div id="recentDonorsList" class="d-flex flex-column gap-2">
+                            <div class="text-center text-muted py-3 small">No recent public contributions recorded.</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+        </div>
+    </main>
 
     <footer class="site-footer mt-auto">
         <div class="footer-inner">
             <div class="footer-column about-column">
                 <h3>About Onudhabon</h3>
-                <p>Onudhabon is a community-driven initiative focused on providing access to quality education for children in Bangladesh.</p>
+                <p>Onudhabon is a community-driven initiative focused on providing access to quality education for children in Bangladesh. We collaborate with local educators, volunteers, and organizations to create sustainable change.</p>
             </div>
             <div class="footer-column navigation-column">
                 <h3>Navigation</h3>
@@ -180,20 +277,119 @@
                     <li><a href="lectures.html">Lectures</a></li>
                     <li><a href="materials.html">Materials</a></li>
                     <li><a href="about.html">About Us</a></li>
-                    <li><a href="donate.html">Donate</a></li>
-                    <li><a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">Live App <i class="bi bi-box-arrow-up-right"></i></a></li>
+                    <li><a href="https://onudhabon-sd-3-2.onrender.com/Forum" target="_blank" rel="noopener noreferrer">Forum</a></li>
+                    <li><a href="donate.html" class="fw-semibold text-primary"><i class="bi bi-shield-heart me-1 text-primary"></i> Donate to Onudhabon</a></li>
                 </ul>
             </div>
             <div class="footer-column connect-column">
-                <h3>Project Info</h3>
+                <h3>Connect</h3>
                 <ul>
-                    <li><i class="bi bi-github me-1"></i> <a href="https://github.com/abonty360/Onudhabon_SD_3.2" target="_blank" rel="noopener noreferrer">Source on GitHub</a></li>
-                    <li><i class="bi bi-cloud-arrow-up-fill me-1"></i> <a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">Live on Render</a></li>
-                    <li><i class="bi bi-mortarboard me-1"></i> SD 3.2 Lab Project</li>
+                    <li><a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><i class="bi bi-facebook me-1"></i> Facebook</a></li>
+                    <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram me-1"></i> Instagram</a></li>
+                    <li><a href="mailto:support@onudhabon.com"><i class="bi bi-envelope me-1"></i> Contact Us</a></li>
                 </ul>
             </div>
         </div>
-        <div class="footer-bottom">&copy; 2026 Onudhabon. Static UI showcase via GitHub Pages.</div>
+        <div class="footer-bottom">
+            &copy; 2026 Onudhabon. All rights reserved.
+        </div>
     </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/site.js"></script>
+    <script>
+        // EXACT script from Views/Donation/Index.cshtml (the validation is loaded via _ValidationScriptsPartial in the real app)
+        document.addEventListener('DOMContentLoaded', function () {
+            const customAmountInput = document.getElementById('customAmountInput');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+            const btnAmountDisplay = document.getElementById('btnAmountDisplay');
+            const btnLaunchSandboxPGW = document.getElementById('btnLaunchSandboxPGW');
+            const formErrorMessage = document.getElementById('formErrorMessage');
+
+            // Handle Preset Amount Clicks
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    presetButtons.forEach(b => {
+                        b.classList.remove('active', 'btn-primary', 'text-white', 'border-primary');
+                        b.classList.add('btn-outline-secondary');
+                    });
+                    this.classList.remove('btn-outline-secondary');
+                    this.classList.add('active', 'btn-primary', 'text-white', 'border-primary');
+
+                    const amt = this.getAttribute('data-amount');
+                    customAmountInput.value = amt;
+                    btnAmountDisplay.textContent = Number(amt).toLocaleString();
+                });
+            });
+
+            // Handle Custom Amount Input
+            customAmountInput.addEventListener('input', function () {
+                const val = parseFloat(this.value) || 0;
+                btnAmountDisplay.textContent = val.toLocaleString();
+                presetButtons.forEach(b => {
+                    if (b.getAttribute('data-amount') === this.value) {
+                        b.classList.remove('btn-outline-secondary');
+                        b.classList.add('active', 'btn-primary', 'text-white', 'border-primary');
+                    } else {
+                        b.classList.remove('active', 'btn-primary', 'text-white', 'border-primary');
+                        b.classList.add('btn-outline-secondary');
+                    }
+                });
+            });
+
+            // Launch SSLCommerz Payment Gateway - posts to live app
+            if (btnLaunchSandboxPGW) {
+                btnLaunchSandboxPGW.addEventListener('click', function () {
+                    formErrorMessage.classList.add('d-none');
+
+                    const donorName = document.getElementById('donorNameInput').value.trim();
+                    const donorPhone = document.getElementById('donorPhoneInput').value.trim();
+                    const amount = parseFloat(customAmountInput.value);
+
+                    if (!donorName) {
+                        formErrorMessage.textContent = 'Please enter your Full Name before proceeding.';
+                        formErrorMessage.classList.remove('d-none');
+                        document.getElementById('donorNameInput').focus();
+                        return;
+                    }
+
+                    if (!donorPhone) {
+                        formErrorMessage.textContent = 'Please enter your mobile phone number.';
+                        formErrorMessage.classList.remove('d-none');
+                        document.getElementById('donorPhoneInput').focus();
+                        return;
+                    }
+
+                    if (!amount || amount < 10) {
+                        formErrorMessage.textContent = 'Minimum donation amount is ৳10.';
+                        formErrorMessage.classList.remove('d-none');
+                        customAmountInput.focus();
+                        return;
+                    }
+
+                    // Open the live donation page where SSLCommerz runs
+                    window.location.href = 'https://onudhabon-sd-3-2.onrender.com/Donation';
+                });
+            }
+        });
+
+        // Header scroll effect
+        (function () {
+            const siteHeader = document.getElementById('siteHeader');
+            if (!siteHeader) return;
+            function checkScroll() {
+                const scrollPos = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                if (scrollPos > 15) siteHeader.classList.add('header-scrolled');
+                else siteHeader.classList.remove('header-scrolled');
+            }
+            window.addEventListener('scroll', checkScroll, { passive: true });
+            document.addEventListener('scroll', checkScroll, { passive: true });
+            window.addEventListener('resize', checkScroll, { passive: true });
+            window.addEventListener('load', checkScroll);
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', checkScroll);
+            else checkScroll();
+        })();
+    </script>
 </body>
 </html>
