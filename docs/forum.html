@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Study Materials &amp; Notes - Onudhabon</title>
+    <title>Community Forum - Onudhabon</title>
     <link rel="icon" type="image/png" href="images/tab_logo.png" />
     <link rel="shortcut icon" type="image/png" href="images/tab_logo.png" />
     <link rel="apple-touch-icon" href="images/tab_logo.png" />
@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="css/docs-override.css" />
 </head>
@@ -20,9 +20,9 @@
 
     <div class="ghpages-banner">
         <i class="bi bi-info-circle-fill me-1"></i>
-        This is a static GitHub Pages copy of the UI.
-        <a href="https://onudhabon-sd-3-2.onrender.com/Material" target="_blank" rel="noopener noreferrer">
-            <i class="bi bi-rocket-takeoff-fill"></i> Launch Full Dynamic App
+        The Community Forum runs on the live deployment with full post &amp; reply features.
+        <a href="https://onudhabon-sd-3-2.onrender.com/Forum" target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-rocket-takeoff-fill"></i> Launch Live Forum
         </a>
     </div>
 
@@ -40,9 +40,9 @@
                     <ul class="navbar-nav flex-grow-1 align-items-lg-center">
                         <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
                         <li class="nav-item"><a class="nav-link" href="lectures.html">Lectures</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="materials.html">Materials</a></li>
+                        <li class="nav-item"><a class="nav-link" href="materials.html">Materials</a></li>
                         <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="forum.html">Forum</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="forum.html">Forum</a></li>
                         <li class="nav-item"><a class="nav-link nav-donate-link" href="donate.html"><i class="bi bi-shield-heart me-1 text-warning"></i> Donate</a></li>
                     </ul>
                     <ul class="navbar-nav align-items-lg-center mt-3 mt-lg-0 gap-2">
@@ -55,86 +55,64 @@
     </header>
 
     <main role="main" class="flex-grow-1">
-        <!-- EXACT copy of Views/Material/Index.cshtml body (no model data, so empty-state shown) -->
-        <div class="material-page">
-            <section class="material-hero">
-                <div class="material-hero-overlay"></div>
-                <div class="material-hero-content">
-                    <div class="material-breadcrumb">Home/Materials</div>
-                    <h1>Learning Resources for Every Journey</h1>
-                    <p>Access a growing library of study materials, guides, and tools created by our dedicated community. From foundational concepts to advanced topics, these resources are here to support every learner's path toward success.</p>
+        <div class="forum-page">
+            <section class="forum-hero">
+                <div class="forum-hero-overlay"></div>
+                <div class="forum-hero-content">
+                    <div class="forum-hero-badge">
+                        <i class="bi bi-chat-dots-fill"></i>
+                        <span>Community Forum</span>
+                    </div>
+                    <h1>Conversations that Bring Our Community Together</h1>
+                    <p>
+                        The Onudhabon Community Forum is where educators, guardians, volunteers, and students discuss lessons, share experiences, ask questions, and support one another. Join the conversation on our live platform.
+                    </p>
                 </div>
             </section>
 
-            <main class="material-content">
-                <div class="material-heading-row">
-                    <h2>Study Materials</h2>
-                    <a href="https://onudhabon-sd-3-2.onrender.com/Material" target="_blank" rel="noopener noreferrer" class="material-upload-btn">Open Live Library</a>
+            <div class="container py-5" style="max-width: 820px;">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-rocket-takeoff-fill" style="font-size: 3rem; color: #1d4ed8;"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-2">Forum Lives on the Full Dynamic App</h3>
+                    <p class="text-muted mb-4 mx-auto" style="max-width: 600px;">
+                        This GitHub Pages site is a static showcase. The interactive forum &mdash; with posts, replies, threads, and member activity &mdash; runs on our live Render deployment.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="https://onudhabon-sd-3-2.onrender.com/Forum" target="_blank" rel="noopener noreferrer" class="btn btn-primary rounded-pill px-4 py-2" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: none;">
+                            <i class="bi bi-rocket-takeoff-fill me-2"></i> Launch Live Forum
+                        </a>
+                        <a href="index.html" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                            <i class="bi bi-house-fill me-2"></i> Back to Home
+                        </a>
+                    </div>
                 </div>
 
-                <form method="get" action="https://onudhabon-sd-3-2.onrender.com/Material" class="material-filters">
-                    <div class="material-filter-field material-search-field">
-                        <label for="material-search">Search</label>
-                        <input id="material-search" name="search" type="text" placeholder="Search lectures, instructors, or topics" />
-                    </div>
-                    <div class="material-filter-field">
-                        <label for="classLevel">Class</label>
-                        <select id="classLevel" name="classLevel">
-                            <option value="">All Classes</option>
-                        </select>
-                    </div>
-                    <div class="material-filter-field">
-                        <label for="subject">Subject</label>
-                        <select id="subject" name="subject">
-                            <option value="">All Subjects</option>
-                        </select>
-                    </div>
-                    <div class="material-filter-field">
-                        <label for="topic">Topic</label>
-                        <select id="topic" name="topic">
-                            <option value="">Select subject</option>
-                        </select>
-                    </div>
-                    <div class="material-filter-field">
-                        <label for="version">Version</label>
-                        <select id="version" name="version">
-                            <option value="">Both Versions</option>
-                            <option value="Bangla">Bangla</option>
-                            <option value="English">English</option>
-                        </select>
-                    </div>
-                </form>
-
-                <div class="material-empty-state">
-                    <div>
-                        <div class="mb-3 text-muted">
-                            <svg width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
+                <div class="row g-4 mt-2">
+                    <div class="col-md-4 text-center">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+                            <i class="bi bi-people-fill" style="font-size: 2rem; color: #0d9488;"></i>
+                            <h6 class="fw-bold mt-2 mb-1">Educators</h6>
+                            <p class="text-muted small mb-0">Share teaching tips and resources.</p>
                         </div>
-                        <h5 class="fw-bold text-dark">No study materials uploaded yet</h5>
-                        <p class="text-muted">Educational documents and study guides will appear here for learners.</p>
-                        <p class="text-muted small">
-                            <a href="https://onudhabon-sd-3-2.onrender.com/Material" target="_blank" rel="noopener noreferrer"><strong>Open the full materials library on the live app →</strong></a>
-                        </p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+                            <i class="bi bi-person-heart" style="font-size: 2rem; color: #f59e0b;"></i>
+                            <h6 class="fw-bold mt-2 mb-1">Guardians</h6>
+                            <p class="text-muted small mb-0">Coordinate student progress locally.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+                            <i class="bi bi-mortarboard-fill" style="font-size: 2rem; color: #2563eb;"></i>
+                            <h6 class="fw-bold mt-2 mb-1">Students</h6>
+                            <p class="text-muted small mb-0">Ask questions, find study support.</p>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Pagination Container (hidden since empty) -->
-                <div class="custom-pagination-wrapper" id="materialPagination" style="display: none;">
-                    <div class="pagination-summary" id="materialPaginationSummary">
-                        Showing 1–6 of 0 materials
-                    </div>
-                    <ul class="pagination-controls" id="materialPaginationControls"></ul>
-                </div>
-
-                <!-- Empty Filter Search Result Message -->
-                <div class="no-materials text-center py-5 d-none" id="noMaterialFilterResultsMessage">
-                    <div class="text-muted mb-2"><i class="bi bi-search fs-1"></i></div>
-                    <h5 class="fw-bold text-dark">No matching materials found</h5>
-                    <p class="text-muted small">Try adjusting your search criteria or category filters.</p>
-                </div>
-            </main>
+            </div>
         </div>
     </main>
 
@@ -173,20 +151,36 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/site.js"></script>
     <script>
+        // Auto-redirect to live forum after a short delay (lets user see the page first)
+        (function () {
+            setTimeout(function () {
+                window.location.href = 'https://onudhabon-sd-3-2.onrender.com/Forum';
+            }, 6000);
+        })();
+
+        // Header scroll effect (from _Layout.cshtml)
         (function () {
             const siteHeader = document.getElementById('siteHeader');
             if (!siteHeader) return;
+
             function checkScroll() {
                 const scrollPos = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-                if (scrollPos > 15) siteHeader.classList.add('header-scrolled');
-                else siteHeader.classList.remove('header-scrolled');
+                if (scrollPos > 15) {
+                    siteHeader.classList.add('header-scrolled');
+                } else {
+                    siteHeader.classList.remove('header-scrolled');
+                }
             }
+
             window.addEventListener('scroll', checkScroll, { passive: true });
             document.addEventListener('scroll', checkScroll, { passive: true });
             window.addEventListener('resize', checkScroll, { passive: true });
             window.addEventListener('load', checkScroll);
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', checkScroll);
-            else checkScroll();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', checkScroll);
+            } else {
+                checkScroll();
+            }
         })();
     </script>
 </body>

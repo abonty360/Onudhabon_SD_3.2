@@ -45,6 +45,20 @@
                 </div>
             </div>
 
+            <!-- Static-site warning banner -->
+            <div class="static-warning-alert" role="alert">
+                <div class="static-warning-icon">
+                    <i class="bi bi-info-circle-fill"></i>
+                </div>
+                <div class="static-warning-body">
+                    <strong>This is a static UI demo.</strong>
+                    Submitting this form here will not work — registration requires our live server.
+                    <a href="https://onudhabon-sd-3-2.onrender.com/Account/Register" target="_blank" rel="noopener noreferrer" class="static-warning-link">
+                        Open the live registration page <i class="bi bi-arrow-up-right"></i>
+                    </a>
+                </div>
+            </div>
+
             <!-- Register Form (posts to live app) -->
             <div class="form-panel">
                 <form action="https://onudhabon-sd-3-2.onrender.com/Account/Register" method="post" enctype="multipart/form-data" id="registerForm">
@@ -692,6 +706,20 @@
                 window.location.reload();
             }
         });
+
+        // Static-site guard: intercept register form submit and redirect to live app
+        (function () {
+            const registerForm = document.getElementById('registerForm');
+            if (!registerForm) return;
+
+            registerForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const liveUrl = 'https://onudhabon-sd-3-2.onrender.com/Account/Register';
+                if (confirm('This is a static GitHub Pages demo — submitting here will not register an account.\n\nOpen the live registration page to sign up?')) {
+                    window.open(liveUrl, '_blank', 'noopener,noreferrer');
+                }
+            });
+        })();
     </script>
 </body>
 </html>

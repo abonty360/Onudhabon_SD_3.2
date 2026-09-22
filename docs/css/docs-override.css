@@ -79,3 +79,75 @@
         font-size: 0.78rem;
     }
 }
+
+/* ----- Static-site warning alert (login + register pages) -----
+   Replaces the empty TempData slot from the original Razor view.
+   Tells users the form is a UI-only copy and points them to the live app. */
+.static-warning-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 18px 26px 6px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fcd34d;
+    border-left: 4px solid #f59e0b;
+    border-radius: 12px;
+    color: #78350f;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.12);
+}
+
+.static-warning-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f59e0b;
+    color: #ffffff;
+    border-radius: 50%;
+    font-size: 1rem;
+}
+
+.static-warning-body {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.static-warning-body strong {
+    display: block;
+    font-size: 0.98rem;
+    margin-bottom: 2px;
+    color: #92400e;
+}
+
+.static-warning-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    color: #1d4ed8 !important;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.88rem;
+}
+
+.static-warning-link:hover {
+    color: #1e3a8a !important;
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .static-warning-alert {
+        margin: 14px 16px 4px;
+        padding: 12px;
+    }
+    .static-warning-body {
+        font-size: 0.85rem;
+    }
+    .static-warning-body strong {
+        font-size: 0.92rem;
+    }
+}

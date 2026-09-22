@@ -45,8 +45,19 @@
                 </div>
             </div>
 
-            <!-- Feedback Alerts -->
-            <!-- (Empty on static page - server-side TempData not available) -->
+            <!-- Static-site warning banner -->
+            <div class="static-warning-alert" role="alert">
+                <div class="static-warning-icon">
+                    <i class="bi bi-info-circle-fill"></i>
+                </div>
+                <div class="static-warning-body">
+                    <strong>This is a static UI demo.</strong>
+                    Submitting this form here will not work — authentication requires our live server.
+                    <a href="https://onudhabon-sd-3-2.onrender.com/Account/Login" target="_blank" rel="noopener noreferrer" class="static-warning-link">
+                        Open the live login page <i class="bi bi-arrow-up-right"></i>
+                    </a>
+                </div>
+            </div>
 
             <!-- Login Form (action points to live app) -->
             <div class="form-panel">
@@ -142,6 +153,20 @@
                     </svg>`;
             }
         }
+
+        // Static-site guard: intercept login form submit and redirect to live app
+        (function () {
+            const loginForm = document.querySelector('.form-panel form');
+            if (!loginForm) return;
+
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const liveUrl = 'https://onudhabon-sd-3-2.onrender.com/Account/Login';
+                if (confirm('This is a static GitHub Pages demo — submitting here will not authenticate.\n\nOpen the live login page to sign in?')) {
+                    window.open(liveUrl, '_blank', 'noopener,noreferrer');
+                }
+            });
+        })();
     </script>
 </body>
 </html>
