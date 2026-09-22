@@ -29,10 +29,9 @@
 }
 
 /* ----- Small banner (the ONLY added UI element) -----
-   The banner and the navbar are BOTH fixed so neither pushes the hero or
-   content. Banner sits at top: 0, navbar sits at top: <banner-height>.
-   Navbar z-index > banner z-index so the navbar visibly sits on top
-   (matches live behavior where navbar overlays hero). */
+   Banner is fixed at top: 0. Navbar sits below it. Both never overlap
+   because the banner is constrained to a single short line and the
+   navbar's `top` value matches the banner's exact rendered height. */
 .ghpages-banner {
     position: fixed;
     top: 0;
@@ -41,52 +40,48 @@
     z-index: 1040;
     background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
     color: #ffffff;
-    padding: 9px 18px;
+    padding: 7px 14px;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 34px;
+    box-sizing: border-box;
 }
 
 /* Float the fixed navbar BELOW the fixed banner, with a higher z-index
    so it stacks above the banner whenever they overlap visually. */
 .site-header {
     z-index: 1100 !important;
-    top: 38px !important;
-}
-
-@media (max-width: 600px) {
-    .site-header {
-        top: 34px !important;
-    }
+    top: 34px !important;
 }
 
 /* Banner is out-of-flow above fixed navbar. Push body content down so
    non-hero pages aren't hidden behind the navbar. */
 body:not(.has-hero) main {
-    padding-top: calc(74px + 38px);
-}
-
-@media (max-width: 600px) {
-    body:not(.has-hero) main {
-        padding-top: calc(74px + 34px);
-    }
+    padding-top: calc(74px + 34px);
 }
 
 .ghpages-banner a {
     color: #fde047 !important;
     font-weight: 700;
     text-decoration: none;
-    margin-left: 8px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 14px;
+    gap: 5px;
+    padding: 3px 12px;
     border-radius: 999px;
     border: 1.5px solid rgba(255, 255, 255, 0.45);
     transition: all 0.2s ease;
     background: rgba(255, 255, 255, 0.08);
-    font-size: 0.88rem;
+    font-size: 0.82rem;
 }
 
 .ghpages-banner a:hover {
@@ -103,12 +98,25 @@ body:not(.has-hero) main {
 
 @media (max-width: 600px) {
     .ghpages-banner {
-        font-size: 0.78rem;
-        padding: 8px 12px;
+        font-size: 0.72rem;
+        padding: 5px 8px;
+        gap: 6px;
+        height: 28px;
     }
     .ghpages-banner a {
-        padding: 4px 10px;
+        padding: 2px 7px;
+        font-size: 0.7rem;
+        gap: 3px;
+        border-width: 1px;
+    }
+    .ghpages-banner a i {
         font-size: 0.78rem;
+    }
+    .site-header {
+        top: 28px !important;
+    }
+    body:not(.has-hero) main {
+        padding-top: calc(74px + 28px);
     }
 }
 
