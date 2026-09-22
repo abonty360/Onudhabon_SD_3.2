@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lectures - Onudhabon | SD 3.2 Project</title>
+    <link rel="icon" type="image/png" href="images/tab_logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/docs-override.css" />
+</head>
+<body class="d-flex flex-column min-vh-100 has-hero lecture-page">
+
+    <div class="ghpages-notice">
+        <i class="bi bi-info-circle-fill me-1"></i>
+        Static UI showcase — the live app features video upload, filtering, and playback.
+        <a class="ghpages-notice-link" href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-rocket-takeoff-fill"></i> Launch Full Dynamic App
+        </a>
+    </div>
+
+    <nav class="static-page-nav" aria-label="Showcase navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="lectures.html" class="active">Lectures</a>
+        <a href="materials.html">Materials</a>
+        <a href="donate.html">Donate</a>
+        <a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer"><i class="bi bi-box-arrow-up-right"></i> Live App</a>
+    </nav>
+
+    <section class="lecture-hero">
+        <div class="lecture-hero-overlay"></div>
+        <div class="lecture-hero-content">
+            <div class="hero-label">Home / Lectures</div>
+            <h1>Inspiring Minds, One Lecture at a Time</h1>
+            <p>Dive into a world of knowledge where passionate educators and volunteers share their expertise. Our lectures are designed to spark curiosity, build skills, and empower learners to reach their full potential — no matter where they are.</p>
+            <a class="hero-cta" href="https://onudhabon-sd-3-2.onrender.com/Lecture" target="_blank" rel="noopener noreferrer">
+                <i class="bi bi-rocket-takeoff-fill"></i> Watch Lectures (Live)
+            </a>
+        </div>
+    </section>
+
+    <div class="lecture-inner">
+        <h2 class="lecture-title">Video Lectures</h2>
+
+        <div class="lecture-actions">
+            <a class="upload-btn" href="https://onudhabon-sd-3-2.onrender.com/Lecture" target="_blank" rel="noopener noreferrer">Open Full Library</a>
+        </div>
+
+        <div class="lecture-filters">
+            <div class="filter-field search-field">
+                <label for="search">Search</label>
+                <input id="search" type="text" placeholder="Search lectures, instructors, or topics" />
+            </div>
+            <div class="filter-field">
+                <label for="classLevel">Class</label>
+                <select id="classLevel">
+                    <option value="">All Classes</option>
+                    <option>Class 1</option>
+                    <option>Class 2</option>
+                    <option>Class 3</option>
+                    <option>Class 4</option>
+                    <option>Class 5</option>
+                    <option>Class 6</option>
+                    <option>Class 7</option>
+                    <option>Class 8</option>
+                    <option>Class 9</option>
+                    <option>Class 10</option>
+                    <option>Class 11</option>
+                    <option>Class 12</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label for="subject">Subject</label>
+                <select id="subject">
+                    <option value="">All Subjects</option>
+                    <option>Bangla</option>
+                    <option>English</option>
+                    <option>Mathematics</option>
+                    <option>Science</option>
+                    <option>Physics</option>
+                    <option>Chemistry</option>
+                    <option>Biology</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label for="topic">Topic</label>
+                <select id="topic">
+                    <option value="">All Topics</option>
+                    <option>Algebra</option>
+                    <option>Grammar</option>
+                    <option>Cell Biology</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label for="status">Status</label>
+                <select id="status">
+                    <option value="">All Status</option>
+                    <option>Active</option>
+                    <option>Pending</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="lecture-grid">
+            <article class="lecture-card">
+                <a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">
+                    <div class="video-frame">
+                        <img src="images/home.jpeg" alt="Lecture preview" />
+                        <div class="video-overlay">
+                            <span class="play-icon"><i class="bi bi-play-fill"></i></span>
+                        </div>
+                        <span class="time-label">18:42</span>
+                    </div>
+                    <div class="lecture-card-body">
+                        <div class="meta-row">
+                            <span class="grade-pill">Class 9</span>
+                            <span class="subject-pill">Mathematics</span>
+                            <span class="lecture-status active">Active</span>
+                        </div>
+                        <h3>Algebraic Expressions — Lecture 1</h3>
+                        <p>Introduction to variables, constants, and algebraic notation with worked examples.</p>
+                        <div class="author-row">By Nazmul Hasan · 2 days ago</div>
+                    </div>
+                </a>
+            </article>
+            <article class="lecture-card">
+                <a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">
+                    <div class="video-frame">
+                        <img src="images/about_hero.jpg" alt="Lecture preview" />
+                        <div class="video-overlay">
+                            <span class="play-icon"><i class="bi bi-play-fill"></i></span>
+                        </div>
+                        <span class="time-label">22:05</span>
+                    </div>
+                    <div class="lecture-card-body">
+                        <div class="meta-row">
+                            <span class="grade-pill">Class 10</span>
+                            <span class="subject-pill">Physics</span>
+                            <span class="lecture-status active">Active</span>
+                        </div>
+                        <h3>Newton's Laws of Motion</h3>
+                        <p>Conceptual overview and practical demonstrations of inertia, F=ma, and action-reaction.</p>
+                        <div class="author-row">By Tahmid Rahman · 4 days ago</div>
+                    </div>
+                </a>
+            </article>
+            <article class="lecture-card">
+                <a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">
+                    <div class="video-frame">
+                        <img src="images/forum_hero.jpg" alt="Lecture preview" />
+                        <div class="video-overlay">
+                            <span class="play-icon"><i class="bi bi-play-fill"></i></span>
+                        </div>
+                        <span class="time-label">15:30</span>
+                    </div>
+                    <div class="lecture-card-body">
+                        <div class="meta-row">
+                            <span class="grade-pill">Class 6</span>
+                            <span class="subject-pill">English</span>
+                            <span class="lecture-status pending">Pending</span>
+                        </div>
+                        <h3>Reading Comprehension Strategies</h3>
+                        <p>Skimming, scanning, and inference techniques for mastering unseen passages.</p>
+                        <div class="author-row">By Anika Tabassum · 1 week ago</div>
+                    </div>
+                </a>
+            </article>
+        </div>
+
+        <div class="no-lectures" style="margin-top: 24px;">
+            <i class="bi bi-info-circle me-1"></i>
+            These are placeholder cards for visual demonstration. The live deployment serves real lectures from PostgreSQL via Cloudinary-hosted videos.
+        </div>
+
+        <a class="body-cta" style="margin-top: 22px;" href="https://onudhabon-sd-3-2.onrender.com/Lecture" target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-rocket-takeoff-fill"></i> Launch Full Lecture Library
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer mt-auto">
+        <div class="footer-inner">
+            <div class="footer-column about-column">
+                <h3>About Onudhabon</h3>
+                <p>Onudhabon is a community-driven initiative focused on providing access to quality education for children in Bangladesh.</p>
+            </div>
+            <div class="footer-column navigation-column">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="lectures.html">Lectures</a></li>
+                    <li><a href="materials.html">Materials</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="donate.html">Donate</a></li>
+                    <li><a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">Live App <i class="bi bi-box-arrow-up-right"></i></a></li>
+                </ul>
+            </div>
+            <div class="footer-column connect-column">
+                <h3>Project Info</h3>
+                <ul>
+                    <li><i class="bi bi-github me-1"></i> <a href="https://github.com/abonty360/Onudhabon_SD_3.2" target="_blank" rel="noopener noreferrer">Source on GitHub</a></li>
+                    <li><i class="bi bi-cloud-arrow-up-fill me-1"></i> <a href="https://onudhabon-sd-3-2.onrender.com/" target="_blank" rel="noopener noreferrer">Live on Render</a></li>
+                    <li><i class="bi bi-mortarboard me-1"></i> SD 3.2 Lab Project</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">&copy; 2026 Onudhabon. Static UI showcase via GitHub Pages.</div>
+    </footer>
+</body>
+</html>
