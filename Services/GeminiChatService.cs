@@ -5,13 +5,13 @@ namespace Onudhabon.Services
 {
     public class GeminiChatService : ILlmChatService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _apiKey;
         private readonly string _model;
 
         private static string NormalizeModelName(string? model)
         {
-            if (string.IsNullOrWhiteSpace(model)) return "gemini-3.6-flash";
+            if (string.IsNullOrWhiteSpace(model)) return "gemini-flash-lite-latest";
             var trimmed = model.Trim();
             if (trimmed.StartsWith("models/", StringComparison.OrdinalIgnoreCase))
             {
@@ -20,9 +20,9 @@ namespace Onudhabon.Services
             return trimmed;
         }
 
-        public GeminiChatService(IConfiguration configuration)
+        public GeminiChatService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
-            _httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(2) };
+            _httpClientFactory = httpClientFactory;
 
             // Read from .env first, then appsettings.json
             _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY")
@@ -48,10 +48,16 @@ namespace Onudhabon.Services
                 return result.Text;
             }
 
-            // If 404 Not Found on the primary model, try other supported fallback models
-            if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
+            // If the primary model failed (404 Not Found, 503 Overloaded, or 429 Rate Limit),
+            // swiftly try modern high-speed fallback models
+            var statusCode = result.StatusCode;
+            bool shouldFallback = statusCode == System.Net.HttpStatusCode.NotFound ||
+                                  statusCode == System.Net.HttpStatusCode.ServiceUnavailable ||
+                                  statusCode == (System.Net.HttpStatusCode)429;
+
+            if (shouldFallback)
             {
-                var fallbacks = new[] { "gemini-3.6-flash", "gemini-2.0-flash", "gemini-1.5-flash" };
+                var fallbacks = new[] { "gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.8-flash" };
                 foreach (var fallbackModel in fallbacks)
                 {
                     if (string.Equals(fallbackModel, _model, StringComparison.OrdinalIgnoreCase))
@@ -94,8 +100,9 @@ namespace Onudhabon.Services
 
             requestBody["generationConfig"] = new
             {
-                temperature = 0.7,
-                maxOutputTokens = 1024
+                temperature = 0.2,
+                maxOutputTokens = 1200,
+                topP = 0.95
             };
 
             var content = new StringContent(
@@ -105,7 +112,10 @@ namespace Onudhabon.Services
 
             try
             {
-                var response = await _httpClient.PostAsync(url, content);
+                var client = _httpClientFactory.CreateClient();
+                client.Timeout = TimeSpan.FromSeconds(20);
+
+                var response = await client.PostAsync(url, content);
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)

@@ -43,6 +43,7 @@
             </div>
 
             <!-- Lecture Info Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
                 @{
                     var isAuthenticated = User.Identity != null && User.Identity.IsAuthenticated;
                     var isAdmin = isAuthenticated && (User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin");

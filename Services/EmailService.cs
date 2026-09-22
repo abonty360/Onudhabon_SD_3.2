@@ -1,16 +1,24 @@
 using System.Net;
 using System.Net.Mail;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace Onudhabon.Services
 {
     public class EmailService : IEmailService
     {
         private readonly IConfiguration _configuration;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
+        public EmailService(
+            IConfiguration configuration,
+            IHttpClientFactory httpClientFactory,
+            ILogger<EmailService> logger)
         {
             _configuration = configuration;
+            _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
 
@@ -92,6 +100,10 @@ namespace Onudhabon.Services
 
         public async Task<bool> SendOtpEmailAsync(string toEmail, string recipientName, string otp, string verificationUrl)
         {
+            _logger.LogWarning("================================================================================");
+            _logger.LogWarning(">>> [ONUDHABON OTP CODE] To: {Email} | OTP: {Otp} | Generated: {Time} <<<", toEmail, otp, DateTime.UtcNow);
+            _logger.LogWarning("================================================================================");
+
             var subject = $"Your Onudhabon Verification OTP: {otp}";
             var displayName = string.IsNullOrWhiteSpace(recipientName) ? "Learner/Volunteer" : recipientName.Trim();
 
@@ -250,6 +262,10 @@ namespace Onudhabon.Services
 
         public async Task<bool> SendPasswordResetOtpEmailAsync(string toEmail, string recipientName, string otp)
         {
+            _logger.LogWarning("================================================================================");
+            _logger.LogWarning(">>> [PASSWORD RESET OTP] To: {Email} | OTP: {Otp} | Generated: {Time} <<<", toEmail, otp, DateTime.UtcNow);
+            _logger.LogWarning("================================================================================");
+
             var subject = $"Your Password Reset OTP: {otp} - Onudhabon";
             var displayName = string.IsNullOrWhiteSpace(recipientName) ? "User" : recipientName.Trim();
 
@@ -317,6 +333,126 @@ namespace Onudhabon.Services
 
         public async Task<bool> SendEmailAsync(string toEmail, string subject, string htmlBody)
         {
+            // 1. Try Google Apps Script HTTPS Relay (Sends real emails from Gmail to ANY recipient via HTTPS port 443)
+            var googleScriptUrl = Environment.GetEnvironmentVariable("GOOGLE_SCRIPT_URL")
+                ?? _configuration["GoogleScript:Url"];
+
+            if (!string.IsNullOrWhiteSpace(googleScriptUrl))
+            {
+                _logger.LogInformation("Attempting to deliver email to {ToEmail} via Google Apps Script Relay...", toEmail);
+                var scriptSuccess = await SendViaGoogleScriptAsync(googleScriptUrl.Trim(), toEmail, subject, htmlBody);
+                if (scriptSuccess)
+                {
+                    return true;
+                }
+                _logger.LogWarning("Google Apps Script Relay delivery failed. Falling back to Resend API for {ToEmail}...", toEmail);
+            }
+
+            // 2. Try Resend HTTPS API (Port 443)
+            var resendApiKey = Environment.GetEnvironmentVariable("RESEND_API_KEY")
+                ?? _configuration["Resend:ApiKey"];
+
+            if (!string.IsNullOrWhiteSpace(resendApiKey))
+            {
+                _logger.LogInformation("Attempting to deliver email to {ToEmail} via Resend HTTPS API...", toEmail);
+                var resendSuccess = await SendViaResendAsync(resendApiKey.Trim(), toEmail, subject, htmlBody);
+                if (resendSuccess)
+                {
+                    return true;
+                }
+                _logger.LogWarning("Resend delivery failed. Falling back to Gmail SMTP for {ToEmail}...", toEmail);
+            }
+
+            // 3. Fallback to direct Gmail SMTP (for local development or unblocked port 587)
+            return await SendViaSmtpAsync(toEmail, subject, htmlBody);
+        }
+
+        private async Task<bool> SendViaGoogleScriptAsync(string scriptUrl, string toEmail, string subject, string htmlBody)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                client.Timeout = TimeSpan.FromSeconds(25);
+
+                var payload = new
+                {
+                    to = toEmail,
+                    subject = subject,
+                    html = htmlBody
+                };
+
+                var json = JsonSerializer.Serialize(payload);
+                using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync(scriptUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    _logger.LogInformation("Email successfully sent via Google Apps Script Relay to: {ToEmail} (Response: {Response})", toEmail, responseBody);
+                    return true;
+                }
+
+                if (response.StatusCode == HttpStatusCode.Redirect || response.StatusCode == HttpStatusCode.Found || response.StatusCode == HttpStatusCode.MovedPermanently)
+                {
+                    _logger.LogInformation("Email accepted by Google Apps Script Relay for: {ToEmail} (Redirected {StatusCode})", toEmail, response.StatusCode);
+                    return true;
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Google Apps Script Relay returned status {StatusCode}: {Error}", response.StatusCode, errorContent);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception while sending email via Google Apps Script Relay to {ToEmail}: {Message}", toEmail, ex.Message);
+                return false;
+            }
+        }
+
+        private async Task<bool> SendViaResendAsync(string apiKey, string toEmail, string subject, string htmlBody)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                client.Timeout = TimeSpan.FromSeconds(15);
+
+                var fromEmail = Environment.GetEnvironmentVariable("RESEND_FROM_EMAIL")
+                    ?? _configuration["Resend:FromEmail"]
+                    ?? "Onudhabon <onboarding@resend.dev>";
+
+                var requestPayload = new
+                {
+                    from = fromEmail,
+                    to = new[] { toEmail },
+                    subject = subject,
+                    html = htmlBody
+                };
+
+                using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.resend.com/emails");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+                request.Content = new StringContent(JsonSerializer.Serialize(requestPayload), Encoding.UTF8, "application/json");
+
+                var response = await client.SendAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("Email successfully sent via Resend HTTPS API to: {ToEmail}", toEmail);
+                    return true;
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Resend API returned status {StatusCode}: {Error}", response.StatusCode, errorContent);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception while sending email via Resend API to {ToEmail}: {Message}", toEmail, ex.Message);
+                return false;
+            }
+        }
+
+        private async Task<bool> SendViaSmtpAsync(string toEmail, string subject, string htmlBody)
+        {
             var gmailUser = Environment.GetEnvironmentVariable("GMAIL_USER")
                 ?? Environment.GetEnvironmentVariable("SMTP_EMAIL")
                 ?? _configuration["Gmail:Email"]
@@ -367,7 +503,7 @@ namespace Onudhabon.Services
                     EnableSsl = true,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     UseDefaultCredentials = false,
-                    Timeout = 15000 // 15 seconds timeout
+                    Timeout = 8000 // 8 seconds timeout
                 };
 
                 await smtpClient.SendMailAsync(mailMessage);
